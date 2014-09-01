@@ -925,7 +925,7 @@ var app = (function(app, $) {
 
 		var _inventory = [
 			{
-				'slot' : 'Site_728x90_Homepage_Top',
+				'slot' : 'Leaderboard_AboveTheFold_728x90_AllPages',
 				'type' : 'header_leaderboard',
 				'iteration' : 0,
 				'sizes' : [
@@ -940,177 +940,22 @@ var app = (function(app, $) {
 				]
 			},
 			{
-				'slot' : 'Site_300x250_Homepage_Middle',
+				'slot' : 'Sidebar_AboveTheFold_300x250_AllPages',
 				'type' : 'homepage_rec',
 				'iteration' : 0,
 				'sizes' : [
 					[300, 250],
-					[300, 400],
-					[300, 425],
-					[300, 600],
-					[300, 1050]
+					[300, 600]
 				],
 				'sharethrough' : '548373d5'
 			},
 			{
-				'slot' : 'Homepage_Leaderboard_BTF',
+				'slot' : 'InContent_BelowTheFold_300x250_InternalPages',
 				'type' : 'homepage_leaderboard_btf',
 				'iteration' : 0,
 				'sizes' : [
-					[728, 90],
-					[970, 90],
-					[970, 250],
-					[1000, 200],
-					[1000, 220],
-					[1100, 90],
-					[1100, 250],
-					[1100, 415]
+					[300, 250]
 				]
-			},
-			{
-				'slot' : 'Sponsored_Post',
-				'type' : 'sponsored_post',
-				'iteration' : 0,
-				'sizes' : [
-					[250, 90]
-				]
-			},
-
-			{
-				'slot' : 'Clickable_Skin',
-				'type' : 'clickable_skin',
-				'iteration' : 0,
-				'sizes' : [
-					[1, 1]
-				]
-			},
-			{
-				'slot' : 'Global_Leaderboard_AboveFold',
-				'type' : 'header_leaderboard',
-				'iteration' : 0,
-				'sizes' : [
-					[728, 90],
-					[970, 90],
-					[970, 250],
-					[1000, 200],
-					[1000, 220],
-					[1100, 90],
-					[1100, 250],
-					[1100, 415]
-				],
-			},
-			{
-				'slot' : 'MRec_Article_Above_Fold',
-				'type' : 'global_rec',
-				'iteration' : 0,
-				'sizes' : [
-					[300, 250],
-					[300, 400],
-					[300, 425],
-					[300, 600],
-					[300, 1050]
-				],
-			},
-			{
-				'slot' : 'Article_Detail_Wildcard_MPU',
-				'type' : 'ad_mpu',
-				'iteration' : 0,
-				'sizes' : [
-					[300, 250],
-					[300, 425],
-					[590, 300]
-				],
-			},
-			{
-				'slot' : 'ArticlePage_MPU_BTF',
-				'type' : 'mpu_btf',
-				'iteration' : 0,
-				'sizes' : [
-					[300, 250],
-					[300, 400],
-					[300, 425],
-					[300, 600],
-					[300, 1050],
-					[400, 267]
-				],
-				'sharethrough' : '369e3987'
-			},
-			{
-				'slot' : 'Article_EndMessage',
-				'type' : 'end_message',
-				'iteration' : 0,
-				'use_iterator' : false,
-				'sizes' : [
-					[1, 1]
-				],
-			},
-			{
-				'slot' : 'Article_Detail_Wide_Skyscraper',
-				'type' : 'wide_skyscraper',
-				'iteration' : 0,
-				'sizes' : [
-					[160, 600]
-				],
-			},
-			{
-				'slot' : 'ExperimentalLeaderboard',
-				'type' : 'experimental_leaderboard',
-				'iteration' : 0,
-				'sizes' : [
-					[728, 90],
-					[970, 90],
-					[970, 250],
-					[1000, 200],
-					[1000, 220],
-					[1100, 90],
-					[1100, 250],
-					[1100, 415]
-				],
-			},
-			{
-				'slot' : 'v2_Site_Skin',
-				'type' : 'site_skin',
-				'iteration' : 0,
-				'sizes' : [
-					[1, 1]
-				],
-			},
-			{
-				'slot' : 'Sitewide_Interstitial',
-				'type' : 'sitewide_interstitial',
-				'iteration' : 0,
-				'sizes' : [
-					[1, 1]
-				],
-			},
-			{
-				'slot' : 'Classic_Interstitial',
-				'type' : 'classic_interstitial',
-				'iteration' : 0,
-				'sizes' : [
-					[1, 1],
-					[300, 250],
-					[600, 498],
-					[640, 480],
-					[768, 768],
-					[1024, 728],
-					[1024, 768]
-				],
-			},
-			{
-				'slot' : 'Welcome_Ad',
-				'type' : 'welcome_ad',
-				'iteration' : 0,
-				'use_iterator' : false,
-				'sizes' : [
-					[1, 1],
-					[300, 250],
-					[600, 498],
-					[640, 480],
-					[768, 768],
-					[1024, 728],
-					[1024, 768]
-				],
 			}
 		];
 
