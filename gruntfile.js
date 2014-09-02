@@ -1,10 +1,13 @@
-
 module.exports = function(grunt) {
 
 	'use strict';
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		paths: {
+			modules: 'src/modules',
+			output: 'dist'
+		},
 
 		connect: {
 			server: {
@@ -13,44 +16,38 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		requirejs: {
-			min: {
-				options: {
-					baseUrl: '.',
-					mainConfigFile: 'src/main.js',
-					name: 'bower_components/almond/almond',
-					include: 'src/main',
-					out: 'dist/ad_manager.js',
-					optimize: 'uglify2',
-					uglify2: {
-						mangle: false,
-						output: {
-							beautify: true
-						}
-					},
-					generateSourceMaps: false,
-					preserveLicenseComments: false
-				}
+		concat: {
+			options: {
+				stripBanners: true,
+				footer: 'app.bootstrap.init();'
+			},
+			dist: {
+				src: [
+					'<%= paths.modules %>/bootstrap.js',
+					'<%= paths.modules %>/util.js',
+					'<%= paths.modules %>/*.js',
+					'!<%= paths.modules %>/config.example.js'
+				],
+				dest: '<%= paths.output %>/admanager.js'
 			}
 		},
 		watch: {
 			scripts: {
 				files: [
-					'src/main.js',
-					'src/modules/*',
+					'<%= concat.dist.src %>',
 					'bower_components/*'
 				],
-				tasks: ['requirejs'],
+				tasks: ['concat'],
 			},
 		},
 	});
 
 	// grunt plugins
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-connect');
-	grunt.loadNpmTasks('grunt-contrib-requirejs');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// Tasks
-	grunt.registerTask('default', ['requirejs', 'connect', 'watch']);
+	grunt.registerTask('default', ['concat', 'connect', 'watch']);
 
 };

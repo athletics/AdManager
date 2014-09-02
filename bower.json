@@ -9,7 +9,6 @@
   "license": "MIT",
   "dependencies": {
     "jquery-cookie": "~1.4.1",
-    "requirejs": "~2.1.14",
-    "almond": "~0.3.0"
+    "labjs": "*"
   }
 }
