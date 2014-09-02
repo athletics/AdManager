@@ -21,7 +21,7 @@ var admanager = ( function( app, $ ) {
 			var $layout = $('body')
 			;
 
-			if ( ! $layout.hasClass('node-type-article') ) return;
+			if ( ! $layout.hasClass('node-type-article') ) return app;
 
 			_events_listener();
 
@@ -88,7 +88,7 @@ var admanager = ( function( app, $ ) {
 			var $rec = $('.app_ad_unit[data-type="global_rec"]').first()
 			;
 
-			if (util.is_mobile()) return false;
+			if (admanager.util.is_mobile()) return false;
 
 			if ($rec.length < 1) return false;
 
@@ -200,7 +200,7 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _ad_unit_markup( unit, disable_float ) {
 
-			var ad_type = util.is_mobile() ? 'mobile' : 'desktop',
+			var ad_type = admanager.util.is_mobile() ? 'mobile' : 'desktop',
 				ad_html = '<div class="app_ad_unit '+ ad_type +'" data-type="'+ unit +'"></div>',
 				ad_html_disable_float =	'<div class="app_ad_unit disable_float '+ ad_type +'" data-type="'+ unit +'"></div>'
 			;
@@ -274,7 +274,7 @@ var admanager = ( function( app, $ ) {
 				}
 
 				// mobile logic
-				if (util.is_mobile()) {
+				if (admanager.util.is_mobile()) {
 
 					// skip the first node
 					if (node_iterator === 0) {
