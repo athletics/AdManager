@@ -1,36 +1,64 @@
 /**
- * Events
+ *		Name: Events
+ *
+ *		Requires: app, app.util, jQuery
  */
-define([ 'jquery', 'app/util' ], function( $, util ) {
 
-	var _name = 'Events',
-		_debug_enable = true,
-		debug = ( _debug_enable ) ? util.debug : function(){}
-	;
+var app = ( function( app, $ ) {
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	app.events = ( function( $ ) {
 
-	debug( _name + ': initialized' );
+		var _name = 'Events',
+			debug = app.util.debug
+		;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-	$(document)
-		.on( 'scroll', function() {
+		function init() {
 
-			window.requestAnimationFrame( function() {
-				$.event.trigger('GPT:scroll');
-				$.event.trigger('GPT:updateUI');
-			} );
+			debug( _name + ': initialized' );
 
-		} )
-		.on( 'resize', function() {
+			_broadcast_events();
 
-			window.requestAnimationFrame( function() {
-				$.event.trigger('GPT:resize');
-				$.event.trigger('GPT:updateUI');
-			} );
+			return app;
 
-		} )
-	;
+		}
 
-});
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _broadcast_events() {
+
+			$(document)
+				.on( 'scroll', function() {
+
+					window.requestAnimationFrame( function() {
+						$.event.trigger('GPT:scroll');
+						$.event.trigger('GPT:updateUI');
+					} );
+
+				} )
+				.on( 'resize', function() {
+
+					window.requestAnimationFrame( function() {
+						$.event.trigger('GPT:resize');
+						$.event.trigger('GPT:updateUI');
+					} );
+
+				} )
+			;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		return {
+			init : init
+		};
+
+	}( $ ) );
+
+	return app;
+
+}( app || {}, jQuery ) );
+
+app.bootstrap.register( app.events.init );

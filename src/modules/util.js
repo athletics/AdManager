@@ -1,85 +1,110 @@
 /**
- * Utilities
+ *		Name: Util
+ *
+ *		Requires: app, jQuery
  */
-define([ 'jquery' ], function( $ ) {
 
-	var _name = 'Util'
-	;
+var app = ( function( app, $ ) {
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	app.util = ( function( $ ) {
 
-	function debug( obj ) {
+		var _name = 'Util',
+			_debug_enable = true
+		;
 
-		if ( ( typeof console == "object" ) && ( console.log ) ) {
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-			console.log( obj );
+		function init() {
+
+			debug( _name + ': initialized' );
+
+			_set_window_request_animation_frame();
+
+			return app;
 
 		}
 
-	}
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		function debug( obj ) {
 
-	/**
-	 * Return difference between arrays
-	 *
-	 * @param  array array
-	 * @param  array values
-	 * @return array diff
-	 */
-	function difference( array, values ) {
+			if ( ! _debug_enable ) return;
 
-		var diff = []
-		;
+			if ( ( typeof console == "object" ) && ( console.log ) ) {
 
-		$.grep( array, function( element ) {
-			if ( $.inArray( element, values ) === -1 ) diff.push( element );
-		});
+				console.log( obj );
 
-		return diff;
+			}
 
-	}
+		}
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-	/**
-	 * Is Mobile
-	 *
-	 * @return bool
-	 */
-	function is_mobile() {
+		/**
+		 * Return difference between arrays
+		 *
+		 * @param  array array
+		 * @param  array values
+		 * @return array diff
+		 */
+		function difference( array, values ) {
 
-		return $(window).width() < 768 ? true : false;
+			var diff = []
+			;
 
-	}
+			$.grep( array, function( element ) {
+				if ( $.inArray( element, values ) === -1 ) diff.push( element );
+			});
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+			return diff;
 
-	/**
-	 * Set window.requestAnimationFrame
-	 *
-	 * requestAnimationFrame Firefox 23 / IE 10 / Chrome / Safari 7 (incl. iOS)
-	 * mozRequestAnimationFrame Firefox < 23
-	 * webkitRequestAnimationFrame Older versions of Safari / Chrome
-	 */
-	function _set_window_request_animation_frame() {
+		}
 
-		window.requestAnimationFrame = window.requestAnimationFrame ||
-			window.mozRequestAnimationFrame ||
-			window.webkitRequestAnimationFrame ||
-			window.oRequestAnimationFrame
-		;
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-	}
+		/**
+		 * Is Mobile
+		 *
+		 * @return bool
+		 */
+		function is_mobile() {
 
-	_set_window_request_animation_frame();
+			return $(window).width() < 768 ? true : false;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		}
 
-	return {
-		debug : debug,
-		difference : difference,
-		is_mobile : is_mobile
-	};
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-});
+		/**
+		 * Set window.requestAnimationFrame
+		 *
+		 * requestAnimationFrame Firefox 23 / IE 10 / Chrome / Safari 7 (incl. iOS)
+		 * mozRequestAnimationFrame Firefox < 23
+		 * webkitRequestAnimationFrame Older versions of Safari / Chrome
+		 */
+		function _set_window_request_animation_frame() {
+
+			window.requestAnimationFrame = window.requestAnimationFrame ||
+				window.mozRequestAnimationFrame ||
+				window.webkitRequestAnimationFrame ||
+				window.oRequestAnimationFrame
+			;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		return {
+			init       : init,
+			debug      : debug,
+			difference : difference,
+			is_mobile  : is_mobile
+		};
+
+	}( $ ) );
+
+	return app;
+
+}( app || {}, jQuery ) );
+
+app.bootstrap.register( app.util.init );

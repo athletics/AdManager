@@ -1,42 +1,33 @@
-/*
-*		js module:
-*			ad_manager.js
-*
-*		desc:
-*			After initialization of GPT in the header, defining ad slots,
-*			targeting, single-request mode, and displaying ads.
-*
-*/
-var app = (function(app, $) {
+/**
+ *		Name: Ad Manager
+ *
+ *		Requires: app, app.util, app.config, app.events, jQuery
+ */
 
-	/* define new module */
-	app.ad_manager = (function($){
+var app = ( function( app, $ ) {
 
-		var _name = 'AdManager',
-			_debug_enable = false,
-			debug = ( _debug_enable ) ? app.util.debug : function(){},
+	app.manager = ( function( $ ) {
+
+		var _name = 'Manager',
+			debug = app.util.debug,
+
 			defined_slots = [],
-			interstitial_slot = [],
-			page_positions = []
+			page_positions = [],
+			inventory = []
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		function init() {
 
-			// use this to disable ads
-			// return app;
-
 			debug( _name + ': initialized' );
 
-			alert('hit init');
-			return;
+			// tktktktktktktktktk
+			inventory = _get_available_sizes( config.inventory );
+			// tktktktktktktktktk
 
-			_listen_for_custom_events();
-
-			if ( ! app.ad_utilities.delay_ads_init() ) {
-				_library_request();
-			}
+			_listen_for_jquery_events();
+			_load_library();
 
 			return app;
 
@@ -44,23 +35,17 @@ var app = (function(app, $) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function _library_request() {
+		/**
+		 * Bind to custom jQuery events
+		 */
+		function _listen_for_jquery_events() {
 
-			debug('_library_request');
+			$(document)
+				.on('GPT:initPageAds', function(event) {
 
-			_inventory = _get_available_sizes( _inventory );
+					debug(_name + ': GPT:initPageAds');
+					_display_page_ads();
 
-			window.googletag = window.googletag || {};
-			window.googletag.cmd = window.googletag.cmd || [];
-
-			var useSSL = 'https:' === document.location.protocol,
-				path = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js'
-			;
-
-			$LAB
-				.script( path )
-				.wait(function() {
-					_library_loaded();
 				})
 			;
 
@@ -69,13 +54,86 @@ var app = (function(app, $) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Callback from $LAB when GPT library is loaded
+		 * Remove sizes from inventory that will not display properly
+		 *
+		 * @param array _inventory
+		 * @return array _inventory
 		 */
-		function _library_loaded() {
+		function _get_available_sizes( _inventory ) {
 
-			googletag.cmd.push(function(){
-				$.event.trigger( 'LibraryLoaded.GPT' );
-			});
+			var width = ( window.innerWidth > 0 ) ? window.innerWidth : screen.width
+			;
+
+			if ( width > 1024 ) return _inventory;
+
+			if ( width >= 768 && width <= 1024 ) {
+				var max = 980;
+
+				for (var i = 0; i < _inventory.length; i++) {
+
+					var sizes_to_remove = [];
+
+					for (var j = 0; j < _inventory[i].sizes.length; j++) {
+
+						if ( _inventory[i].sizes[j][0] > max ) {
+							sizes_to_remove.push( _inventory[i].sizes[j] );
+						}
+
+					}
+
+					_inventory[i].sizes = util.difference( _inventory[i].sizes, sizes_to_remove );
+
+				}
+			}
+
+			return _inventory;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Request GPT library
+		 */
+		function _load_library() {
+
+			window.googletag = window.googletag || {};
+			window.googletag.cmd = window.googletag.cmd || [];
+
+			var useSSL = 'https:' === document.location.protocol,
+				path = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js'
+			;
+
+			/*define('gpt', function() {
+				require( path );
+
+				return window.googletag;
+			});*/
+
+			/*require.config({
+				paths: {
+					'gpt': path
+				},
+				shim: {}
+			});*/
+
+			// require( path, _on_library_loaded );
+			require( path );
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Callback when GPT library is loaded
+		 */
+		function _on_library_loaded() {
+
+			debug('_on_library_loaded');
+
+			googletag.cmd.push( function(){
+				$.event.trigger( 'GPT:libraryLoaded' );
+			} );
 
 			_listen_for_dfp_events();
 			_enable_single_request();
@@ -89,33 +147,17 @@ var app = (function(app, $) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Bind to custom jQuery events
-		 */
-		function _listen_for_custom_events() {
-
-			$(document)
-				.on('InitPageAds.GPT', function(event) {
-
-					debug(_name + ': InitPageAds.GPT');
-					_display_page_ads();
-
-				})
-			;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
 		 * Bind to GPT events
 		 */
 		function _listen_for_dfp_events() {
 
 			googletag.cmd.push(function() {
 
-				googletag.pubads().addEventListener('slotRenderEnded', function(event) {
-					_slot_render_ended(event);
-				});
+				googletag.pubads()
+					.addEventListener('slotRenderEnded', function(event) {
+						_slot_render_ended(event);
+					})
+				;
 
 			});
 
@@ -148,271 +190,18 @@ var app = (function(app, $) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Remove sizes from inventory that will not display properly
-		 *
-		 * @param object _inventory
-		 * @return object _inventory
-		 */
-		function _get_available_sizes( _inventory ) {
-
-			var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-
-			if ( width > 1024 ) return _inventory;
-
-			if ( width >= 768 && width <= 1024 ) {
-				var max = 980;
-
-				for (var i = 0; i < _inventory.length; i++) {
-
-					var sizes_to_remove = [];
-
-					for (var j = 0; j < _inventory[i].sizes.length; j++) {
-
-						if ( _inventory[i].sizes[j][0] > max ) {
-							sizes_to_remove.push(_inventory[i].sizes[j]);
-						}
-
-					}
-
-					_inventory[i].sizes = _.difference( _inventory[i].sizes, sizes_to_remove );
-
-				}
-			}
-
-			return _inventory;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Increment Ad Slot
-		 *
-		 * @param string slot
-		 */
-		function _increment_ad_slot( slot ) {
-
-			for (var i = 0; i < _inventory.length; i++) {
-				if ( _inventory[i].slot == slot ) {
-
-					// increment
-					_inventory[i].iteration = _inventory[i].iteration + 1;
-
-					return;
-				}
-			}
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Get Ad Unit Info
-		 *
-		 * @param string slot
-		 * @return object
-		 */
-		function get_ad_info( slot ) {
-
-			var return_object = {};
-
-			for (var i = 0; i < _inventory.length; i++) {
-				if ( _inventory[i].slot == slot ) {
-
-					// build return object
-					return_object = _inventory[i];
-
-					// determine the object's id_name
-					if (typeof return_object.use_iterator != 'undefined' && !return_object.use_iterator) {
-						// don't use the iterator
-						return_object.id_name = return_object.type;
-					} else {
-						// use the iterator
-						return_object.id_name = return_object.type + '_' + return_object.iteration;
-					}
-
-					return return_object;
-				}
-			}
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Define Slots for Page Positions
-		 */
-		function _define_slots_for_page_positions() {
-
-			var cur_position = null,
-				excluded = [ 'Classic_Interstitial', 'Welcome_Ad' ]
-			;
-
-			googletag.cmd.push(function(){
-				for (var i = 0; i < page_positions.length; i++) {
-
-					_increment_ad_slot( page_positions[i] );
-
-					cur_position = get_ad_info( page_positions[i] );
-
-					if ( typeof cur_position.type != 'undefined' ) {
-
-						// find the empty container div on the page. we
-						// will dynamically instantiate the unique ad unit.
-
-						var $unit = $('.app_ad_unit[data-type="'+ cur_position.type +'"]')
-						;
-
-						if ($unit.length > 0) {
-
-							if ( $.inArray( page_positions[i], excluded ) === -1 ) {
-								// generate new div
-								$unit.html(
-									'<div class="unit_target" id="'+ cur_position.id_name +'"></div>'
-								);
-
-								// activate
-								$unit.addClass('active');
-							}
-
-							if ( typeof(cur_position.sharethrough) !== 'undefined' ) {
-								defined_slots[i] = googletag
-									.defineSlot(
-										'/2322946/' + cur_position.slot,
-										cur_position.sizes,
-										cur_position.id_name
-									)
-									.addService(googletag.pubads())
-									.setTargeting('strnativekey', cur_position.sharethrough)
-								;
-							}
-							else {
-								defined_slots[i] = googletag
-									.defineSlot(
-										'/2322946/' + cur_position.slot,
-										cur_position.sizes,
-										cur_position.id_name
-									)
-									.addService(googletag.pubads())
-								;
-							}
-						}
-					}
-				}
-
-				// Enables GPT services for defined slots
-				googletag.enableServices();
-
-				$.event.trigger( 'SlotsDefined.GPT' );
-
-			});
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function _display_page_ads() {
-
-			googletag.cmd.push(function() {
-
-				// Fetch and display ads for defined_slots
-				googletag.pubads().refresh( defined_slots );
-
-				// lastly, run display code
-				for (var n = 0; n < page_positions.length; n++) {
-
-					cur_position = get_ad_info( page_positions[n] );
-
-					if ( $('#' + cur_position.id_name).length > 0 ) {
-						googletag.display(
-							cur_position.id_name
-						);
-					}
-				}
-
-			});
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * _get_defined_slot
-		 *
-		 * @param string name
-		 * @return object defined_slot
-		 */
-		function _get_defined_slot( name ) {
-
-			var defined_slot = null
-			;
-
-			$.each( defined_slots, function( i, slot ) {
-				var unit_name = slot.getAdUnitPath().replace('/2322946/', '')
-				;
-
-				if ( unit_name === name ) {
-					defined_slot = slot;
-					return false;
-				}
-			} );
-
-			return defined_slot;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * display_slot
-		 *
-		 * @param string name
-		 */
-		function display_slot( name ) {
-
-			googletag.cmd.push(function() {
-
-				var position = get_ad_info( name ),
-					slot = _get_defined_slot( name )
-				;
-
-				googletag.pubads().refresh( [slot] );
-				googletag.display( position.id_name );
-				remove_defined_slot( name );
-
-			});
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * remove_defined_slot
-		 *
-		 * @param string name
-		 * @return object defined_slot
-		 */
-		function remove_defined_slot( name ) {
-
-			defined_slots = _.reject(defined_slots, function( slot ) {
-				var unit_name = slot.getAdUnitPath().replace('/2322946/', '')
-				;
-
-				return ( unit_name === name );
-			});
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
 		 * Send targeting info defined in page config
+		 *
+		 * @todo
 		 */
 		function _set_targeting() {
 
+			return;
+
 			googletag.cmd.push(function() {
 
-				var config = app.controller.get_page_config(),
-					targeting = config.targeting,
-					tags = config.suggested_tags
+				var config = util.get_page_config(),
+					targeting = config.targeting
 				;
 
 				// Set targeting
@@ -420,11 +209,6 @@ var app = (function(app, $) {
 					$.each( targeting, function( key, value ) {
 						googletag.pubads().setTargeting(key, value);
 					});
-				}
-
-				// Suggested Tags
-				if (typeof tags !== 'undefined') {
-					googletag.pubads().setTargeting('tag', tags);
 				}
 
 			});
@@ -435,12 +219,11 @@ var app = (function(app, $) {
 
 		function _set_page_positions() {
 
-			if ( is_mobile_ads() ) {
+			if ( util.is_mobile() ) {
 				_set_mobile_page_positions();
 			}
 			else {
 				_set_desktop_page_positions();
-				//_set_special_page_positions();
 			}
 
 		}
@@ -543,19 +326,100 @@ var app = (function(app, $) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		// function _set_special_page_positions() {
+		/**
+		 * Define Slots for Page Positions
+		 */
+		function _define_slots_for_page_positions() {
 
-		// 	// push on Classical Interstitial if enabled
-		// 	if ( ! _intersitial_disabled ) {
-		// 		page_positions.push('Classic_Interstitial');
-		// 	}
+			var cur_position = null,
+				excluded = [ 'Classic_Interstitial', 'Welcome_Ad' ]
+			;
 
-		// 	// push on Welcome Ad if enabled
-		// 	if ( ! _welcome_ad_disabled ) {
-		// 		page_positions.push('Welcome_Ad');
-		// 	}
+			googletag.cmd.push(function(){
+				for (var i = 0; i < page_positions.length; i++) {
 
-		// }
+					_increment_ad_slot( page_positions[i] );
+
+					cur_position = get_ad_info( page_positions[i] );
+
+					if ( typeof cur_position.type != 'undefined' ) {
+
+						// find the empty container div on the page. we
+						// will dynamically instantiate the unique ad unit.
+
+						var $unit = $('.app_ad_unit[data-type="'+ cur_position.type +'"]')
+						;
+
+						if ($unit.length > 0) {
+
+							if ( $.inArray( page_positions[i], excluded ) === -1 ) {
+								// generate new div
+								$unit.html(
+									'<div class="unit_target" id="'+ cur_position.id_name +'"></div>'
+								);
+
+								// activate
+								$unit.addClass('active');
+							}
+
+							if ( typeof(cur_position.sharethrough) !== 'undefined' ) {
+								defined_slots[i] = googletag
+									.defineSlot(
+										'/2322946/' + cur_position.slot,
+										cur_position.sizes,
+										cur_position.id_name
+									)
+									.addService(googletag.pubads())
+									.setTargeting('strnativekey', cur_position.sharethrough)
+								;
+							}
+							else {
+								defined_slots[i] = googletag
+									.defineSlot(
+										'/2322946/' + cur_position.slot,
+										cur_position.sizes,
+										cur_position.id_name
+									)
+									.addService(googletag.pubads())
+								;
+							}
+						}
+					}
+				}
+
+				// Enables GPT services for defined slots
+				googletag.enableServices();
+
+				$.event.trigger( 'GPT:slotsDefined' );
+
+			});
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _display_page_ads() {
+
+			googletag.cmd.push(function() {
+
+				// Fetch and display ads for defined_slots
+				googletag.pubads().refresh( defined_slots );
+
+				// lastly, run display code
+				for (var n = 0; n < page_positions.length; n++) {
+
+					cur_position = get_ad_info( page_positions[n] );
+
+					if ( $('#' + cur_position.id_name).length > 0 ) {
+						googletag.display(
+							cur_position.id_name
+						);
+					}
+				}
+
+			});
+
+		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -570,7 +434,7 @@ var app = (function(app, $) {
 			var unit_name = unit.slot.getAdUnitPath().replace('/2322946/', '')
 			;
 
-			$.event.trigger( 'AdUnitRendered.DFP', {
+			$.event.trigger( 'GPT:adUnitRendered', {
 				'name': unit_name,
 				'size': unit.size
 			} );
@@ -589,356 +453,137 @@ var app = (function(app, $) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * _location_to_insert_ad_unit
+		 * Increment Ad Slot
 		 *
-		 * @param object options
+		 * @param string slot
+		 */
+		function _increment_ad_slot( slot ) {
+
+			for (var i = 0; i < _inventory.length; i++) {
+				if ( _inventory[i].slot == slot ) {
+
+					// increment
+					_inventory[i].iteration = _inventory[i].iteration + 1;
+
+					return;
+				}
+			}
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Get Ad Unit Info
+		 *
+		 * @param string slot
 		 * @return object
 		 */
-		function _location_to_insert_ad_unit( options ) {
+		function get_ad_info( slot ) {
 
-			var $insert_after = false,
-				$nodes = null,
-				offset_top = options.$target.offset().top,
-				fold_height = $(window).height() - 130, // 130 represents approximation of leaderboard
-				location_found = false,
-				disable_float = false,
-				maybe_more = true,
-				$prev_unit = false
+			var return_object = {};
+
+			for (var i = 0; i < _inventory.length; i++) {
+				if ( _inventory[i].slot == slot ) {
+
+					// build return object
+					return_object = _inventory[i];
+
+					// determine the object's id_name
+					if (typeof return_object.use_iterator != 'undefined' && !return_object.use_iterator) {
+						// don't use the iterator
+						return_object.id_name = return_object.type;
+					} else {
+						// use the iterator
+						return_object.id_name = return_object.type + '_' + return_object.iteration;
+					}
+
+					return return_object;
+				}
+			}
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * _get_defined_slot
+		 *
+		 * @param string name
+		 * @return object defined_slot
+		 */
+		function _get_defined_slot( name ) {
+
+			var defined_slot = null
 			;
 
-			// nodes after
-			if ( typeof(options.$after) !== 'undefined' ) {
-				$nodes = options.$after.nextAll();
-				$prev_unit = options.$after;
-			}
-			// or all nodes
-			else {
-				$nodes = options.$target.children();
-			}
-
-			// no nodes?
-			if ( $nodes.length < 1 ) {
-				return false;
-			}
-
-			if ( fold_height < 750 ) fold_height = 750;
-
-			var	preferred_max_height = fold_height - (250 / 2),
-				node_iterator = 0
-			;
-
-			// insert ad into article
-			$nodes.each(function(i) {
-
-				var $this = $(this),
-					$prev = $nodes.eq( i - 1 ),
-					$next = $nodes.eq( i + 1 ),
-					$last = $nodes.last(),
-					height_from_top = $this.position().top + offset_top,
-					end_point = $last.position().top + $last.height() + offset_top
+			$.each( defined_slots, function( i, slot ) {
+				var unit_name = slot.getAdUnitPath().replace('/2322946/', '')
 				;
 
-				// continue if not valid
-				if ( ! _is_valid_insertion_location( $this, i ) ) {
-					$this.css('display', 'block');
-					node_iterator++;
-					return true;
-				}
-
-				// mobile logic
-				if (is_mobile_ads()) {
-
-					// skip the first node
-					if (node_iterator === 0) {
-						node_iterator++;
-						return true;
-					}
-
-					// give distance bw first image
-					if ( $prev.find('img').length > 0 && i === 1) {
-						node_iterator++;
-						return true;
-					}
-
-					// check distance from previous unit
-					if ( $prev_unit !== false ) {
-
-						var previous_position = $prev_unit.position().top,
-							previous_height = $prev_unit.height(),
-							this_position = $this.position().top,
-							ad_height = 250,
-							total = previous_position + previous_height + ad_height,
-							difference = this_position - total,
-							min_difference = 500
-						;
-
-						if ( difference < min_difference ) {
-							node_iterator++;
-							return true;
-						}
-
-					}
-
-					$insert_after = $prev;
-					location_found = true;
+				if ( unit_name === name ) {
+					defined_slot = slot;
 					return false;
-
 				}
+			} );
 
-				// desktop logic
-				else {
-
-					if (node_iterator > 0 || $nodes.length < 2 ) {
-						// Is this element a related post item?
-						if (($prev.length > 0 && $prev.hasClass('related-post') || $this.hasClass('related-post')) && $next.length > 0) {
-							node_iterator++;
-							return true; // continue
-						}
-
-						$insert_after = $prev;
-
-						if ( _is_full_bleed_image( $this ) && _is_full_bleed_image( $next ) ) {
-							disable_float = true;
-						}
-
-						location_found = true;
-						return false;
-					}
-				}
-
-				node_iterator++;
-
-			});
-
-			if ( ! location_found && ! $prev_unit ) {
-				$insert_after = options.$target.children().last();
-				disable_float = true;
-				maybe_more = false;
-			}
-			else if ( $prev_unit !== false ) {
-				maybe_more = false;
-			}
-
-			return {
-				'$insert_after' : $insert_after,
-				'disable_float' : disable_float,
-				'maybe_more' : maybe_more
-			};
+			return defined_slot;
 
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * _is_valid_location
+		 * display_slot
 		 *
-		 * @param  object $element
-		 * @param  int index
-		 * @return bool
+		 * @param string name
 		 */
-		function _is_valid_insertion_location( $element, index ) {
+		function display_slot( name ) {
 
-			var valid = true;
+			googletag.cmd.push(function() {
 
-			// is a div and not a pull quote
-			if ( $element.is('div') && ! $element.is('div.site_pull_quote') ) {
-				valid = false;
-			}
-
-			// first or second node
-			else if ( index === 0 || index === 1 ) {
-
-				// this is an image
-				if ( $element.is('p, figure') && $element.find('img').length > 0 ) {
-					valid = false;
-				}
-
-			}
-
-			// don't double up on ads
-			// catches [ad-wildcard] / app_ad_unit
-			else if ( $element.prev().is('.app_ad_unit') ) {
-				valid = false;
-			}
-
-			return valid;
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * _is_full_bleed_image
-		 *
-		 * @param  object $element
-		 * @return bool
-		 */
-		function _is_full_bleed_image( $element ) {
-			var is_full_bleed_image = false;
-
-			if (
-				$element.is('.size-full_bleed') ||
-				$element.find('img').hasClass('size-full_bleed')
-			) {
-				is_full_bleed_image = true;
-			}
-
-			return is_full_bleed_image;
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * _ad_unit_markup
-		 *
-		 * @param object unit
-		 * @param bool disable_float
-		 * @return string
-		 */
-		function _ad_unit_markup( unit, disable_float ) {
-
-			var ad_type = is_mobile_ads() ? 'mobile' : 'desktop',
-				ad_html = '<div class="app_ad_unit '+ ad_type +'" data-type="'+ unit +'"></div>',
-				ad_html_disable_float =	'<div class="app_ad_unit disable_float '+ ad_type +'" data-type="'+ unit +'"></div>'
-			;
-
-			if ( disable_float ) {
-				return ad_html_disable_float;
-			}
-			else {
-				return ad_html;
-			}
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * _insert_ad_unit_into_body
-		 *
-		 * @param object unit
-		 * @param object location
-		 */
-		function _insert_ad_unit_into_body(unit, location) {
-
-			$(location).after(unit);
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Add adjust class to neighbor elements
-		 *
-		 * @param object $target
-		 * @param int ad_height
-		 */
-		function _denote_blocks_for_adjustment( $target, ad_height ) {
-
-			var adjustment = 0,
-				$nodes = $target.nextAll()
-			;
-
-			ad_height = ad_height || 600;
-
-			if ( ! _is_full_bleed_image( $target ) ) {
-				$target.addClass('adjust_blocks_for_ads');
-				adjustment += $target.height();
-			}
-
-			if ( adjustment > ad_height ) {
-				return; // bail if already enough room
-			}
-
-			$nodes.each(function(i) {
-
-				var $this = $(this);
-
-				if ( adjustment > ad_height || _is_full_bleed_image( $this ) ) {
-					return false; // break the loop
-				}
-
-				adjustment += $this.height();
-				$this.addClass('adjust_blocks_for_ads');
-
-			});
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function _adjust_blocks_for_ads() {
-
-			var $rec = $('.app_ad_unit[data-type="global_rec"]').first()
-			;
-
-			if (is_mobile_ads()) return false;
-
-			if ($rec.length < 1) return false;
-
-			var rec_pos_left = $rec.position().left,
-				normal_width = $('.adjust_blocks_for_ads').first().width(),
-				width_reduction = Math.ceil( normal_width - rec_pos_left + parseInt( $rec.css('margin-left'), 10) ),
-				new_width = normal_width - width_reduction
-			;
-
-			$('.adjust_blocks_for_ads').each(function(){
-
-				var $this = $(this)
+				var position = get_ad_info( name ),
+					slot = _get_defined_slot( name )
 				;
 
-				$this.find('img,iframe,object').each(function(){
-
-					var $item = $(this);
-
-					if ($item.width() > new_width) {
-						$item.css({
-							'width' : new_width
-						});
-					}
-				});
+				googletag.pubads().refresh( [slot] );
+				googletag.display( position.id_name );
+				remove_defined_slot( name );
 
 			});
+
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Helper: Is Mobile Ads
+		 * remove_defined_slot
 		 *
-		 * @return bool
+		 * @param string name
+		 * @return object defined_slot
 		 */
-		function is_mobile_ads() {
+		function remove_defined_slot( name ) {
 
-			return false;
+			$.each( defined_slots, function( index, slot ) {
+
+				var unit_name = slot.getAdUnitPath().replace('/2322946/', '')
+				;
+
+				if ( unit_name === name ) delete defined_slots[index];
+
+			} );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function update_ui() {
-
-			_adjust_blocks_for_ads();
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/* return public-facing methods and/or vars */
 		return {
-			init : init,
-			get_ad_info : get_ad_info,
-			is_mobile_ads : is_mobile_ads,
-			display_slot : display_slot,
-			remove_defined_slot : remove_defined_slot,
-			update_ui : update_ui
+			init                : init,
+			get_ad_info         : get_ad_info,
+			display_slot        : display_slot,
+			remove_defined_slot : remove_defined_slot
 		};
 
-	}($));
+	}( $ ) );
 
-	return app; /* return augmented app object */
+	return app;
 
-}( app || {}, jQuery )); /* import app if exists, or create new */
+}( app || {}, jQuery ) );
+
+app.bootstrap.register( app.manager.init );
