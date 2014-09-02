@@ -37,7 +37,7 @@ module.exports = function(grunt) {
 			scripts: {
 				files: [
 					'src/main.js',
-					'src/modules/*.js',
+					'src/modules/*',
 					'bower_components/*'
 				],
 				tasks: ['requirejs'],
