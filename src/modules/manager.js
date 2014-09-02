@@ -923,41 +923,7 @@ var app = (function(app, $) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		var _inventory = [
-			{
-				'slot' : 'Leaderboard_AboveTheFold_728x90_AllPages',
-				'type' : 'header_leaderboard',
-				'iteration' : 0,
-				'sizes' : [
-					[728, 90],
-					[970, 90],
-					[970, 250],
-					[1000, 200],
-					[1000, 220],
-					[1100, 90],
-					[1100, 250],
-					[1100, 415]
-				]
-			},
-			{
-				'slot' : 'Sidebar_AboveTheFold_300x250_AllPages',
-				'type' : 'homepage_rec',
-				'iteration' : 0,
-				'sizes' : [
-					[300, 250],
-					[300, 600]
-				],
-				'sharethrough' : '548373d5'
-			},
-			{
-				'slot' : 'InContent_BelowTheFold_300x250_InternalPages',
-				'type' : 'homepage_leaderboard_btf',
-				'iteration' : 0,
-				'sizes' : [
-					[300, 250]
-				]
-			}
-		];
+		
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
