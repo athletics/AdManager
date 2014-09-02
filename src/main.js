@@ -14,6 +14,5 @@ require.config({
 
 requirejs([
 	'jquery',
-	'app/util',
 	'app/manager'
 ]);
