@@ -1,6 +1,6 @@
-/*
-*	Utilities
-*/
+/**
+ * Utilities
+ */
 define([ 'jquery' ], function( $ ) {
 
 	var _name = 'Util'
@@ -15,6 +15,28 @@ define([ 'jquery' ], function( $ ) {
 			console.log( obj );
 
 		}
+
+	}
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+	/**
+	 * Return difference between arrays
+	 *
+	 * @param  array array
+	 * @param  array values
+	 * @return array diff
+	 */
+	function difference( array, values ) {
+
+		var diff = []
+		;
+
+		$.grep( array, function( element ) {
+			if ( $.inArray( element, values ) === -1 ) diff.push( element );
+		});
+
+		return diff;
 
 	}
 
@@ -42,7 +64,8 @@ define([ 'jquery' ], function( $ ) {
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	return {
-		debug : debug
+		debug : debug,
+		difference : difference
 	};
 
 });
