@@ -5,6 +5,7 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		paths: {
+			bower: 'bower_components',
 			modules: 'src/modules',
 			output: 'dist'
 		},
@@ -23,6 +24,7 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				src: [
+					'<%= paths.modules %>/bower_components/labjs/LAB.min.js',
 					'<%= paths.modules %>/bootstrap.js',
 					'<%= paths.modules %>/util.js',
 					'<%= paths.modules %>/*.js',
