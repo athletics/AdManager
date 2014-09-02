@@ -4,12 +4,12 @@
  *		Requires: app, app.util, app.config, app.events, jQuery
  */
 
-var app = ( function( app, $ ) {
+var admanager = ( function( app, $ ) {
 
 	app.manager = ( function( $ ) {
 
 		var _name = 'Manager',
-			debug = app.util.debug,
+			debug = admanager.util.debug,
 
 			defined_slots = [],
 			page_positions = [],
@@ -584,6 +584,6 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.manager.init );
+admanager.bootstrap.register( admanager.manager.init );

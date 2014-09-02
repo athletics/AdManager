@@ -4,12 +4,12 @@
  *		Requires: app, app.util, jQuery
  */
 
-var app = ( function( app, $ ) {
+var admanager = ( function( app, $ ) {
 
 	app.events = ( function( $ ) {
 
 		var _name = 'Events',
-			debug = app.util.debug
+			debug = admanager.util.debug
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -59,6 +59,6 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.events.init );
+admanager.bootstrap.register( admanager.events.init );

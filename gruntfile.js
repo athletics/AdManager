@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 		concat: {
 			options: {
 				stripBanners: true,
-				footer: 'app.bootstrap.init();'
+				footer: 'admanager.bootstrap.init();'
 			},
 			dist: {
 				src: [

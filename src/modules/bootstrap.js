@@ -4,7 +4,7 @@
  *		Requires: jQuery
  */
 
-var app = ( function( app ) {
+var admanager = ( function( app ) {
 
 	if ( typeof app.initialized == 'undefined' ) {
 
@@ -26,7 +26,7 @@ var app = ( function( app ) {
 
 			if ( app.initialized ) return false; // the app has already been initialized
 
-			if ( app.util.debug ) debug = app.util.debug;
+			if ( admanager.util.debug ) debug = admanager.util.debug;
 
 			// store ref to jQuery
 			$ = jQuery;
@@ -64,4 +64,4 @@ var app = ( function( app ) {
 
 	return app;
 
-}( app || {} ) );
+}( admanager || {} ) );

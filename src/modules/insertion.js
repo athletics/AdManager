@@ -4,12 +4,12 @@
  *		Requires: app, app.util, jQuery
  */
 
-var app = ( function( app, $ ) {
+var admanager = ( function( app, $ ) {
 
 	app.insertion = ( function( $ ) {
 
 		var _name = 'Insertion',
-			debug = app.util.debug
+			debug = admanager.util.debug
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -365,6 +365,6 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.insertion.init );
+admanager.bootstrap.register( admanager.insertion.init );

@@ -4,12 +4,12 @@
  *		Requires: app, app.util, jQuery
  */
 
-var app = ( function( app, $ ) {
+var admanager = ( function( app, $ ) {
 
 	app.config = ( function( $ ) {
 
 		var _name = 'Config',
-			debug = app.util.debug,
+			debug = admanager.util.debug,
 
 			id = '123456789',
 			inventory = [
@@ -46,6 +46,6 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.config.init );
+admanager.bootstrap.register( admanager.config.init );

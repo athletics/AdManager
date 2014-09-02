@@ -1,4 +1,4 @@
-var app = ( function( app ) {
+var admanager = ( function( app ) {
 
 	if ( typeof app.initialized == 'undefined' ) {
 
@@ -20,7 +20,7 @@ var app = ( function( app ) {
 
 			if ( app.initialized ) return false; // the app has already been initialized
 
-			if ( app.util.debug ) debug = app.util.debug;
+			if ( admanager.util.debug ) debug = admanager.util.debug;
 
 			// store ref to jQuery
 			$ = jQuery;
@@ -58,8 +58,8 @@ var app = ( function( app ) {
 
 	return app;
 
-}( app || {} ) );
-var app = ( function( app, $ ) {
+}( admanager || {} ) );
+var admanager = ( function( app, $ ) {
 
 	app.util = ( function( $ ) {
 
@@ -160,15 +160,15 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.util.init );
-var app = ( function( app, $ ) {
+admanager.bootstrap.register( admanager.util.init );
+var admanager = ( function( app, $ ) {
 
 	app.config = ( function( $ ) {
 
 		var _name = 'Config',
-			debug = app.util.debug,
+			debug = admanager.util.debug,
 
 			id = '18901142',
 			inventory = [
@@ -221,15 +221,15 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.config.init );
-var app = ( function( app, $ ) {
+admanager.bootstrap.register( admanager.config.init );
+var admanager = ( function( app, $ ) {
 
 	app.events = ( function( $ ) {
 
 		var _name = 'Events',
-			debug = app.util.debug
+			debug = admanager.util.debug
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -279,15 +279,15 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.events.init );
-var app = ( function( app, $ ) {
+admanager.bootstrap.register( admanager.events.init );
+var admanager = ( function( app, $ ) {
 
 	app.insertion = ( function( $ ) {
 
 		var _name = 'Insertion',
-			debug = app.util.debug
+			debug = admanager.util.debug
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -643,15 +643,15 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.insertion.init );
-var app = ( function( app, $ ) {
+admanager.bootstrap.register( admanager.insertion.init );
+var admanager = ( function( app, $ ) {
 
 	app.manager = ( function( $ ) {
 
 		var _name = 'Manager',
-			debug = app.util.debug,
+			debug = admanager.util.debug,
 
 			defined_slots = [],
 			page_positions = [],
@@ -1226,6 +1226,6 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.manager.init );app.bootstrap.init();
+admanager.bootstrap.register( admanager.manager.init );admanager.bootstrap.init();

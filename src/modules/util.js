@@ -4,7 +4,7 @@
  *		Requires: app, jQuery
  */
 
-var app = ( function( app, $ ) {
+var admanager = ( function( app, $ ) {
 
 	app.util = ( function( $ ) {
 
@@ -105,6 +105,6 @@ var app = ( function( app, $ ) {
 
 	return app;
 
-}( app || {}, jQuery ) );
+}( admanager || {}, jQuery ) );
 
-app.bootstrap.register( app.util.init );
+admanager.bootstrap.register( admanager.util.init );
