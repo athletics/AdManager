@@ -170,7 +170,7 @@ var admanager = ( function( app, $ ) {
 		var _name = 'Config',
 			debug = admanager.util.debug,
 
-			id = '18901142',
+			account = '18901142',
 			inventory = [
 				{
 					'slot' : 'Leaderboard_AboveTheFold_728x90_AllPages',
@@ -213,7 +213,7 @@ var admanager = ( function( app, $ ) {
 
 		return {
 			init      : init,
-			id        : id,
+			account   : account,
 			inventory : inventory
 		};
 
@@ -299,7 +299,7 @@ var admanager = ( function( app, $ ) {
 			var $layout = $('body')
 			;
 
-			if ( ! $layout.hasClass('node-type-article') ) return;
+			if ( ! $layout.hasClass('node-type-article') ) return app;
 
 			_events_listener();
 
@@ -366,7 +366,7 @@ var admanager = ( function( app, $ ) {
 			var $rec = $('.app_ad_unit[data-type="global_rec"]').first()
 			;
 
-			if (util.is_mobile()) return false;
+			if (admanager.util.is_mobile()) return false;
 
 			if ($rec.length < 1) return false;
 
@@ -478,7 +478,7 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _ad_unit_markup( unit, disable_float ) {
 
-			var ad_type = util.is_mobile() ? 'mobile' : 'desktop',
+			var ad_type = admanager.util.is_mobile() ? 'mobile' : 'desktop',
 				ad_html = '<div class="app_ad_unit '+ ad_type +'" data-type="'+ unit +'"></div>',
 				ad_html_disable_float =	'<div class="app_ad_unit disable_float '+ ad_type +'" data-type="'+ unit +'"></div>'
 			;
@@ -552,7 +552,7 @@ var admanager = ( function( app, $ ) {
 				}
 
 				// mobile logic
-				if (util.is_mobile()) {
+				if (admanager.util.is_mobile()) {
 
 					// skip the first node
 					if (node_iterator === 0) {
@@ -655,7 +655,8 @@ var admanager = ( function( app, $ ) {
 
 			defined_slots = [],
 			page_positions = [],
-			inventory = []
+			inventory = [],
+			account = null
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -664,9 +665,13 @@ var admanager = ( function( app, $ ) {
 
 			debug( _name + ': initialized' );
 
-			// tktktktktktktktktk
-			inventory = _get_available_sizes( config.inventory );
-			// tktktktktktktktktk
+			if ( typeof app.config == 'undefined' ) {
+				debug( 'No config.' );
+				return app;
+			}
+
+			inventory = _get_available_sizes( app.config.inventory );
+			account = app.config.account;
 
 			_listen_for_jquery_events();
 			_load_library();
@@ -746,21 +751,12 @@ var admanager = ( function( app, $ ) {
 				path = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js'
 			;
 
-			/*define('gpt', function() {
-				require( path );
-
-				return window.googletag;
-			});*/
-
-			/*require.config({
-				paths: {
-					'gpt': path
-				},
-				shim: {}
-			});*/
-
-			// require( path, _on_library_loaded );
-			require( path );
+			$LAB
+				.script( path )
+				.wait(function() {
+					_on_library_loaded();
+				})
+			;
 
 		}
 
@@ -770,8 +766,6 @@ var admanager = ( function( app, $ ) {
 		 * Callback when GPT library is loaded
 		 */
 		function _on_library_loaded() {
-
-			debug('_on_library_loaded');
 
 			googletag.cmd.push( function(){
 				$.event.trigger( 'GPT:libraryLoaded' );
@@ -861,7 +855,7 @@ var admanager = ( function( app, $ ) {
 
 		function _set_page_positions() {
 
-			if ( util.is_mobile() ) {
+			if ( admanager.util.is_mobile() ) {
 				_set_mobile_page_positions();
 			}
 			else {
@@ -1007,7 +1001,7 @@ var admanager = ( function( app, $ ) {
 							if ( typeof(cur_position.sharethrough) !== 'undefined' ) {
 								defined_slots[i] = googletag
 									.defineSlot(
-										'/2322946/' + cur_position.slot,
+										'/' + account + '/' + cur_position.slot,
 										cur_position.sizes,
 										cur_position.id_name
 									)
@@ -1018,7 +1012,7 @@ var admanager = ( function( app, $ ) {
 							else {
 								defined_slots[i] = googletag
 									.defineSlot(
-										'/2322946/' + cur_position.slot,
+										'/' + account + '/' + cur_position.slot,
 										cur_position.sizes,
 										cur_position.id_name
 									)
@@ -1073,8 +1067,10 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _slot_render_ended( unit ) {
 
-			var unit_name = unit.slot.getAdUnitPath().replace('/2322946/', '')
+			var unit_name = unit.slot.getAdUnitPath().replace('/' + account + '/', '')
 			;
+
+			debug( unit_name );
 
 			$.event.trigger( 'GPT:adUnitRendered', {
 				'name': unit_name,
@@ -1158,7 +1154,7 @@ var admanager = ( function( app, $ ) {
 			;
 
 			$.each( defined_slots, function( i, slot ) {
-				var unit_name = slot.getAdUnitPath().replace('/2322946/', '')
+				var unit_name = slot.getAdUnitPath().replace('/' + account + '/', '')
 				;
 
 				if ( unit_name === name ) {
@@ -1206,7 +1202,7 @@ var admanager = ( function( app, $ ) {
 
 			$.each( defined_slots, function( index, slot ) {
 
-				var unit_name = slot.getAdUnitPath().replace('/2322946/', '')
+				var unit_name = slot.getAdUnitPath().replace('/' + account + '/', '')
 				;
 
 				if ( unit_name === name ) delete defined_slots[index];

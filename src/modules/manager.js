@@ -13,7 +13,8 @@ var admanager = ( function( app, $ ) {
 
 			defined_slots = [],
 			page_positions = [],
-			inventory = []
+			inventory = [],
+			account = null
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -22,9 +23,13 @@ var admanager = ( function( app, $ ) {
 
 			debug( _name + ': initialized' );
 
-			// tktktktktktktktktk
-			inventory = _get_available_sizes( config.inventory );
-			// tktktktktktktktktk
+			if ( typeof app.config == 'undefined' ) {
+				debug( 'No config.' );
+				return app;
+			}
+
+			inventory = _get_available_sizes( app.config.inventory );
+			account = app.config.account;
 
 			_listen_for_jquery_events();
 			_load_library();
@@ -354,7 +359,7 @@ var admanager = ( function( app, $ ) {
 							if ( typeof(cur_position.sharethrough) !== 'undefined' ) {
 								defined_slots[i] = googletag
 									.defineSlot(
-										'/2322946/' + cur_position.slot,
+										'/' + account + '/' + cur_position.slot,
 										cur_position.sizes,
 										cur_position.id_name
 									)
@@ -365,7 +370,7 @@ var admanager = ( function( app, $ ) {
 							else {
 								defined_slots[i] = googletag
 									.defineSlot(
-										'/2322946/' + cur_position.slot,
+										'/' + account + '/' + cur_position.slot,
 										cur_position.sizes,
 										cur_position.id_name
 									)
@@ -420,8 +425,10 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _slot_render_ended( unit ) {
 
-			var unit_name = unit.slot.getAdUnitPath().replace('/2322946/', '')
+			var unit_name = unit.slot.getAdUnitPath().replace('/' + account + '/', '')
 			;
+
+			debug( unit_name );
 
 			$.event.trigger( 'GPT:adUnitRendered', {
 				'name': unit_name,
@@ -505,7 +512,7 @@ var admanager = ( function( app, $ ) {
 			;
 
 			$.each( defined_slots, function( i, slot ) {
-				var unit_name = slot.getAdUnitPath().replace('/2322946/', '')
+				var unit_name = slot.getAdUnitPath().replace('/' + account + '/', '')
 				;
 
 				if ( unit_name === name ) {
@@ -553,7 +560,7 @@ var admanager = ( function( app, $ ) {
 
 			$.each( defined_slots, function( index, slot ) {
 
-				var unit_name = slot.getAdUnitPath().replace('/2322946/', '')
+				var unit_name = slot.getAdUnitPath().replace('/' + account + '/', '')
 				;
 
 				if ( unit_name === name ) delete defined_slots[index];
