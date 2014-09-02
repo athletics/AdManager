@@ -208,7 +208,7 @@ var admanager = ( function( app, $ ) {
 
 		function _set_page_positions() {
 
-			if ( util.is_mobile() ) {
+			if ( admanager.util.is_mobile() ) {
 				_set_mobile_page_positions();
 			}
 			else {
