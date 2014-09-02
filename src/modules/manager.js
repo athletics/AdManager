@@ -104,21 +104,12 @@ var admanager = ( function( app, $ ) {
 				path = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js'
 			;
 
-			/*define('gpt', function() {
-				require( path );
-
-				return window.googletag;
-			});*/
-
-			/*require.config({
-				paths: {
-					'gpt': path
-				},
-				shim: {}
-			});*/
-
-			// require( path, _on_library_loaded );
-			require( path );
+			$LAB
+				.script( path )
+				.wait(function() {
+					_on_library_loaded();
+				})
+			;
 
 		}
 
@@ -128,8 +119,6 @@ var admanager = ( function( app, $ ) {
 		 * Callback when GPT library is loaded
 		 */
 		function _on_library_loaded() {
-
-			debug('_on_library_loaded');
 
 			googletag.cmd.push( function(){
 				$.event.trigger( 'GPT:libraryLoaded' );
