@@ -43,6 +43,19 @@ define([ 'jquery' ], function( $ ) {
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	/**
+	 * Is Mobile
+	 *
+	 * @return bool
+	 */
+	function is_mobile() {
+
+		return $(window).width() < 768 ? true : false;
+
+	}
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+	/**
 	 * Set window.requestAnimationFrame
 	 *
 	 * requestAnimationFrame Firefox 23 / IE 10 / Chrome / Safari 7 (incl. iOS)
@@ -65,7 +78,8 @@ define([ 'jquery' ], function( $ ) {
 
 	return {
 		debug : debug,
-		difference : difference
+		difference : difference,
+		is_mobile : is_mobile
 	};
 
 });
