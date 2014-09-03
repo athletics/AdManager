@@ -1,7 +1,7 @@
 /**
  *		Name: Ad Manager
  *
- *		Requires: app, app.util, app.config, app.events, jQuery
+ *		Requires: app, app.util, app.config, app.insertion, app.events, jQuery
  */
 
 var admanager = ( function( app, $ ) {
@@ -13,7 +13,7 @@ var admanager = ( function( app, $ ) {
 
 			defined_slots = [],
 			page_positions = [],
-			inventory = [],
+			_inventory = [],
 			account = null
 		;
 
@@ -24,11 +24,10 @@ var admanager = ( function( app, $ ) {
 			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
-			inventory = _get_available_sizes( app.config.inventory );
+			_inventory = _get_available_sizes( app.config.inventory );
 			account = app.config.account;
 
-			_listen_for_jquery_events();
-			_load_library();
+			_listen_for_custom_events();
 
 			return app;
 
@@ -39,12 +38,31 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * Bind to custom jQuery events
 		 */
-		function _listen_for_jquery_events() {
+		function _listen_for_custom_events() {
 
 			$(document)
-				.on('GPT:initPageAds', function(event) {
+				.on('GPT:unitsInserted', function() {
 
-					debug(_name + ': GPT:initPageAds');
+					debug(_name + ': GPT:unitsInserted');
+
+					_load_library();
+
+				})
+				.on('GPT:libraryLoaded', function() {
+
+					debug(_name + ': GPT:libraryLoaded');
+
+					_listen_for_dfp_events();
+					_enable_single_request();
+					_set_targeting();
+					_set_page_positions();
+					_define_slots_for_page_positions();
+
+				})
+				.on('GPT:slotsDefined', function() {
+
+					debug(_name + ': GPT:slotsDefined');
+
 					_display_page_ads();
 
 				})
@@ -125,13 +143,6 @@ var admanager = ( function( app, $ ) {
 				$.event.trigger( 'GPT:libraryLoaded' );
 			} );
 
-			_listen_for_dfp_events();
-			_enable_single_request();
-			_set_targeting();
-			_set_page_positions();
-			_define_slots_for_page_positions();
-			_display_page_ads();
-
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -180,18 +191,15 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Send targeting info defined in page config
-		 *
-		 * @todo
+		 * Send Targeting
+		 * Defined in Page Config
 		 */
 		function _set_targeting() {
 
-			return;
-
 			googletag.cmd.push(function() {
 
-				var config = util.get_page_config(),
-					targeting = config.targeting
+				var page_config = app.util.page_config(),
+					targeting = page_config.targeting
 				;
 
 				// Set targeting
@@ -207,25 +215,16 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		/**
+		 * Set Page Positions
+		 */
 		function _set_page_positions() {
 
-			if ( admanager.util.is_mobile() ) {
-				_set_mobile_page_positions();
-			}
-			else {
+			if ( ! app.util.is_mobile() ) {
+
 				_set_desktop_page_positions();
+
 			}
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Set Mobile Page Positions
-		 *
-		 * @todo Separate markup insertion
-		 */
-		function _set_mobile_page_positions() {
 
 		}
 
@@ -233,84 +232,21 @@ var admanager = ( function( app, $ ) {
 
 		/**
 		 * Set Desktop Page Positions
-		 *
-		 * @todo Separate markup insertion
 		 */
 		function _set_desktop_page_positions() {
 
-			page_positions = [];
+			var $units = $('.app_ad_unit')
+			;
 
-			// Is homepage
-			if ( $('.page').hasClass('homepage') ) {
+			$units.each(function() {
 
-				page_positions = [
-					'Site_728x90_Homepage_Top',
-					'Site_300x250_Homepage_Middle',
-					'Homepage_Leaderboard_BTF',
-					'Sponsored_Post',
-					'Clickable_Skin',
-					'Sitewide_Interstitial'
-				];
-
-			}
-
-			// Is post detail page
-			else if ( $('.page').hasClass('article_detail') ) {
-
-				var ad_unit = _location_to_insert_ad_unit({
-						'$target' : $('article.post.entry')
-					}),
-					_location = ad_unit.$insert_after,
-					disable_float = ad_unit.disable_float,
-					_markup = _ad_unit_markup('global_rec', disable_float)
+				var $unit = $(this),
+					type = $unit.data('type')
 				;
 
-				_insert_ad_unit_into_body( _markup, _location );
+				page_positions.push( type );
 
-				page_positions = [
-					'Global_Leaderboard_AboveFold',
-					'MRec_Article_Above_Fold',
-					'ArticlePage_MPU_BTF',
-					'Article_EndMessage',
-					'ExperimentalLeaderboard',
-					'Article_Detail_Wide_Skyscraper',
-					'v2_Site_Skin',
-					'Sitewide_Interstitial'
-				];
-
-				// shortcode puts ad position in article body
-				if ( $('.app_ad_unit[data-type="ad_mpu"]').length > 0 ) {
-					page_positions.push('Article_Detail_Wildcard_MPU');
-				}
-
-			}
-
-
-			// Is this a page with the standard Leaderboard + Right Rail?
-			else if (
-				$('.page').hasClass('archive') ||
-				$('.page').hasClass('generic') ||
-				$('.page').hasClass('privacy_policy') ||
-				$('.page').hasClass('contact') ||
-				$('.page').hasClass('404')
-			) {
-
-				page_positions = [
-					'Global_Leaderboard_AboveFold',
-					'MRec_Article_Above_Fold'
-				];
-
-			}
-
-
-			// Is a page with a Leaderboard only (i.e. About, Submissions, etc.)
-			else if ( $('.page').hasClass('leaderboard_only') ) {
-
-				page_positions = [
-					'Global_Leaderboard_AboveFold'
-				];
-
-			}
+			});
 
 		}
 
@@ -321,60 +257,42 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _define_slots_for_page_positions() {
 
-			var cur_position = null,
-				excluded = [ 'Classic_Interstitial', 'Welcome_Ad' ]
+			var current_position = null
 			;
 
-			googletag.cmd.push(function(){
+			googletag.cmd.push(function() {
 				for (var i = 0; i < page_positions.length; i++) {
 
 					_increment_ad_slot( page_positions[i] );
 
-					cur_position = get_ad_info( page_positions[i] );
+					current_position = get_ad_info( page_positions[i] );
 
-					if ( typeof cur_position.type != 'undefined' ) {
+					if ( typeof current_position.type == 'undefined' ) return;
 
-						// find the empty container div on the page. we
-						// will dynamically instantiate the unique ad unit.
+					// find the empty container div on the page. we
+					// will dynamically instantiate the unique ad unit.
+					var $unit = $('.app_ad_unit[data-type="'+ current_position.type +'"]')
+					;
 
-						var $unit = $('.app_ad_unit[data-type="'+ cur_position.type +'"]')
-						;
+					if ( $unit.length < 1 ) return;
 
-						if ($unit.length > 0) {
+					// generate new div
+					$unit.html(
+						'<div class="unit_target" id="'+ current_position.id_name +'"></div>'
+					);
 
-							if ( $.inArray( page_positions[i], excluded ) === -1 ) {
-								// generate new div
-								$unit.html(
-									'<div class="unit_target" id="'+ cur_position.id_name +'"></div>'
-								);
+					// activate
+					$unit.addClass('active');
 
-								// activate
-								$unit.addClass('active');
-							}
+					defined_slots[i] = googletag
+						.defineSlot(
+							'/' + account + '/' + current_position.slot,
+							current_position.sizes,
+							current_position.id_name
+						)
+						.addService(googletag.pubads())
+					;
 
-							if ( typeof(cur_position.sharethrough) !== 'undefined' ) {
-								defined_slots[i] = googletag
-									.defineSlot(
-										'/' + account + '/' + cur_position.slot,
-										cur_position.sizes,
-										cur_position.id_name
-									)
-									.addService(googletag.pubads())
-									.setTargeting('strnativekey', cur_position.sharethrough)
-								;
-							}
-							else {
-								defined_slots[i] = googletag
-									.defineSlot(
-										'/' + account + '/' + cur_position.slot,
-										cur_position.sizes,
-										cur_position.id_name
-									)
-									.addService(googletag.pubads())
-								;
-							}
-						}
-					}
 				}
 
 				// Enables GPT services for defined slots
@@ -398,11 +316,11 @@ var admanager = ( function( app, $ ) {
 				// lastly, run display code
 				for (var n = 0; n < page_positions.length; n++) {
 
-					cur_position = get_ad_info( page_positions[n] );
+					current_position = get_ad_info( page_positions[n] );
 
-					if ( $('#' + cur_position.id_name).length > 0 ) {
+					if ( $('#' + current_position.id_name).length > 0 ) {
 						googletag.display(
-							cur_position.id_name
+							current_position.id_name
 						);
 					}
 				}
@@ -424,22 +342,11 @@ var admanager = ( function( app, $ ) {
 			var unit_name = unit.slot.getAdUnitPath().replace('/' + account + '/', '')
 			;
 
-			debug( unit_name );
-
 			$.event.trigger( 'GPT:adUnitRendered', {
 				'name': unit_name,
 				'size': unit.size
 			} );
 
-			if ( unit_name === 'MRec_Article_Above_Fold' && $('.page').hasClass('article_detail') ) {
-				var this_unit = get_ad_info('MRec_Article_Above_Fold'),
-					$target = $('.app_ad_unit[data-type="' + this_unit.type + '"]').next(),
-					height = unit.size[1]
-				;
-
-				_denote_blocks_for_adjustment( $target, height );
-				_adjust_blocks_for_ads();
-			}
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -447,19 +354,21 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * Increment Ad Slot
 		 *
-		 * @param string slot
+		 * @param string unit
 		 */
-		function _increment_ad_slot( slot ) {
+		function _increment_ad_slot( unit ) {
 
 			for (var i = 0; i < _inventory.length; i++) {
-				if ( _inventory[i].slot == slot ) {
+				if ( _inventory[i].type !== unit && _inventory[i].slot !== unit ) continue;
 
-					// increment
-					_inventory[i].iteration = _inventory[i].iteration + 1;
+				if ( typeof _inventory[i].iteration == 'undefined' ) _inventory[i].iteration = 0;
 
-					return;
-				}
+				// increment
+				_inventory[i].iteration = _inventory[i].iteration + 1;
+
+				return;
 			}
+
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -467,31 +376,32 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * Get Ad Unit Info
 		 *
-		 * @param string slot
+		 * @param string unit
 		 * @return object
 		 */
-		function get_ad_info( slot ) {
+		function get_ad_info( unit ) {
 
 			var return_object = {};
 
-			for (var i = 0; i < _inventory.length; i++) {
-				if ( _inventory[i].slot == slot ) {
+			for ( var i = 0; i < _inventory.length; i++ ) {
+				if ( _inventory[i].type !== unit && _inventory[i].slot !== unit ) continue;
 
-					// build return object
-					return_object = _inventory[i];
+				// build return object
+				return_object = _inventory[i];
 
-					// determine the object's id_name
-					if (typeof return_object.use_iterator != 'undefined' && !return_object.use_iterator) {
-						// don't use the iterator
-						return_object.id_name = return_object.type;
-					} else {
-						// use the iterator
-						return_object.id_name = return_object.type + '_' + return_object.iteration;
-					}
-
-					return return_object;
+				// determine the object's id_name
+				if (typeof return_object.use_iterator != 'undefined' && !return_object.use_iterator) {
+					// don't use the iterator
+					return_object.id_name = return_object.type;
+				} else {
+					// use the iterator
+					return_object.id_name = return_object.type + '_' + return_object.iteration;
 				}
+
+				return return_object;
 			}
+
+			return return_object;
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -526,19 +436,19 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * display_slot
 		 *
-		 * @param string name
+		 * @param string unit [type or slot]
 		 */
-		function display_slot( name ) {
+		function display_slot( unit ) {
 
 			googletag.cmd.push(function() {
 
-				var position = get_ad_info( name ),
-					slot = _get_defined_slot( name )
+				var position = get_ad_info( unit ),
+					slot = _get_defined_slot( position.slot )
 				;
 
 				googletag.pubads().refresh( [slot] );
 				googletag.display( position.id_name );
-				remove_defined_slot( name );
+				remove_defined_slot( position.slot );
 
 			});
 
@@ -564,6 +474,8 @@ var admanager = ( function( app, $ ) {
 			} );
 
 		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		return {
 			init                : init,
