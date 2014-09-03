@@ -23,7 +23,6 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				src: [
-					'<%= paths.modules %>/bower_components/labjs/LAB.min.js',
 					'<%= paths.modules %>/bootstrap.js',
 					'<%= paths.modules %>/util.js',
 					'<%= paths.modules %>/*.js',
