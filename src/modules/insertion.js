@@ -9,7 +9,9 @@ var admanager = ( function( app, $ ) {
 	app.insertion = ( function( $ ) {
 
 		var _name = 'Insertion',
-			debug = admanager.util.debug
+			debug = admanager.util.debug ? admanager.util.debug : function(){},
+
+			$layout = null
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

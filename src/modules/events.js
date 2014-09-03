@@ -9,7 +9,7 @@ var admanager = ( function( app, $ ) {
 	app.events = ( function( $ ) {
 
 		var _name = 'Events',
-			debug = admanager.util.debug
+			debug = admanager.util.debug ? admanager.util.debug : function(){}
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

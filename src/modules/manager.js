@@ -9,7 +9,7 @@ var admanager = ( function( app, $ ) {
 	app.manager = ( function( $ ) {
 
 		var _name = 'Manager',
-			debug = admanager.util.debug,
+			debug = admanager.util.debug ? admanager.util.debug : function(){},
 
 			defined_slots = [],
 			page_positions = [],
