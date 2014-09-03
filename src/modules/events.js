@@ -9,13 +9,14 @@ var admanager = ( function( app, $ ) {
 	app.events = ( function( $ ) {
 
 		var _name = 'Events',
-			debug = admanager.util.debug ? admanager.util.debug : function(){}
+			debug = null
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		function init() {
 
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
 			_broadcast_events();
@@ -60,5 +61,3 @@ var admanager = ( function( app, $ ) {
 	return app;
 
 }( admanager || {}, jQuery ) );
-
-admanager.bootstrap.register( admanager.events.init );

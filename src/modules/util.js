@@ -106,5 +106,3 @@ var admanager = ( function( app, $ ) {
 	return app;
 
 }( admanager || {}, jQuery ) );
-
-admanager.bootstrap.register( admanager.util.init );

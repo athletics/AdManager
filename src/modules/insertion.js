@@ -9,7 +9,7 @@ var admanager = ( function( app, $ ) {
 	app.insertion = ( function( $ ) {
 
 		var _name = 'Insertion',
-			debug = admanager.util.debug ? admanager.util.debug : function(){},
+			debug = null,
 
 			$layout = null
 		;
@@ -18,6 +18,7 @@ var admanager = ( function( app, $ ) {
 
 		function init() {
 
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
 			var $layout = $('body')
@@ -368,5 +369,3 @@ var admanager = ( function( app, $ ) {
 	return app;
 
 }( admanager || {}, jQuery ) );
-
-admanager.bootstrap.register( admanager.insertion.init );

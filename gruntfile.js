@@ -23,10 +23,7 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				src: [
-					'<%= paths.modules %>/bootstrap.js',
-					'<%= paths.modules %>/util.js',
-					'<%= paths.modules %>/*.js',
-					'!<%= paths.modules %>/config.example.js'
+					'<%= paths.modules %>/*.js'
 				],
 				dest: '<%= paths.output %>/admanager.js'
 			}

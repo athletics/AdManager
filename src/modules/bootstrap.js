@@ -26,8 +26,6 @@ var admanager = ( function( app ) {
 
 			if ( app.initialized ) return false; // the app has already been initialized
 
-			debug = admanager.util.debug ? admanager.util.debug : function(){};
-
 			admanager.config = config || false;
 
 			if ( ! admanager.config ) {
@@ -36,6 +34,15 @@ var admanager = ( function( app ) {
 
 			// store ref to jQuery
 			$ = jQuery;
+
+			app
+				.util.init()
+				.events.init()
+				.manager.init()
+				.insertion.init()
+			;
+
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
 
 			for ( var i = 0; i < _init_callbacks.length; i++ ) {
 

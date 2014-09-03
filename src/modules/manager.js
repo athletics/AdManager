@@ -9,7 +9,7 @@ var admanager = ( function( app, $ ) {
 	app.manager = ( function( $ ) {
 
 		var _name = 'Manager',
-			debug = admanager.util.debug ? admanager.util.debug : function(){},
+			debug = null,
 
 			defined_slots = [],
 			page_positions = [],
@@ -21,6 +21,7 @@ var admanager = ( function( app, $ ) {
 
 		function init() {
 
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
 			inventory = _get_available_sizes( app.config.inventory );
@@ -576,5 +577,3 @@ var admanager = ( function( app, $ ) {
 	return app;
 
 }( admanager || {}, jQuery ) );
-
-admanager.bootstrap.register( admanager.manager.init );
