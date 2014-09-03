@@ -23,11 +23,6 @@ var admanager = ( function( app, $ ) {
 
 			debug( _name + ': initialized' );
 
-			if ( typeof app.config == 'undefined' ) {
-				debug( 'No config.' );
-				return app;
-			}
-
 			inventory = _get_available_sizes( app.config.inventory );
 			account = app.config.account;
 
