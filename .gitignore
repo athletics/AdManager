@@ -2,4 +2,4 @@
 *.html
 bower_components
 node_modules
-src/modules/config.js
+dist/athletics.js

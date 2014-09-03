@@ -22,11 +22,17 @@ var admanager = ( function( app ) {
 
 		/* * * * * * * * * * * * * * * * * * * * */
 
-		function init() {
+		function init( config ) {
 
 			if ( app.initialized ) return false; // the app has already been initialized
 
-			if ( admanager.util.debug ) debug = admanager.util.debug;
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
+
+			admanager.config = config || false;
+
+			if ( ! admanager.config ) {
+				throw new Error('Please provide config');
+			}
 
 			// store ref to jQuery
 			$ = jQuery;
