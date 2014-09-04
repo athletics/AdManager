@@ -477,11 +477,29 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		function get_dynamic_inventory() {
+
+			var dynamic_inventory = []
+			;
+
+			$.each( _inventory, function( index, position ) {
+
+				if ( position.dynamic == true ) dynamic_inventory.push( position );
+
+			} );
+
+			return dynamic_inventory;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 		return {
-			init                : init,
-			get_ad_info         : get_ad_info,
-			display_slot        : display_slot,
-			remove_defined_slot : remove_defined_slot
+			init                  : init,
+			get_ad_info           : get_ad_info,
+			display_slot          : display_slot,
+			remove_defined_slot   : remove_defined_slot,
+			get_dynamic_inventory : get_dynamic_inventory
 		};
 
 	}( $ ) );
