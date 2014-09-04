@@ -9,7 +9,7 @@ var admanager = ( function( app, $ ) {
 	app.util = ( function( $ ) {
 
 		var _name = 'Util',
-			_debug_enable = true
+			_debug_enable = false
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
