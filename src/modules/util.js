@@ -18,6 +18,7 @@ var admanager = ( function( app, $ ) {
 
 			debug( _name + ': initialized' );
 
+			_init_array_remove();
 			_set_window_request_animation_frame();
 
 			return app;
@@ -94,11 +95,31 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		function _init_array_remove() {
+
+			// Array Remove - By John Resig (MIT Licensed)
+			Array.prototype.remove = function(from, to) {
+				var rest = this.slice((to || from) + 1 || this.length);
+				this.length = from < 0 ? this.length + from : from;
+				return this.push.apply(this, rest);
+			};
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function page_config() {
+			return {};
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 		return {
-			init       : init,
-			debug      : debug,
-			difference : difference,
-			is_mobile  : is_mobile
+			init        : init,
+			debug       : debug,
+			difference  : difference,
+			is_mobile   : is_mobile,
+			page_config : page_config
 		};
 
 	}( $ ) );
