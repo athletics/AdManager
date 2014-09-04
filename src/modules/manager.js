@@ -278,7 +278,7 @@ var admanager = ( function( app, $ ) {
 
 					// generate new div
 					$unit.html(
-						'<div class="unit_target" id="'+ current_position.id_name +'"></div>'
+						'<div class="app_unit_target" id="'+ current_position.id_name +'"></div>'
 					);
 
 					// activate
