@@ -16,14 +16,27 @@ var admanager = ( function( app ) {
 
 		/* * * * * * * * * * * * * * * * * * * * */
 
-		function init() {
+		function init( config ) {
 
 			if ( app.initialized ) return false; // the app has already been initialized
 
-			if ( admanager.util.debug ) debug = admanager.util.debug;
+			admanager.config = config || false;
+
+			if ( ! admanager.config ) {
+				throw new Error('Please provide config');
+			}
 
 			// store ref to jQuery
 			$ = jQuery;
+
+			app
+				.util.init()
+				.events.init()
+				.manager.init()
+				.insertion.init()
+			;
+
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
 
 			for ( var i = 0; i < _init_callbacks.length; i++ ) {
 
@@ -61,181 +74,17 @@ var admanager = ( function( app ) {
 }( admanager || {} ) );
 var admanager = ( function( app, $ ) {
 
-	app.util = ( function( $ ) {
-
-		var _name = 'Util',
-			_debug_enable = true
-		;
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function init() {
-
-			debug( _name + ': initialized' );
-
-			_set_window_request_animation_frame();
-
-			return app;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function debug( obj ) {
-
-			if ( ! _debug_enable ) return;
-
-			if ( ( typeof console == "object" ) && ( console.log ) ) {
-
-				console.log( obj );
-
-			}
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Return difference between arrays
-		 *
-		 * @param  array array
-		 * @param  array values
-		 * @return array diff
-		 */
-		function difference( array, values ) {
-
-			var diff = []
-			;
-
-			$.grep( array, function( element ) {
-				if ( $.inArray( element, values ) === -1 ) diff.push( element );
-			});
-
-			return diff;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Is Mobile
-		 *
-		 * @return bool
-		 */
-		function is_mobile() {
-
-			return $(window).width() < 768 ? true : false;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Set window.requestAnimationFrame
-		 *
-		 * requestAnimationFrame Firefox 23 / IE 10 / Chrome / Safari 7 (incl. iOS)
-		 * mozRequestAnimationFrame Firefox < 23
-		 * webkitRequestAnimationFrame Older versions of Safari / Chrome
-		 */
-		function _set_window_request_animation_frame() {
-
-			window.requestAnimationFrame = window.requestAnimationFrame ||
-				window.mozRequestAnimationFrame ||
-				window.webkitRequestAnimationFrame ||
-				window.oRequestAnimationFrame
-			;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		return {
-			init       : init,
-			debug      : debug,
-			difference : difference,
-			is_mobile  : is_mobile
-		};
-
-	}( $ ) );
-
-	return app;
-
-}( admanager || {}, jQuery ) );
-
-admanager.bootstrap.register( admanager.util.init );
-var admanager = ( function( app, $ ) {
-
-	app.config = ( function( $ ) {
-
-		var _name = 'Config',
-			debug = admanager.util.debug,
-
-			account = '18901142',
-			inventory = [
-				{
-					'slot' : 'Leaderboard_AboveTheFold_728x90_AllPages',
-					'type' : 'header_leaderboard',
-					'iteration' : 0,
-					'sizes' : [
-						[728, 90]
-					]
-				},
-				{
-					'slot' : 'Footer_BelowTheFold_300x250_InternalPage',
-					'type' : 'rr_rectangle',
-					'iteration' : 0,
-					'sizes' : [
-						[300, 250]
-					]
-				},
-				{
-					'slot' : 'InContent_BelowTheFold_300x250_InternalPages',
-					'type' : 'incontent_btf',
-					'iteration' : 0,
-					'sizes' : [
-						[300, 250]
-					]
-				}
-			]
-		;
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function init() {
-
-			debug( _name + ': initialized' );
-
-			return app;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		return {
-			init      : init,
-			account   : account,
-			inventory : inventory
-		};
-
-	}( $ ) );
-
-	return app;
-
-}( admanager || {}, jQuery ) );
-
-admanager.bootstrap.register( admanager.config.init );
-var admanager = ( function( app, $ ) {
-
 	app.events = ( function( $ ) {
 
 		var _name = 'Events',
-			debug = admanager.util.debug
+			debug = null
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		function init() {
 
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
 			_broadcast_events();
@@ -280,28 +129,35 @@ var admanager = ( function( app, $ ) {
 	return app;
 
 }( admanager || {}, jQuery ) );
-
-admanager.bootstrap.register( admanager.events.init );
 var admanager = ( function( app, $ ) {
 
 	app.insertion = ( function( $ ) {
 
 		var _name = 'Insertion',
-			debug = admanager.util.debug
+			debug = null,
+
+			$target = null,
+			_inventory = []
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		function init() {
 
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
-			var $layout = $('body')
-			;
+			$target = $( app.config.insertion_selector ).first();
 
-			if ( ! $layout.hasClass('node-type-article') ) return app;
+			if ( $target.length < 1 ) {
+				_broadcast();
 
-			_events_listener();
+				return app;
+			}
+
+			_inventory = app.manager.get_dynamic_inventory();
+
+			_insert_ad_units();
 
 			return app;
 
@@ -309,162 +165,81 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function _events_listener() {
-
-			$(document)
-				.on('GPT:updateUI', function() {
-					_adjust_blocks_for_ads();
-				})
-			;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 		/**
-		 * Add adjust class to neighbor elements
-		 *
-		 * @param object $target
-		 * @param int ad_height
+		 * Ad units have been inserted / proceed
 		 */
-		function _denote_blocks_for_adjustment( $target, ad_height ) {
+		function _broadcast() {
 
-			var adjustment = 0,
-				$nodes = $target.nextAll()
-			;
-
-			ad_height = ad_height || 600;
-
-			if ( ! _is_full_bleed_image( $target ) ) {
-				$target.addClass('adjust_blocks_for_ads');
-				adjustment += $target.height();
-			}
-
-			if ( adjustment > ad_height ) {
-				return; // bail if already enough room
-			}
-
-			$nodes.each(function(i) {
-
-				var $this = $(this);
-
-				if ( adjustment > ad_height || _is_full_bleed_image( $this ) ) {
-					return false; // break the loop
-				}
-
-				adjustment += $this.height();
-				$this.addClass('adjust_blocks_for_ads');
-
-			});
+			$.event.trigger( 'GPT:unitsInserted' );
 
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function _adjust_blocks_for_ads() {
+		function _insert_ad_units() {
 
-			var $rec = $('.app_ad_unit[data-type="global_rec"]').first()
+			_denote_valid_insertions();
+
+			_insert_primary_unit();
+			_insert_secondary_units();
+
+			_broadcast();
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _denote_valid_insertions() {
+
+			var $nodes = $target.children(),
+				excluded = [
+					'img',
+					'iframe',
+					'.video',
+					'.app_ad_unit'
+				]
 			;
 
-			if (admanager.util.is_mobile()) return false;
+			$nodes.each( function( i ) {
 
-			if ($rec.length < 1) return false;
-
-			var rec_pos_left = $rec.position().left,
-				normal_width = $('.adjust_blocks_for_ads').first().width(),
-				width_reduction = Math.ceil( normal_width - rec_pos_left + parseInt( $rec.css('margin-left'), 10) ),
-				new_width = normal_width - width_reduction
-			;
-
-			$('.adjust_blocks_for_ads').each(function(){
-
-				var $this = $(this)
+				var $element = $(this),
+					$prev = i > 0 ? $nodes.eq( i - 1 ) : false,
+					valid = true
 				;
 
-				$this.find('img,iframe,object').each(function(){
+				$.each( excluded, function( index, item ) {
 
-					var $item = $(this);
+					if ( $element.is( item ) || $element.find( item ).length > 0 ) {
 
-					if ($item.width() > new_width) {
-						$item.css({
-							'width' : new_width
-						});
+						// not valid
+						valid = false;
+
+						// break loop
+						return false;
 					}
-				});
 
-			});
-		}
+				} );
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+				if ( $prev && $prev.is('p') && $prev.find('img').length === 1 ) valid = false;
 
-		/**
-		 * _insert_ad_unit_into_body
-		 *
-		 * @param object unit
-		 * @param object location
-		 */
-		function _insert_ad_unit_into_body(unit, location) {
+				$element.data('valid-location', valid);
 
-			$(location).after(unit);
+			} );
 
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * _is_full_bleed_image
+		 * Check against of list of elements to skip
 		 *
 		 * @param  object $element
 		 * @return bool
 		 */
-		function _is_full_bleed_image( $element ) {
-			var is_full_bleed_image = false;
+		function _is_valid_insertion_location( $element ) {
 
-			if (
-				$element.is('.size-full_bleed') ||
-				$element.find('img').hasClass('size-full_bleed')
-			) {
-				is_full_bleed_image = true;
-			}
+			return $element.data('valid-location');
 
-			return is_full_bleed_image;
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * _is_valid_location
-		 *
-		 * @param  object $element
-		 * @param  int index
-		 * @return bool
-		 */
-		function _is_valid_insertion_location( $element, index ) {
-
-			var valid = true;
-
-			// is a div and not a pull quote
-			if ( $element.is('div') && ! $element.is('div.site_pull_quote') ) {
-				valid = false;
-			}
-
-			// first or second node
-			else if ( index === 0 || index === 1 ) {
-
-				// this is an image
-				if ( $element.is('p, figure') && $element.find('img').length > 0 ) {
-					valid = false;
-				}
-
-			}
-
-			// don't double up on ads
-			// catches [ad-wildcard] / app_ad_unit
-			else if ( $element.prev().is('.app_ad_unit') ) {
-				valid = false;
-			}
-
-			return valid;
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -479,16 +254,76 @@ var admanager = ( function( app, $ ) {
 		function _ad_unit_markup( unit, disable_float ) {
 
 			var ad_type = admanager.util.is_mobile() ? 'mobile' : 'desktop',
-				ad_html = '<div class="app_ad_unit '+ ad_type +'" data-type="'+ unit +'"></div>',
+				ad_html = '<div class="app_ad_unit in_content '+ ad_type +'" data-type="'+ unit +'"></div>',
 				ad_html_disable_float =	'<div class="app_ad_unit disable_float '+ ad_type +'" data-type="'+ unit +'"></div>'
 			;
 
-			if ( disable_float ) {
-				return ad_html_disable_float;
+			return disable_float ? ad_html_disable_float : ad_html;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _insert_primary_unit() {
+
+			var location = _location_to_insert_ad_unit({
+					'limit' : 1000
+				}),
+				unit = _get_primary_unit(),
+				markup = _ad_unit_markup( unit.type, location.disable_float )
+			;
+
+			debug( location );
+
+			location.$insert_before.before( markup );
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _insert_secondary_units() {
+
+			$.each( _inventory, function( index, unit ) {
+
+				var location = _location_to_insert_ad_unit(),
+					markup = null
+				;
+
+				if ( ! location ) {
+					return false;
+				}
+
+				markup = _ad_unit_markup( unit.type, location.disable_float );
+				location.$insert_before.before( markup );
+
+			} );
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _get_primary_unit() {
+
+			var primary_unit = false
+			;
+
+			$.each( _inventory, function( index, unit ) {
+
+				if ( unit.primary == true ) {
+					primary_unit = unit;
+					_inventory.remove(index);
+
+					return false;
+				}
+
+			} );
+
+			if ( ! primary_unit ) {
+				primary_unit = _inventory[0];
+				_inventory.remove(0);
 			}
-			else {
-				return ad_html;
-			}
+
+			return primary_unit;
 
 		}
 
@@ -502,134 +337,97 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _location_to_insert_ad_unit( options ) {
 
-			var $insert_after = false,
-				$nodes = null,
-				offset_top = options.$target.offset().top,
-				fold_height = $(window).height() - 130, // 130 represents approximation of leaderboard
+			options = options || {};
+
+			var $nodes = _get_nodes(),
+				$insert_before = null,
+				inserted = [],
+
+				total_height = 0,
+				valid_height = 0,
+				limit = options.limit ? options.limit : false,
+				min_height = limit ? 600 : 900,
+
 				location_found = false,
 				disable_float = false,
-				maybe_more = true,
-				$prev_unit = false
+				maybe_more = true
 			;
 
-			// nodes after
-			if ( typeof(options.$after) !== 'undefined' ) {
-				$nodes = options.$after.nextAll();
-				$prev_unit = options.$after;
-			}
-			// or all nodes
-			else {
-				$nodes = options.$target.children();
-			}
+			if ( $nodes.length < 1 ) return false;
 
-			// no nodes?
-			if ( $nodes.length < 1 ) {
-				return false;
-			}
-
-			if ( fold_height < 750 ) fold_height = 750;
-
-			var	preferred_max_height = fold_height - (250 / 2),
-				node_iterator = 0
-			;
-
-			// insert ad into article
 			$nodes.each(function(i) {
 
 				var $this = $(this),
-					$prev = $nodes.eq( i - 1 ),
-					$next = $nodes.eq( i + 1 ),
-					$last = $nodes.last(),
-					height_from_top = $this.position().top + offset_top,
-					end_point = $last.position().top + $last.height() + offset_top
+					height = $this.outerHeight(),
+					is_last = ($nodes.length - 1) === i
 				;
 
-				// continue if not valid
-				if ( ! _is_valid_insertion_location( $this, i ) ) {
-					$this.css('display', 'block');
-					node_iterator++;
-					return true;
-				}
+				total_height += height;
 
-				// mobile logic
-				if (admanager.util.is_mobile()) {
-
-					// skip the first node
-					if (node_iterator === 0) {
-						node_iterator++;
-						return true;
-					}
-
-					// give distance bw first image
-					if ( $prev.find('img').length > 0 && i === 1) {
-						node_iterator++;
-						return true;
-					}
-
-					// check distance from previous unit
-					if ( $prev_unit !== false ) {
-
-						var previous_position = $prev_unit.position().top,
-							previous_height = $prev_unit.height(),
-							this_position = $this.position().top,
-							ad_height = 250,
-							total = previous_position + previous_height + ad_height,
-							difference = this_position - total,
-							min_difference = 500
-						;
-
-						if ( difference < min_difference ) {
-							node_iterator++;
-							return true;
-						}
-
-					}
-
-					$insert_after = $prev;
+				if ( limit && (total_height >= limit || is_last) ) {
+					$insert_before = $this;
+					disable_float = true;
 					location_found = true;
-					return false;
 
+					return false;
 				}
 
-				// desktop logic
-				else {
+				if ( _is_valid_insertion_location($this) ) {
+					valid_height += height;
 
-					if (node_iterator > 0 || $nodes.length < 2 ) {
-						// Is this element a related post item?
-						if (($prev.length > 0 && $prev.hasClass('related-post') || $this.hasClass('related-post')) && $next.length > 0) {
-							node_iterator++;
-							return true; // continue
-						}
+					inserted.push($this);
 
-						$insert_after = $prev;
+					if ( $insert_before === null ) {
+						$insert_before = $this;
+					}
 
-						if ( _is_full_bleed_image( $this ) && _is_full_bleed_image( $next ) ) {
-							disable_float = true;
-						}
-
+					if ( valid_height >= min_height ) {
 						location_found = true;
 						return false;
 					}
 				}
-
-				node_iterator++;
+				else {
+					valid_height = 0;
+					$insert_before = null;
+					inserted = [];
+				}
 
 			});
 
-			if ( ! location_found && ! $prev_unit ) {
-				$insert_after = options.$target.children().last();
-				disable_float = true;
-				maybe_more = false;
+			if ( ! location_found ) {
+				return false;
 			}
-			else if ( $prev_unit !== false ) {
-				maybe_more = false;
+
+			if ( inserted.length > 0 ) {
+				$.each( inserted, function( index, item ) {
+					$(item).data('valid-location', false);
+				} );
 			}
 
 			return {
-				'$insert_after' : $insert_after,
-				'disable_float' : disable_float,
-				'maybe_more' : maybe_more
+				'$insert_before' : $insert_before,
+				'disable_float' : disable_float
 			};
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Get Nodes to Loop Through
+		 *
+		 * @return array $nodes
+		 */
+		function _get_nodes() {
+
+			var $prev_unit = $target.find('.app_ad_unit').last(),
+				$nodes = null
+			;
+
+			// nodes after previous unit or all nodes
+			$nodes = ( $prev_unit.length > 0 ) ? $prev_unit.nextAll( $target ) : $target.children();
+
+			return $nodes;
 
 		}
 
@@ -644,18 +442,16 @@ var admanager = ( function( app, $ ) {
 	return app;
 
 }( admanager || {}, jQuery ) );
-
-admanager.bootstrap.register( admanager.insertion.init );
 var admanager = ( function( app, $ ) {
 
 	app.manager = ( function( $ ) {
 
 		var _name = 'Manager',
-			debug = admanager.util.debug,
+			debug = null,
 
 			defined_slots = [],
 			page_positions = [],
-			inventory = [],
+			_inventory = [],
 			account = null
 		;
 
@@ -663,18 +459,13 @@ var admanager = ( function( app, $ ) {
 
 		function init() {
 
+			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
-			if ( typeof app.config == 'undefined' ) {
-				debug( 'No config.' );
-				return app;
-			}
-
-			inventory = _get_available_sizes( app.config.inventory );
+			_inventory = _get_available_sizes( app.config.inventory );
 			account = app.config.account;
 
-			_listen_for_jquery_events();
-			_load_library();
+			_listen_for_custom_events();
 
 			return app;
 
@@ -685,12 +476,31 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * Bind to custom jQuery events
 		 */
-		function _listen_for_jquery_events() {
+		function _listen_for_custom_events() {
 
 			$(document)
-				.on('GPT:initPageAds', function(event) {
+				.on('GPT:unitsInserted', function() {
 
-					debug(_name + ': GPT:initPageAds');
+					debug(_name + ': GPT:unitsInserted');
+
+					_load_library();
+
+				})
+				.on('GPT:libraryLoaded', function() {
+
+					debug(_name + ': GPT:libraryLoaded');
+
+					_listen_for_dfp_events();
+					_enable_single_request();
+					_set_targeting();
+					_set_page_positions();
+					_define_slots_for_page_positions();
+
+				})
+				.on('GPT:slotsDefined', function() {
+
+					debug(_name + ': GPT:slotsDefined');
+
 					_display_page_ads();
 
 				})
@@ -771,13 +581,6 @@ var admanager = ( function( app, $ ) {
 				$.event.trigger( 'GPT:libraryLoaded' );
 			} );
 
-			_listen_for_dfp_events();
-			_enable_single_request();
-			_set_targeting();
-			_set_page_positions();
-			_define_slots_for_page_positions();
-			_display_page_ads();
-
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -826,18 +629,15 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Send targeting info defined in page config
-		 *
-		 * @todo
+		 * Send Targeting
+		 * Defined in Page Config
 		 */
 		function _set_targeting() {
 
-			return;
-
 			googletag.cmd.push(function() {
 
-				var config = util.get_page_config(),
-					targeting = config.targeting
+				var page_config = app.util.page_config(),
+					targeting = page_config.targeting
 				;
 
 				// Set targeting
@@ -853,25 +653,16 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		/**
+		 * Set Page Positions
+		 */
 		function _set_page_positions() {
 
-			if ( admanager.util.is_mobile() ) {
-				_set_mobile_page_positions();
-			}
-			else {
+			if ( ! app.util.is_mobile() ) {
+
 				_set_desktop_page_positions();
+
 			}
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Set Mobile Page Positions
-		 *
-		 * @todo Separate markup insertion
-		 */
-		function _set_mobile_page_positions() {
 
 		}
 
@@ -879,84 +670,21 @@ var admanager = ( function( app, $ ) {
 
 		/**
 		 * Set Desktop Page Positions
-		 *
-		 * @todo Separate markup insertion
 		 */
 		function _set_desktop_page_positions() {
 
-			page_positions = [];
+			var $units = $('.app_ad_unit')
+			;
 
-			// Is homepage
-			if ( $('.page').hasClass('homepage') ) {
+			$units.each(function() {
 
-				page_positions = [
-					'Site_728x90_Homepage_Top',
-					'Site_300x250_Homepage_Middle',
-					'Homepage_Leaderboard_BTF',
-					'Sponsored_Post',
-					'Clickable_Skin',
-					'Sitewide_Interstitial'
-				];
-
-			}
-
-			// Is post detail page
-			else if ( $('.page').hasClass('article_detail') ) {
-
-				var ad_unit = _location_to_insert_ad_unit({
-						'$target' : $('article.post.entry')
-					}),
-					_location = ad_unit.$insert_after,
-					disable_float = ad_unit.disable_float,
-					_markup = _ad_unit_markup('global_rec', disable_float)
+				var $unit = $(this),
+					type = $unit.data('type')
 				;
 
-				_insert_ad_unit_into_body( _markup, _location );
+				page_positions.push( type );
 
-				page_positions = [
-					'Global_Leaderboard_AboveFold',
-					'MRec_Article_Above_Fold',
-					'ArticlePage_MPU_BTF',
-					'Article_EndMessage',
-					'ExperimentalLeaderboard',
-					'Article_Detail_Wide_Skyscraper',
-					'v2_Site_Skin',
-					'Sitewide_Interstitial'
-				];
-
-				// shortcode puts ad position in article body
-				if ( $('.app_ad_unit[data-type="ad_mpu"]').length > 0 ) {
-					page_positions.push('Article_Detail_Wildcard_MPU');
-				}
-
-			}
-
-
-			// Is this a page with the standard Leaderboard + Right Rail?
-			else if (
-				$('.page').hasClass('archive') ||
-				$('.page').hasClass('generic') ||
-				$('.page').hasClass('privacy_policy') ||
-				$('.page').hasClass('contact') ||
-				$('.page').hasClass('404')
-			) {
-
-				page_positions = [
-					'Global_Leaderboard_AboveFold',
-					'MRec_Article_Above_Fold'
-				];
-
-			}
-
-
-			// Is a page with a Leaderboard only (i.e. About, Submissions, etc.)
-			else if ( $('.page').hasClass('leaderboard_only') ) {
-
-				page_positions = [
-					'Global_Leaderboard_AboveFold'
-				];
-
-			}
+			});
 
 		}
 
@@ -967,60 +695,42 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _define_slots_for_page_positions() {
 
-			var cur_position = null,
-				excluded = [ 'Classic_Interstitial', 'Welcome_Ad' ]
+			var current_position = null
 			;
 
-			googletag.cmd.push(function(){
+			googletag.cmd.push(function() {
 				for (var i = 0; i < page_positions.length; i++) {
 
 					_increment_ad_slot( page_positions[i] );
 
-					cur_position = get_ad_info( page_positions[i] );
+					current_position = get_ad_info( page_positions[i] );
 
-					if ( typeof cur_position.type != 'undefined' ) {
+					if ( typeof current_position.type == 'undefined' ) return;
 
-						// find the empty container div on the page. we
-						// will dynamically instantiate the unique ad unit.
+					// find the empty container div on the page. we
+					// will dynamically instantiate the unique ad unit.
+					var $unit = $('.app_ad_unit[data-type="'+ current_position.type +'"]')
+					;
 
-						var $unit = $('.app_ad_unit[data-type="'+ cur_position.type +'"]')
-						;
+					if ( $unit.length < 1 ) return;
 
-						if ($unit.length > 0) {
+					// generate new div
+					$unit.html(
+						'<div class="unit_target" id="'+ current_position.id_name +'"></div>'
+					);
 
-							if ( $.inArray( page_positions[i], excluded ) === -1 ) {
-								// generate new div
-								$unit.html(
-									'<div class="unit_target" id="'+ cur_position.id_name +'"></div>'
-								);
+					// activate
+					$unit.addClass('active');
 
-								// activate
-								$unit.addClass('active');
-							}
+					defined_slots[i] = googletag
+						.defineSlot(
+							'/' + account + '/' + current_position.slot,
+							current_position.sizes,
+							current_position.id_name
+						)
+						.addService(googletag.pubads())
+					;
 
-							if ( typeof(cur_position.sharethrough) !== 'undefined' ) {
-								defined_slots[i] = googletag
-									.defineSlot(
-										'/' + account + '/' + cur_position.slot,
-										cur_position.sizes,
-										cur_position.id_name
-									)
-									.addService(googletag.pubads())
-									.setTargeting('strnativekey', cur_position.sharethrough)
-								;
-							}
-							else {
-								defined_slots[i] = googletag
-									.defineSlot(
-										'/' + account + '/' + cur_position.slot,
-										cur_position.sizes,
-										cur_position.id_name
-									)
-									.addService(googletag.pubads())
-								;
-							}
-						}
-					}
 				}
 
 				// Enables GPT services for defined slots
@@ -1044,11 +754,11 @@ var admanager = ( function( app, $ ) {
 				// lastly, run display code
 				for (var n = 0; n < page_positions.length; n++) {
 
-					cur_position = get_ad_info( page_positions[n] );
+					current_position = get_ad_info( page_positions[n] );
 
-					if ( $('#' + cur_position.id_name).length > 0 ) {
+					if ( $('#' + current_position.id_name).length > 0 ) {
 						googletag.display(
-							cur_position.id_name
+							current_position.id_name
 						);
 					}
 				}
@@ -1070,22 +780,11 @@ var admanager = ( function( app, $ ) {
 			var unit_name = unit.slot.getAdUnitPath().replace('/' + account + '/', '')
 			;
 
-			debug( unit_name );
-
 			$.event.trigger( 'GPT:adUnitRendered', {
 				'name': unit_name,
 				'size': unit.size
 			} );
 
-			if ( unit_name === 'MRec_Article_Above_Fold' && $('.page').hasClass('article_detail') ) {
-				var this_unit = get_ad_info('MRec_Article_Above_Fold'),
-					$target = $('.app_ad_unit[data-type="' + this_unit.type + '"]').next(),
-					height = unit.size[1]
-				;
-
-				_denote_blocks_for_adjustment( $target, height );
-				_adjust_blocks_for_ads();
-			}
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1093,19 +792,21 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * Increment Ad Slot
 		 *
-		 * @param string slot
+		 * @param string unit
 		 */
-		function _increment_ad_slot( slot ) {
+		function _increment_ad_slot( unit ) {
 
 			for (var i = 0; i < _inventory.length; i++) {
-				if ( _inventory[i].slot == slot ) {
+				if ( _inventory[i].type !== unit && _inventory[i].slot !== unit ) continue;
 
-					// increment
-					_inventory[i].iteration = _inventory[i].iteration + 1;
+				if ( typeof _inventory[i].iteration == 'undefined' ) _inventory[i].iteration = 0;
 
-					return;
-				}
+				// increment
+				_inventory[i].iteration = _inventory[i].iteration + 1;
+
+				return;
 			}
+
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1113,31 +814,32 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * Get Ad Unit Info
 		 *
-		 * @param string slot
+		 * @param string unit
 		 * @return object
 		 */
-		function get_ad_info( slot ) {
+		function get_ad_info( unit ) {
 
 			var return_object = {};
 
-			for (var i = 0; i < _inventory.length; i++) {
-				if ( _inventory[i].slot == slot ) {
+			for ( var i = 0; i < _inventory.length; i++ ) {
+				if ( _inventory[i].type !== unit && _inventory[i].slot !== unit ) continue;
 
-					// build return object
-					return_object = _inventory[i];
+				// build return object
+				return_object = _inventory[i];
 
-					// determine the object's id_name
-					if (typeof return_object.use_iterator != 'undefined' && !return_object.use_iterator) {
-						// don't use the iterator
-						return_object.id_name = return_object.type;
-					} else {
-						// use the iterator
-						return_object.id_name = return_object.type + '_' + return_object.iteration;
-					}
-
-					return return_object;
+				// determine the object's id_name
+				if (typeof return_object.use_iterator != 'undefined' && !return_object.use_iterator) {
+					// don't use the iterator
+					return_object.id_name = return_object.type;
+				} else {
+					// use the iterator
+					return_object.id_name = return_object.type + '_' + return_object.iteration;
 				}
+
+				return return_object;
 			}
+
+			return return_object;
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1172,19 +874,19 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * display_slot
 		 *
-		 * @param string name
+		 * @param string unit [type or slot]
 		 */
-		function display_slot( name ) {
+		function display_slot( unit ) {
 
 			googletag.cmd.push(function() {
 
-				var position = get_ad_info( name ),
-					slot = _get_defined_slot( name )
+				var position = get_ad_info( unit ),
+					slot = _get_defined_slot( position.slot )
 				;
 
 				googletag.pubads().refresh( [slot] );
 				googletag.display( position.id_name );
-				remove_defined_slot( name );
+				remove_defined_slot( position.slot );
 
 			});
 
@@ -1205,17 +907,37 @@ var admanager = ( function( app, $ ) {
 				var unit_name = slot.getAdUnitPath().replace('/' + account + '/', '')
 				;
 
-				if ( unit_name === name ) delete defined_slots[index];
+				if ( unit_name === name ) defined_slots.remove(index);
 
 			} );
 
 		}
 
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function get_dynamic_inventory() {
+
+			var dynamic_inventory = []
+			;
+
+			$.each( _inventory, function( index, position ) {
+
+				if ( position.dynamic == true ) dynamic_inventory.push( position );
+
+			} );
+
+			return dynamic_inventory;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 		return {
-			init                : init,
-			get_ad_info         : get_ad_info,
-			display_slot        : display_slot,
-			remove_defined_slot : remove_defined_slot
+			init                  : init,
+			get_ad_info           : get_ad_info,
+			display_slot          : display_slot,
+			remove_defined_slot   : remove_defined_slot,
+			get_dynamic_inventory : get_dynamic_inventory
 		};
 
 	}( $ ) );
@@ -1223,5 +945,126 @@ var admanager = ( function( app, $ ) {
 	return app;
 
 }( admanager || {}, jQuery ) );
+var admanager = ( function( app, $ ) {
 
-admanager.bootstrap.register( admanager.manager.init );admanager.bootstrap.init();
+	app.util = ( function( $ ) {
+
+		var _name = 'Util',
+			_debug_enable = true
+		;
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function init() {
+
+			debug( _name + ': initialized' );
+
+			_init_array_remove();
+			_set_window_request_animation_frame();
+
+			return app;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function debug( obj ) {
+
+			if ( ! _debug_enable ) return;
+
+			if ( ( typeof console == "object" ) && ( console.log ) ) {
+
+				console.log( obj );
+
+			}
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Return difference between arrays
+		 *
+		 * @param  array array
+		 * @param  array values
+		 * @return array diff
+		 */
+		function difference( array, values ) {
+
+			var diff = []
+			;
+
+			$.grep( array, function( element ) {
+				if ( $.inArray( element, values ) === -1 ) diff.push( element );
+			});
+
+			return diff;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Is Mobile
+		 *
+		 * @return bool
+		 */
+		function is_mobile() {
+
+			return $(window).width() < 768 ? true : false;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Set window.requestAnimationFrame
+		 *
+		 * requestAnimationFrame Firefox 23 / IE 10 / Chrome / Safari 7 (incl. iOS)
+		 * mozRequestAnimationFrame Firefox < 23
+		 * webkitRequestAnimationFrame Older versions of Safari / Chrome
+		 */
+		function _set_window_request_animation_frame() {
+
+			window.requestAnimationFrame = window.requestAnimationFrame ||
+				window.mozRequestAnimationFrame ||
+				window.webkitRequestAnimationFrame ||
+				window.oRequestAnimationFrame
+			;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _init_array_remove() {
+
+			// Array Remove - By John Resig (MIT Licensed)
+			Array.prototype.remove = function(from, to) {
+				var rest = this.slice((to || from) + 1 || this.length);
+				this.length = from < 0 ? this.length + from : from;
+				return this.push.apply(this, rest);
+			};
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function page_config() {
+			return {};
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		return {
+			init        : init,
+			debug       : debug,
+			difference  : difference,
+			is_mobile   : is_mobile,
+			page_config : page_config
+		};
+
+	}( $ ) );
+
+	return app;
+
+}( admanager || {}, jQuery ) );
