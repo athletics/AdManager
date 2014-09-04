@@ -195,7 +195,10 @@ var admanager = ( function( app, $ ) {
 				excluded = [
 					'img',
 					'iframe',
+					'video',
+					'audio',
 					'.video',
+					'.audio',
 					'.app_ad_unit'
 				]
 			;
