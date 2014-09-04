@@ -12,7 +12,8 @@ var admanager = ( function( app, $ ) {
 			debug = null,
 
 			$target = null,
-			_inventory = []
+			_inventory = [],
+			last_position = 0
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -151,8 +152,6 @@ var admanager = ( function( app, $ ) {
 				markup = _ad_unit_markup( unit.type, location.disable_float )
 			;
 
-			debug( location );
-
 			location.$insert_before.before( markup );
 
 		}
@@ -224,7 +223,8 @@ var admanager = ( function( app, $ ) {
 				total_height = 0,
 				valid_height = 0,
 				limit = options.limit ? options.limit : false,
-				min_height = limit ? 600 : 900,
+				unit_height = 600,
+				between_units = 900,
 
 				location_found = false,
 				disable_float = false,
@@ -236,6 +236,9 @@ var admanager = ( function( app, $ ) {
 			$nodes.each(function(i) {
 
 				var $this = $(this),
+					$prev = i > 0 ? $nodes.eq( i - 1 ) : false,
+					offset = $this.offset().top,
+					since = offset - last_position,
 					height = $this.outerHeight(),
 					is_last = ($nodes.length - 1) === i
 				;
@@ -250,6 +253,7 @@ var admanager = ( function( app, $ ) {
 					return false;
 				}
 
+
 				if ( _is_valid_insertion_location($this) ) {
 					valid_height += height;
 
@@ -259,7 +263,13 @@ var admanager = ( function( app, $ ) {
 						$insert_before = $this;
 					}
 
-					if ( valid_height >= min_height ) {
+					if ( valid_height >= unit_height ) {
+						if ( limit === false && (since < between_units) ) {
+							valid_height = 0;
+							$insert_before = null;
+							return true;
+						}
+
 						location_found = true;
 						return false;
 					}
@@ -267,7 +277,6 @@ var admanager = ( function( app, $ ) {
 				else {
 					valid_height = 0;
 					$insert_before = null;
-					inserted = [];
 				}
 
 			});
@@ -282,10 +291,28 @@ var admanager = ( function( app, $ ) {
 				} );
 			}
 
+			last_position = $insert_before.offset().top + unit_height;
+
 			return {
 				'$insert_before' : $insert_before,
 				'disable_float' : disable_float
 			};
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Is Element an Ad Unit
+		 *
+		 * @param mixed $el
+		 * @return bool
+		 */
+		function _is_this_an_ad( $el ) {
+
+			if ( ! $el ) return false;
+
+			return $el.is('.app_ad_unit');
 
 		}
 
@@ -304,6 +331,7 @@ var admanager = ( function( app, $ ) {
 
 			// nodes after previous unit or all nodes
 			$nodes = ( $prev_unit.length > 0 ) ? $prev_unit.nextAll( $target ) : $target.children();
+			// $nodes = $target.children();
 
 			return $nodes;
 
