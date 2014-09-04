@@ -469,7 +469,7 @@ var admanager = ( function( app, $ ) {
 				var unit_name = slot.getAdUnitPath().replace('/' + account + '/', '')
 				;
 
-				if ( unit_name === name ) delete defined_slots[index];
+				if ( unit_name === name ) defined_slots.remove(index);
 
 			} );
 
