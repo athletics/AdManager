@@ -11,7 +11,8 @@ var admanager = ( function( app, $ ) {
 		var _name = 'Insertion',
 			debug = null,
 
-			$layout = null
+			$target = null,
+			_inventory = []
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -21,12 +22,17 @@ var admanager = ( function( app, $ ) {
 			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
-			var $layout = $('body')
-			;
+			$target = $( app.config.insertion_selector ).first();
 
-			if ( ! $layout.hasClass('node-type-article') ) return app;
+			if ( $target.length < 1 ) {
+				_broadcast();
 
-			_events_listener();
+				return app;
+			}
+
+			_inventory = app.manager.get_dynamic_inventory();
+
+			_insert_ad_units();
 
 			return app;
 
@@ -34,162 +40,81 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function _events_listener() {
-
-			$(document)
-				.on('GPT:updateUI', function() {
-					_adjust_blocks_for_ads();
-				})
-			;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 		/**
-		 * Add adjust class to neighbor elements
-		 *
-		 * @param object $target
-		 * @param int ad_height
+		 * Ad units have been inserted / proceed
 		 */
-		function _denote_blocks_for_adjustment( $target, ad_height ) {
+		function _broadcast() {
 
-			var adjustment = 0,
-				$nodes = $target.nextAll()
-			;
-
-			ad_height = ad_height || 600;
-
-			if ( ! _is_full_bleed_image( $target ) ) {
-				$target.addClass('adjust_blocks_for_ads');
-				adjustment += $target.height();
-			}
-
-			if ( adjustment > ad_height ) {
-				return; // bail if already enough room
-			}
-
-			$nodes.each(function(i) {
-
-				var $this = $(this);
-
-				if ( adjustment > ad_height || _is_full_bleed_image( $this ) ) {
-					return false; // break the loop
-				}
-
-				adjustment += $this.height();
-				$this.addClass('adjust_blocks_for_ads');
-
-			});
+			$.event.trigger( 'GPT:unitsInserted' );
 
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function _adjust_blocks_for_ads() {
+		function _insert_ad_units() {
 
-			var $rec = $('.app_ad_unit[data-type="global_rec"]').first()
+			_denote_valid_insertions();
+
+			_insert_primary_unit();
+			_insert_secondary_units();
+
+			_broadcast();
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _denote_valid_insertions() {
+
+			var $nodes = $target.children(),
+				excluded = [
+					'img',
+					'iframe',
+					'.video',
+					'.app_ad_unit'
+				]
 			;
 
-			if (admanager.util.is_mobile()) return false;
+			$nodes.each( function( i ) {
 
-			if ($rec.length < 1) return false;
-
-			var rec_pos_left = $rec.position().left,
-				normal_width = $('.adjust_blocks_for_ads').first().width(),
-				width_reduction = Math.ceil( normal_width - rec_pos_left + parseInt( $rec.css('margin-left'), 10) ),
-				new_width = normal_width - width_reduction
-			;
-
-			$('.adjust_blocks_for_ads').each(function(){
-
-				var $this = $(this)
+				var $element = $(this),
+					$prev = i > 0 ? $nodes.eq( i - 1 ) : false,
+					valid = true
 				;
 
-				$this.find('img,iframe,object').each(function(){
+				$.each( excluded, function( index, item ) {
 
-					var $item = $(this);
+					if ( $element.is( item ) || $element.find( item ).length > 0 ) {
 
-					if ($item.width() > new_width) {
-						$item.css({
-							'width' : new_width
-						});
+						// not valid
+						valid = false;
+
+						// break loop
+						return false;
 					}
-				});
 
-			});
-		}
+				} );
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+				if ( $prev && $prev.is('p') && $prev.find('img').length === 1 ) valid = false;
 
-		/**
-		 * _insert_ad_unit_into_body
-		 *
-		 * @param object unit
-		 * @param object location
-		 */
-		function _insert_ad_unit_into_body(unit, location) {
+				$element.data('valid-location', valid);
 
-			$(location).after(unit);
+			} );
 
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * _is_full_bleed_image
+		 * Check against of list of elements to skip
 		 *
 		 * @param  object $element
 		 * @return bool
 		 */
-		function _is_full_bleed_image( $element ) {
-			var is_full_bleed_image = false;
+		function _is_valid_insertion_location( $element ) {
 
-			if (
-				$element.is('.size-full_bleed') ||
-				$element.find('img').hasClass('size-full_bleed')
-			) {
-				is_full_bleed_image = true;
-			}
+			return $element.data('valid-location');
 
-			return is_full_bleed_image;
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * _is_valid_location
-		 *
-		 * @param  object $element
-		 * @param  int index
-		 * @return bool
-		 */
-		function _is_valid_insertion_location( $element, index ) {
-
-			var valid = true;
-
-			// is a div and not a pull quote
-			if ( $element.is('div') && ! $element.is('div.site_pull_quote') ) {
-				valid = false;
-			}
-
-			// first or second node
-			else if ( index === 0 || index === 1 ) {
-
-				// this is an image
-				if ( $element.is('p, figure') && $element.find('img').length > 0 ) {
-					valid = false;
-				}
-
-			}
-
-			// don't double up on ads
-			// catches [ad-wildcard] / app_ad_unit
-			else if ( $element.prev().is('.app_ad_unit') ) {
-				valid = false;
-			}
-
-			return valid;
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -204,16 +129,76 @@ var admanager = ( function( app, $ ) {
 		function _ad_unit_markup( unit, disable_float ) {
 
 			var ad_type = admanager.util.is_mobile() ? 'mobile' : 'desktop',
-				ad_html = '<div class="app_ad_unit '+ ad_type +'" data-type="'+ unit +'"></div>',
+				ad_html = '<div class="app_ad_unit in_content '+ ad_type +'" data-type="'+ unit +'"></div>',
 				ad_html_disable_float =	'<div class="app_ad_unit disable_float '+ ad_type +'" data-type="'+ unit +'"></div>'
 			;
 
-			if ( disable_float ) {
-				return ad_html_disable_float;
+			return disable_float ? ad_html_disable_float : ad_html;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _insert_primary_unit() {
+
+			var location = _location_to_insert_ad_unit({
+					'limit' : 1000
+				}),
+				unit = _get_primary_unit(),
+				markup = _ad_unit_markup( unit.type, location.disable_float )
+			;
+
+			debug( location );
+
+			location.$insert_before.before( markup );
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _insert_secondary_units() {
+
+			$.each( _inventory, function( index, unit ) {
+
+				var location = _location_to_insert_ad_unit(),
+					markup = null
+				;
+
+				if ( ! location ) {
+					return false;
+				}
+
+				markup = _ad_unit_markup( unit.type, location.disable_float );
+				location.$insert_before.before( markup );
+
+			} );
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _get_primary_unit() {
+
+			var primary_unit = false
+			;
+
+			$.each( _inventory, function( index, unit ) {
+
+				if ( unit.primary == true ) {
+					primary_unit = unit;
+					_inventory.remove(index);
+
+					return false;
+				}
+
+			} );
+
+			if ( ! primary_unit ) {
+				primary_unit = _inventory[0];
+				_inventory.remove(0);
 			}
-			else {
-				return ad_html;
-			}
+
+			return primary_unit;
 
 		}
 
@@ -227,134 +212,97 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _location_to_insert_ad_unit( options ) {
 
-			var $insert_after = false,
-				$nodes = null,
-				offset_top = options.$target.offset().top,
-				fold_height = $(window).height() - 130, // 130 represents approximation of leaderboard
+			options = options || {};
+
+			var $nodes = _get_nodes(),
+				$insert_before = null,
+				inserted = [],
+
+				total_height = 0,
+				valid_height = 0,
+				limit = options.limit ? options.limit : false,
+				min_height = limit ? 600 : 900,
+
 				location_found = false,
 				disable_float = false,
-				maybe_more = true,
-				$prev_unit = false
+				maybe_more = true
 			;
 
-			// nodes after
-			if ( typeof(options.$after) !== 'undefined' ) {
-				$nodes = options.$after.nextAll();
-				$prev_unit = options.$after;
-			}
-			// or all nodes
-			else {
-				$nodes = options.$target.children();
-			}
+			if ( $nodes.length < 1 ) return false;
 
-			// no nodes?
-			if ( $nodes.length < 1 ) {
-				return false;
-			}
-
-			if ( fold_height < 750 ) fold_height = 750;
-
-			var	preferred_max_height = fold_height - (250 / 2),
-				node_iterator = 0
-			;
-
-			// insert ad into article
 			$nodes.each(function(i) {
 
 				var $this = $(this),
-					$prev = $nodes.eq( i - 1 ),
-					$next = $nodes.eq( i + 1 ),
-					$last = $nodes.last(),
-					height_from_top = $this.position().top + offset_top,
-					end_point = $last.position().top + $last.height() + offset_top
+					height = $this.outerHeight(),
+					is_last = ($nodes.length - 1) === i
 				;
 
-				// continue if not valid
-				if ( ! _is_valid_insertion_location( $this, i ) ) {
-					$this.css('display', 'block');
-					node_iterator++;
-					return true;
-				}
+				total_height += height;
 
-				// mobile logic
-				if (admanager.util.is_mobile()) {
-
-					// skip the first node
-					if (node_iterator === 0) {
-						node_iterator++;
-						return true;
-					}
-
-					// give distance bw first image
-					if ( $prev.find('img').length > 0 && i === 1) {
-						node_iterator++;
-						return true;
-					}
-
-					// check distance from previous unit
-					if ( $prev_unit !== false ) {
-
-						var previous_position = $prev_unit.position().top,
-							previous_height = $prev_unit.height(),
-							this_position = $this.position().top,
-							ad_height = 250,
-							total = previous_position + previous_height + ad_height,
-							difference = this_position - total,
-							min_difference = 500
-						;
-
-						if ( difference < min_difference ) {
-							node_iterator++;
-							return true;
-						}
-
-					}
-
-					$insert_after = $prev;
+				if ( limit && (total_height >= limit || is_last) ) {
+					$insert_before = $this;
+					disable_float = true;
 					location_found = true;
-					return false;
 
+					return false;
 				}
 
-				// desktop logic
-				else {
+				if ( _is_valid_insertion_location($this) ) {
+					valid_height += height;
 
-					if (node_iterator > 0 || $nodes.length < 2 ) {
-						// Is this element a related post item?
-						if (($prev.length > 0 && $prev.hasClass('related-post') || $this.hasClass('related-post')) && $next.length > 0) {
-							node_iterator++;
-							return true; // continue
-						}
+					inserted.push($this);
 
-						$insert_after = $prev;
+					if ( $insert_before === null ) {
+						$insert_before = $this;
+					}
 
-						if ( _is_full_bleed_image( $this ) && _is_full_bleed_image( $next ) ) {
-							disable_float = true;
-						}
-
+					if ( valid_height >= min_height ) {
 						location_found = true;
 						return false;
 					}
 				}
-
-				node_iterator++;
+				else {
+					valid_height = 0;
+					$insert_before = null;
+					inserted = [];
+				}
 
 			});
 
-			if ( ! location_found && ! $prev_unit ) {
-				$insert_after = options.$target.children().last();
-				disable_float = true;
-				maybe_more = false;
+			if ( ! location_found ) {
+				return false;
 			}
-			else if ( $prev_unit !== false ) {
-				maybe_more = false;
+
+			if ( inserted.length > 0 ) {
+				$.each( inserted, function( index, item ) {
+					$(item).data('valid-location', false);
+				} );
 			}
 
 			return {
-				'$insert_after' : $insert_after,
-				'disable_float' : disable_float,
-				'maybe_more' : maybe_more
+				'$insert_before' : $insert_before,
+				'disable_float' : disable_float
 			};
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Get Nodes to Loop Through
+		 *
+		 * @return array $nodes
+		 */
+		function _get_nodes() {
+
+			var $prev_unit = $target.find('.app_ad_unit').last(),
+				$nodes = null
+			;
+
+			// nodes after previous unit or all nodes
+			$nodes = ( $prev_unit.length > 0 ) ? $prev_unit.nextAll( $target ) : $target.children();
+
+			return $nodes;
 
 		}
 
