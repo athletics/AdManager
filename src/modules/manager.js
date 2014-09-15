@@ -14,7 +14,8 @@ var admanager = ( function( app, $ ) {
 			defined_slots = [],
 			page_positions = [],
 			_inventory = [],
-			account = null
+			account = null,
+			has_mobile_ads = true
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -26,6 +27,8 @@ var admanager = ( function( app, $ ) {
 
 			_inventory = _get_available_sizes( app.config.inventory );
 			account = app.config.account;
+
+			has_mobile_ads = typeof app.config.has_mobile_ads !== 'undefined' ? app.config.has_mobile_ads : has_mobile_ads;
 
 			_listen_for_custom_events();
 
@@ -220,7 +223,7 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _set_page_positions() {
 
-			if ( ! app.util.is_mobile() ) {
+			if ( ! app.util.is_mobile() || ! has_mobile_ads ) {
 
 				_set_desktop_page_positions();
 
