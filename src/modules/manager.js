@@ -103,7 +103,7 @@ var admanager = ( function( app, $ ) {
 
 					}
 
-					_inventory[i].sizes = util.difference( _inventory[i].sizes, sizes_to_remove );
+					_inventory[i].sizes = app.util.difference( _inventory[i].sizes, sizes_to_remove );
 
 				}
 			}
