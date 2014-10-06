@@ -10,41 +10,33 @@ module.exports = function(grunt) {
 			output: 'dist'
 		},
 
-		connect: {
-			server: {
-				options: {
-					port: 8000
-				}
-			}
-		},
-		concat: {
+		uglify: {
 			options: {
-				stripBanners: true
+				preserveComments: false,
+				banner: '// athleticsnyc.com - <%= grunt.template.today("yyyy-mm-dd") %>\n'
 			},
-			dist: {
-				src: [
-					'<%= paths.modules %>/*.js'
-				],
-				dest: '<%= paths.output %>/admanager.js'
+			build: {
+				files: {
+					'<%= paths.output %>/admanager.js': [ '<%= paths.modules %>/*.js' ]
+				}
 			}
 		},
 		watch: {
 			scripts: {
 				files: [
-					'<%= concat.dist.src %>',
-					'bower_components/*'
+					'<%= paths.modules %>/*',
+					'<%= paths.bower %>/*'
 				],
-				tasks: ['concat'],
+				tasks: ['uglify'],
 			},
 		},
 	});
 
 	// grunt plugins
-	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// Tasks
-	grunt.registerTask('default', ['concat', 'connect', 'watch']);
+	grunt.registerTask('default', ['uglify', 'watch']);
 
 };
