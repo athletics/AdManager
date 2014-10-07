@@ -26,7 +26,7 @@ The inventory is an array of objects
 | `sizes`      | array   |
 | `dynamic`    | boolean |
 
-:small_orange_diamond: __* Optional__
+__* Optional__
 
 #### Example Usage
 
