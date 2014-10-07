@@ -223,7 +223,7 @@ var admanager = ( function( app, $ ) {
 				total_height = 0,
 				valid_height = 0,
 				limit = options.limit ? options.limit : false,
-				unit_height = 600,
+				needed_height = 560,
 				between_units = 900,
 
 				location_found = false,
@@ -263,7 +263,7 @@ var admanager = ( function( app, $ ) {
 						$insert_before = $this;
 					}
 
-					if ( valid_height >= unit_height ) {
+					if ( valid_height >= needed_height ) {
 						if ( limit === false && (since < between_units) ) {
 							valid_height = 0;
 							$insert_before = null;
@@ -291,7 +291,7 @@ var admanager = ( function( app, $ ) {
 				} );
 			}
 
-			last_position = $insert_before.offset().top + unit_height;
+			last_position = $insert_before.offset().top + needed_height;
 
 			return {
 				'$insert_before' : $insert_before,
