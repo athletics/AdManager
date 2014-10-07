@@ -24,6 +24,7 @@ The inventory is an array of objects
 | `type`       | string  |
 | `iteration`* | integer |
 | `sizes`      | array   |
+| `dynamic`    | boolean |
 
 :small_orange_diamond: __* Optional__
 
