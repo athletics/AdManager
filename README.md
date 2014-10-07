@@ -25,7 +25,7 @@ The inventory is an array of objects
 | `iteration`* | integer |
 | `sizes`      | array   |
 
-:small_orange_diamond: *** Optional**
+:small_orange_diamond: __*Optional__
 
 #### Example Usage
 
