@@ -487,7 +487,7 @@ var admanager = ( function( app, $ ) {
 
 			$.each( _inventory, function( index, position ) {
 
-				if ( position.dynamic == true ) dynamic_inventory.push( position );
+				if ( position.dynamic === true ) dynamic_inventory.push( position );
 
 			} );
 
