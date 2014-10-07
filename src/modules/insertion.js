@@ -13,7 +13,8 @@ var admanager = ( function( app, $ ) {
 
 			$target = null,
 			_inventory = [],
-			last_position = 0
+			last_position = 0,
+			odd = true
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -132,12 +133,17 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _ad_unit_markup( unit, disable_float ) {
 
-			var ad_type = admanager.util.is_mobile() ? 'mobile' : 'desktop',
-				ad_html = '<div class="app_ad_unit in_content '+ ad_type +'" data-type="'+ unit +'"></div>',
-				ad_html_disable_float =	'<div class="app_ad_unit disable_float '+ ad_type +'" data-type="'+ unit +'"></div>'
+			disable_float = disable_float || false;
+
+			var type = admanager.util.is_mobile() ? 'mobile' : 'desktop',
+				alignment = odd ? 'odd' : 'even',
+				html = '<div class="app_ad_unit in_content '+ alignment + ' ' + type +'" data-type="'+ unit +'"></div>',
+				html_disable_float =	'<div class="app_ad_unit disable_float '+ type +'" data-type="'+ unit +'"></div>'
 			;
 
-			return disable_float ? ad_html_disable_float : ad_html;
+			if ( ! disable_float ) odd = ! odd;
+
+			return disable_float ? html_disable_float : html;
 
 		}
 
