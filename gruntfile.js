@@ -13,7 +13,8 @@ module.exports = function(grunt) {
 		uglify: {
 			options: {
 				preserveComments: false,
-				banner: '// athleticsnyc.com - <%= grunt.template.today("yyyy-mm-dd") %>\n'
+				banner: '// athleticsnyc.com - <%= grunt.template.today("yyyy-mm-dd") %>\n',
+				footer: '\nwindow.AdManager = admanager.bootstrap.init;'
 			},
 			build: {
 				files: {

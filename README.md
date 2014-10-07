@@ -1,7 +1,4 @@
-ad-manager
-==========
-
-Generic code for ad management
+# Ad Manager
 
 ## Usage
 
@@ -47,10 +44,10 @@ __* Optional__
 }
 ```
 
-### Init
+### Initialize with Configuration
 
 ```javascript
-admanager.bootstrap.init( config );
+AdManager( config );
 ```
 
 ## Events
