@@ -224,7 +224,7 @@ var admanager = ( function( app, $ ) {
 				valid_height = 0,
 				limit = options.limit ? options.limit : false,
 				needed_height = 560,
-				between_units = 900,
+				between_units = 800,
 
 				location_found = false,
 				disable_float = false,
