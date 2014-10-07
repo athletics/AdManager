@@ -2,6 +2,3 @@
 *.html
 bower_components
 node_modules
-dist/athletics.js
-dist/athletics.less
-dist/athletics.css
