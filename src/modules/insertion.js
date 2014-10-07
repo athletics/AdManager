@@ -186,7 +186,7 @@ var admanager = ( function( app, $ ) {
 
 			$.each( _inventory, function( index, unit ) {
 
-				if ( unit.primary == true ) {
+				if ( unit.primary === true ) {
 					primary_unit = unit;
 					_inventory.remove(index);
 
