@@ -270,14 +270,14 @@ var admanager = ( function( app, $ ) {
 
 					current_position = get_ad_info( page_positions[i] );
 
-					if ( typeof current_position.type == 'undefined' ) return;
+					if ( typeof current_position.type == 'undefined' ) continue;
 
 					// find the empty container div on the page. we
 					// will dynamically instantiate the unique ad unit.
 					var $unit = $('.app_ad_unit[data-type="'+ current_position.type +'"]')
 					;
 
-					if ( $unit.length < 1 ) return;
+					if ( $unit.length < 1 ) continue;
 
 					// generate new div
 					$unit.html(
