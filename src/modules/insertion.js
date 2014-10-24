@@ -151,10 +151,10 @@ var admanager = ( function( app, $ ) {
 
 		function _insert_primary_unit() {
 
-			var location = _location_to_insert_ad_unit({
-					'limit' : 1000
+			var unit = _get_primary_unit(),
+				location = _location_to_insert_ad_unit({
+					limit: 1000
 				}),
-				unit = _get_primary_unit(),
 				markup = _ad_unit_markup( unit.type, location.disable_float )
 			;
 
