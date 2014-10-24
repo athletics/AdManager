@@ -345,6 +345,24 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		/**
+		 * Get Tallest Possible Size for Unit
+		 *
+		 * @param object unit
+		 * @return integer
+		 */
+		function _tallest_available( unit ) {
+			var tallest = 0;
+
+			$.each( units.sizes, function( index, sizes ) {
+				if ( sizes[1] > tallest ) tallest = sizes[1];
+			});
+
+			return tallest;
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 		return {
 			init : init
 		};
