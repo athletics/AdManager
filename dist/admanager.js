@@ -411,7 +411,7 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.util = function($) {
-        var _name = "Util", _debug_enable = false;
+        var _name = "Util", _debug_enable = true;
         function init() {
             debug(_name + ": initialized");
             _init_array_remove();
@@ -446,7 +446,9 @@ var admanager = function(app, $) {
         }
         function page_config() {
             if (typeof app.config.page_config_selector === "undefined") return {};
-            return $(app.config.page_config_selector).data("page-config");
+            var config = $(app.config.page_config_selector).data("page-config");
+            if (typeof config !== "object") return {};
+            return config;
         }
         return {
             init: init,
