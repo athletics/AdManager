@@ -411,7 +411,7 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.util = function($) {
-        var _name = "Util", _debug_enable = true;
+        var _name = "Util", _debug_enable = false;
         function init() {
             debug(_name + ": initialized");
             _init_array_remove();

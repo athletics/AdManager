@@ -9,7 +9,7 @@ var admanager = ( function( app, $ ) {
 	app.util = ( function( $ ) {
 
 		var _name = 'Util',
-			_debug_enable = true
+			_debug_enable = false
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -118,7 +118,7 @@ var admanager = ( function( app, $ ) {
 
 			var config = $( app.config.page_config_selector ).data('page-config');
 
-			if ( typeof config !== 'object' ) return {}
+			if ( typeof config !== 'object' ) return {};
 
 			return config;
 		}
