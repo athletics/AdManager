@@ -13,7 +13,13 @@ module.exports = function(grunt) {
 		uglify: {
 			options: {
 				preserveComments: false,
-				banner: '// athleticsnyc.com - <%= grunt.template.today("yyyy-mm-dd") %>\n',
+				banner: '/**\n' +
+					' * <%= pkg.name %> - <%= pkg.description %>\n' +
+					' *\n' +
+					' * @author <%= pkg.author.name %> - <%= pkg.author.url %>\n' +
+					' * @see <%= pkg.homepage %>\n' +
+					' * @version <%= pkg.version %> (<%= grunt.template.today("yyyy-mm-dd") %>)\n' +
+					' */\n',
 				footer: '\nwindow.AdManager = admanager.bootstrap.init;'
 			},
 			build: {
