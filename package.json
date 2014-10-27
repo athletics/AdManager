@@ -6,7 +6,10 @@
     "type": "git",
     "url": "https://github.com/athletics/ad-manager.git"
   },
-  "author": "Athletics",
+  "author": {
+    "name": "Athletics",
+    "url": "http://athleticsnyc.com"
+  },
   "license": "MIT",
   "homepage": "https://github.com/athletics/ad-manager",
   "devDependencies": {
