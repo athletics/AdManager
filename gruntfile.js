@@ -4,6 +4,16 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		comments: {
+			banner: '/**\n' +
+				' * <%= pkg.name %> - <%= pkg.description %>\n' +
+				' *\n' +
+				' * @author <%= pkg.author.name %> - <%= pkg.author.url %>\n' +
+				' * @see <%= pkg.homepage %>\n' +
+				' * @version <%= pkg.version %> (<%= grunt.template.today("yyyy-mm-dd") %>)\n' +
+				' */\n',
+			footer: '\nwindow.AdManager = admanager.bootstrap.init;'
+		},
 		paths: {
 			bower: 'bower_components',
 			modules: 'src/modules',
@@ -13,14 +23,8 @@ module.exports = function(grunt) {
 		uglify: {
 			options: {
 				preserveComments: false,
-				banner: '/**\n' +
-					' * <%= pkg.name %> - <%= pkg.description %>\n' +
-					' *\n' +
-					' * @author <%= pkg.author.name %> - <%= pkg.author.url %>\n' +
-					' * @see <%= pkg.homepage %>\n' +
-					' * @version <%= pkg.version %> (<%= grunt.template.today("yyyy-mm-dd") %>)\n' +
-					' */\n',
-				footer: '\nwindow.AdManager = admanager.bootstrap.init;'
+				banner: '<%= comments.banner %>',
+				footer: '<%= comments.footer %>'
 			},
 			build: {
 				files: {
