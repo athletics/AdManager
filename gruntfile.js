@@ -21,14 +21,28 @@ module.exports = function(grunt) {
 		},
 
 		uglify: {
-			options: {
-				preserveComments: false,
-				banner: '<%= comments.banner %>',
-				footer: '<%= comments.footer %>'
-			},
 			build: {
+				options: {
+					preserveComments: false,
+					mangle: false,
+					compress: false,
+					beautify: true,
+					banner: '<%= comments.banner %>',
+					footer: '<%= comments.footer %>'
+				},
 				files: {
 					'<%= paths.output %>/admanager.js': [ '<%= paths.modules %>/*.js' ]
+				}
+			},
+			min: {
+				options: {
+					preserveComments: false,
+					mangle: true,
+					banner: '<%= comments.banner %>',
+					footer: '<%= comments.footer %>'
+				},
+				files: {
+					'<%= paths.output %>/admanager.min.js': [ '<%= paths.modules %>/*.js' ]
 				}
 			}
 		},

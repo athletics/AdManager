@@ -5,5 +5,457 @@
  * @see https://github.com/athletics/ad-manager
  * @version 0.1.0 (2014-10-27)
  */
-var admanager=function(a){return"undefined"==typeof a.initialized&&(a.initialized=!1),a.bootstrap=function(){function b(b){if(a.initialized)return!1;if(admanager.config=b||!1,!admanager.config)throw new Error("Please provide config");e=jQuery,a.util.init().events.init().manager.init().insertion.init(),f=admanager.util.debug?admanager.util.debug:function(){};for(var c=0;c<g.length;c++)g[c]();return f(d+": initialized"),a.initialized=!0,a}function c(a){g.push(a)}var d="Bootstrap",e=null,f=null,g=[];return{init:b,register:c}}(),a}(admanager||{}),admanager=function(a,b){return a.events=function(b){function c(){return f=admanager.util.debug?admanager.util.debug:function(){},f(e+": initialized"),d(),a}function d(){b(document).on("scroll",function(){window.requestAnimationFrame(function(){b.event.trigger("GPT:scroll"),b.event.trigger("GPT:updateUI")})}).on("resize",function(){window.requestAnimationFrame(function(){b.event.trigger("GPT:resize"),b.event.trigger("GPT:updateUI")})})}var e="Events",f=null;return{init:c}}(b),a}(admanager||{},jQuery),admanager=function(a,b){return a.insertion=function(b){function c(){return o=admanager.util.debug?admanager.util.debug:function(){},o(n+": initialized"),p=b(a.config.insertion_selector).first(),p.length<1?(d(),a):(q=a.manager.get_dynamic_inventory(),e(),a)}function d(){b.event.trigger("GPT:unitsInserted")}function e(){f(),i(),j(),d()}function f(){var a=p.children(),c=["img","iframe","video","audio",".video",".audio",".app_ad_unit"];a.each(function(d){var e=b(this),f=d>0?a.eq(d-1):!1,g=!0;b.each(c,function(a,b){return e.is(b)||e.find(b).length>0?(g=!1,!1):void 0}),f&&f.is("p")&&1===f.find("img").length&&(g=!1),e.data("valid-location",g)})}function g(a){return a.data("valid-location")}function h(a,b){b=b||!1;var c=admanager.util.is_mobile()?"mobile":"desktop",d=s?"odd":"even",e='<div class="app_ad_unit in_content '+d+" "+c+'" data-type="'+a+'"></div>',f='<div class="app_ad_unit disable_float '+c+'" data-type="'+a+'"></div>';return b||(s=!s),b?f:e}function i(){var a=k(),b=l({limit:1e3}),c=h(a.type,b.disable_float);b.$insert_before.before(c)}function j(){b.each(q,function(a,b){var c=l(),d=null;return c?(d=h(b.type,c.disable_float),void c.$insert_before.before(d)):!1})}function k(){var a=!1;return b.each(q,function(b,c){return c.primary===!0?(a=c,q.remove(b),!1):void 0}),a||(a=q[0],q.remove(0)),a}function l(a){a=a||{};var c=m(),d=null,e=[],f=0,h=0,i=a.limit?a.limit:!1,j=560,k=800,l=!1,n=!1;return c.length<1?!1:(c.each(function(a){var m=b(this),o=(a>0?c.eq(a-1):!1,m.offset().top),p=o-r,q=m.outerHeight(),s=c.length-1===a;if(f+=q,i&&(f>=i||s))return d=m,n=!0,l=!0,!1;if(g(m)){if(h+=q,e.push(m),null===d&&(d=m),h>=j)return i===!1&&k>p?(h=0,d=null,!0):(l=!0,!1)}else h=0,d=null}),l?(e.length>0&&b.each(e,function(a,c){b(c).data("valid-location",!1)}),r=d.offset().top+j,{$insert_before:d,disable_float:n}):!1)}function m(){var a=p.find(".app_ad_unit").last(),b=null;return b=a.length>0?a.nextAll(p):p.children()}var n="Insertion",o=null,p=null,q=[],r=0,s=!0;return{init:c}}(b),a}(admanager||{},jQuery),admanager=function(a,b){return a.manager=function(b){function c(){return w=admanager.util.debug?admanager.util.debug:function(){},w(v+": initialized"),z=e(a.config.inventory),A=a.config.account,B="undefined"!=typeof a.config.has_mobile_ads?a.config.has_mobile_ads:B,d(),a}function d(){b(document).on("GPT:unitsInserted",function(){w(v+": GPT:unitsInserted"),f()}).on("GPT:libraryLoaded",function(){w(v+": GPT:libraryLoaded"),h(),i(),j(),k(),m()}).on("GPT:slotsDefined",function(){w(v+": GPT:slotsDefined"),n()})}function e(b){var c=window.innerWidth>0?window.innerWidth:screen.width;if(c>1024)return b;if(c>=768&&1024>=c)for(var d=980,e=0;e<b.length;e++){for(var f=[],g=0;g<b[e].sizes.length;g++)b[e].sizes[g][0]>d&&f.push(b[e].sizes[g]);b[e].sizes=a.util.difference(b[e].sizes,f)}return b}function f(){window.googletag=window.googletag||{},window.googletag.cmd=window.googletag.cmd||[];var a="https:"===document.location.protocol,b=(a?"https:":"http:")+"//www.googletagservices.com/tag/js/gpt.js";$LAB.script(b).wait(function(){g()})}function g(){googletag.cmd.push(function(){b.event.trigger("GPT:libraryLoaded")})}function h(){googletag.cmd.push(function(){googletag.pubads().addEventListener("slotRenderEnded",function(a){o(a)})})}function i(){googletag.cmd.push(function(){googletag.pubads().collapseEmptyDivs(),googletag.pubads().enableSingleRequest(),googletag.pubads().disableInitialLoad()})}function j(){googletag.cmd.push(function(){var c=a.util.page_config(),d=c.targeting;"undefined"!=typeof d&&b.each(d,function(a,b){googletag.pubads().setTargeting(a,b)})})}function k(){a.util.is_mobile()&&B||l()}function l(){var a=b(".app_ad_unit");a.each(function(){var a=b(this),c=a.data("type");y.push(c)})}function m(){var a=null;googletag.cmd.push(function(){for(var c=0;c<y.length;c++)if(p(y[c]),a=q(y[c]),"undefined"!=typeof a.type){var d=b('.app_ad_unit[data-type="'+a.type+'"]');d.length<1||(d.html('<div class="app_unit_target" id="'+a.id_name+'"></div>'),d.addClass("active"),x[c]=googletag.defineSlot("/"+A+"/"+a.slot,a.sizes,a.id_name).addService(googletag.pubads()))}googletag.enableServices(),b.event.trigger("GPT:slotsDefined")})}function n(){googletag.cmd.push(function(){googletag.pubads().refresh(x);for(var a=0;a<y.length;a++)current_position=q(y[a]),b("#"+current_position.id_name).length>0&&googletag.display(current_position.id_name)})}function o(a){var c=a.slot.getAdUnitPath().replace("/"+A+"/","");b.event.trigger("GPT:adUnitRendered",{name:c,size:a.size})}function p(a){for(var b=0;b<z.length;b++)if(z[b].type===a||z[b].slot===a)return"undefined"==typeof z[b].iteration&&(z[b].iteration=0),void(z[b].iteration=z[b].iteration+1)}function q(a){for(var b={},c=0;c<z.length;c++)if(z[c].type===a||z[c].slot===a)return b=z[c],b.id_name="undefined"==typeof b.use_iterator||b.use_iterator?b.type+"_"+b.iteration:b.type,b;return b}function r(a){var c=null;return b.each(x,function(b,d){var e=d.getAdUnitPath().replace("/"+A+"/","");return e===a?(c=d,!1):void 0}),c}function s(a){googletag.cmd.push(function(){var b=q(a),c=r(b.slot);googletag.pubads().refresh([c]),googletag.display(b.id_name),t(b.slot)})}function t(a){b.each(x,function(b,c){var d=c.getAdUnitPath().replace("/"+A+"/","");d===a&&x.remove(b)})}function u(){var a=[];return b.each(z,function(b,c){c.dynamic===!0&&a.push(c)}),a}var v="Manager",w=null,x=[],y=[],z=[],A=null,B=!0;return{init:c,get_ad_info:q,display_slot:s,remove_defined_slot:t,get_dynamic_inventory:u}}(b),a}(admanager||{},jQuery),admanager=function(a,b){return a.util=function(b){function c(){return d(j+": initialized"),h(),g(),a}function d(a){k&&"object"==typeof console&&console.log&&console.log(a)}function e(a,c){var d=[];return b.grep(a,function(a){-1===b.inArray(a,c)&&d.push(a)}),d}function f(){return b(window).width()<768?!0:!1}function g(){window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.oRequestAnimationFrame}function h(){Array.prototype.remove=function(a,b){var c=this.slice((b||a)+1||this.length);return this.length=0>a?this.length+a:a,this.push.apply(this,c)}}function i(){return"undefined"==typeof a.config.page_config_selector?{}:b(a.config.page_config_selector).data("page-config")}var j="Util",k=!1;return{init:c,debug:d,difference:e,is_mobile:f,page_config:i}}(b),a}(admanager||{},jQuery);
+var admanager = function(app) {
+    if (typeof app.initialized == "undefined") {
+        app.initialized = false;
+    }
+    app.bootstrap = function() {
+        var _name = "Bootstrap", $ = null, debug = null, _init_callbacks = [];
+        function init(config) {
+            if (app.initialized) return false;
+            admanager.config = config || false;
+            if (!admanager.config) {
+                throw new Error("Please provide config");
+            }
+            $ = jQuery;
+            app.util.init().events.init().manager.init().insertion.init();
+            debug = admanager.util.debug ? admanager.util.debug : function() {};
+            for (var i = 0; i < _init_callbacks.length; i++) {
+                _init_callbacks[i]();
+            }
+            debug(_name + ": initialized");
+            app.initialized = true;
+            return app;
+        }
+        function register(callback) {
+            _init_callbacks.push(callback);
+        }
+        return {
+            init: init,
+            register: register
+        };
+    }();
+    return app;
+}(admanager || {});
+
+var admanager = function(app, $) {
+    app.events = function($) {
+        var _name = "Events", debug = null;
+        function init() {
+            debug = admanager.util.debug ? admanager.util.debug : function() {};
+            debug(_name + ": initialized");
+            _broadcast_events();
+            return app;
+        }
+        function _broadcast_events() {
+            $(document).on("scroll", function() {
+                window.requestAnimationFrame(function() {
+                    $.event.trigger("GPT:scroll");
+                    $.event.trigger("GPT:updateUI");
+                });
+            }).on("resize", function() {
+                window.requestAnimationFrame(function() {
+                    $.event.trigger("GPT:resize");
+                    $.event.trigger("GPT:updateUI");
+                });
+            });
+        }
+        return {
+            init: init
+        };
+    }($);
+    return app;
+}(admanager || {}, jQuery);
+
+var admanager = function(app, $) {
+    app.insertion = function($) {
+        var _name = "Insertion", debug = null, $target = null, _inventory = [], last_position = 0, odd = true;
+        function init() {
+            debug = admanager.util.debug ? admanager.util.debug : function() {};
+            debug(_name + ": initialized");
+            $target = $(app.config.insertion_selector).first();
+            if ($target.length < 1) {
+                _broadcast();
+                return app;
+            }
+            _inventory = app.manager.get_dynamic_inventory();
+            _insert_ad_units();
+            return app;
+        }
+        function _broadcast() {
+            $.event.trigger("GPT:unitsInserted");
+        }
+        function _insert_ad_units() {
+            _denote_valid_insertions();
+            _insert_primary_unit();
+            _insert_secondary_units();
+            _broadcast();
+        }
+        function _denote_valid_insertions() {
+            var $nodes = $target.children(), excluded = [ "img", "iframe", "video", "audio", ".video", ".audio", ".app_ad_unit" ];
+            $nodes.each(function(i) {
+                var $element = $(this), $prev = i > 0 ? $nodes.eq(i - 1) : false, valid = true;
+                $.each(excluded, function(index, item) {
+                    if ($element.is(item) || $element.find(item).length > 0) {
+                        valid = false;
+                        return false;
+                    }
+                });
+                if ($prev && $prev.is("p") && $prev.find("img").length === 1) valid = false;
+                $element.data("valid-location", valid);
+            });
+        }
+        function _is_valid_insertion_location($element) {
+            return $element.data("valid-location");
+        }
+        function _ad_unit_markup(unit, disable_float) {
+            disable_float = disable_float || false;
+            var type = admanager.util.is_mobile() ? "mobile" : "desktop", alignment = odd ? "odd" : "even", html = '<div class="app_ad_unit in_content ' + alignment + " " + type + '" data-type="' + unit + '"></div>', html_disable_float = '<div class="app_ad_unit disable_float ' + type + '" data-type="' + unit + '"></div>';
+            if (!disable_float) odd = !odd;
+            return disable_float ? html_disable_float : html;
+        }
+        function _insert_primary_unit() {
+            var unit = _get_primary_unit(), location = _location_to_insert_ad_unit({
+                limit: 1e3
+            }), markup = _ad_unit_markup(unit.type, location.disable_float);
+            location.$insert_before.before(markup);
+        }
+        function _insert_secondary_units() {
+            $.each(_inventory, function(index, unit) {
+                var location = _location_to_insert_ad_unit(), markup = null;
+                if (!location) {
+                    return false;
+                }
+                markup = _ad_unit_markup(unit.type, location.disable_float);
+                location.$insert_before.before(markup);
+            });
+        }
+        function _get_primary_unit() {
+            var primary_unit = false;
+            $.each(_inventory, function(index, unit) {
+                if (unit.primary === true) {
+                    primary_unit = unit;
+                    _inventory.remove(index);
+                    return false;
+                }
+            });
+            if (!primary_unit) {
+                primary_unit = _inventory[0];
+                _inventory.remove(0);
+            }
+            return primary_unit;
+        }
+        function _location_to_insert_ad_unit(options) {
+            options = options || {};
+            var $nodes = _get_nodes(), $insert_before = null, inserted = [], total_height = 0, valid_height = 0, limit = options.limit ? options.limit : false, needed_height = 560, between_units = 800, location_found = false, disable_float = false, maybe_more = true;
+            if ($nodes.length < 1) return false;
+            $nodes.each(function(i) {
+                var $this = $(this), $prev = i > 0 ? $nodes.eq(i - 1) : false, offset = $this.offset().top, since = offset - last_position, height = $this.outerHeight(), is_last = $nodes.length - 1 === i;
+                total_height += height;
+                if (limit && (total_height >= limit || is_last)) {
+                    $insert_before = $this;
+                    disable_float = true;
+                    location_found = true;
+                    return false;
+                }
+                if (_is_valid_insertion_location($this)) {
+                    valid_height += height;
+                    inserted.push($this);
+                    if ($insert_before === null) {
+                        $insert_before = $this;
+                    }
+                    if (valid_height >= needed_height) {
+                        if (limit === false && since < between_units) {
+                            valid_height = 0;
+                            $insert_before = null;
+                            return true;
+                        }
+                        location_found = true;
+                        return false;
+                    }
+                } else {
+                    valid_height = 0;
+                    $insert_before = null;
+                }
+            });
+            if (!location_found) {
+                return false;
+            }
+            if (inserted.length > 0) {
+                $.each(inserted, function(index, item) {
+                    $(item).data("valid-location", false);
+                });
+            }
+            last_position = $insert_before.offset().top + needed_height;
+            return {
+                $insert_before: $insert_before,
+                disable_float: disable_float
+            };
+        }
+        function _is_this_an_ad($el) {
+            if (!$el) return false;
+            return $el.is(".app_ad_unit");
+        }
+        function _get_nodes() {
+            var $prev_unit = $target.find(".app_ad_unit").last(), $nodes = null;
+            $nodes = $prev_unit.length > 0 ? $prev_unit.nextAll($target) : $target.children();
+            return $nodes;
+        }
+        function _tallest_available(unit) {
+            var tallest = 0;
+            $.each(units.sizes, function(index, sizes) {
+                if (sizes[1] > tallest) tallest = sizes[1];
+            });
+            return tallest;
+        }
+        return {
+            init: init
+        };
+    }($);
+    return app;
+}(admanager || {}, jQuery);
+
+var admanager = function(app, $) {
+    app.manager = function($) {
+        var _name = "Manager", debug = null, defined_slots = [], page_positions = [], _inventory = [], account = null, has_mobile_ads = true;
+        function init() {
+            debug = admanager.util.debug ? admanager.util.debug : function() {};
+            debug(_name + ": initialized");
+            _inventory = _get_available_sizes(app.config.inventory);
+            account = app.config.account;
+            has_mobile_ads = typeof app.config.has_mobile_ads !== "undefined" ? app.config.has_mobile_ads : has_mobile_ads;
+            _listen_for_custom_events();
+            return app;
+        }
+        function _listen_for_custom_events() {
+            $(document).on("GPT:unitsInserted", function() {
+                debug(_name + ": GPT:unitsInserted");
+                _load_library();
+            }).on("GPT:libraryLoaded", function() {
+                debug(_name + ": GPT:libraryLoaded");
+                _listen_for_dfp_events();
+                _enable_single_request();
+                _set_targeting();
+                _set_page_positions();
+                _define_slots_for_page_positions();
+            }).on("GPT:slotsDefined", function() {
+                debug(_name + ": GPT:slotsDefined");
+                _display_page_ads();
+            });
+        }
+        function _get_available_sizes(_inventory) {
+            var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
+            if (width > 1024) return _inventory;
+            if (width >= 768 && width <= 1024) {
+                var max = 980;
+                for (var i = 0; i < _inventory.length; i++) {
+                    var sizes_to_remove = [];
+                    for (var j = 0; j < _inventory[i].sizes.length; j++) {
+                        if (_inventory[i].sizes[j][0] > max) {
+                            sizes_to_remove.push(_inventory[i].sizes[j]);
+                        }
+                    }
+                    _inventory[i].sizes = app.util.difference(_inventory[i].sizes, sizes_to_remove);
+                }
+            }
+            return _inventory;
+        }
+        function _load_library() {
+            window.googletag = window.googletag || {};
+            window.googletag.cmd = window.googletag.cmd || [];
+            var useSSL = "https:" === document.location.protocol, path = (useSSL ? "https:" : "http:") + "//www.googletagservices.com/tag/js/gpt.js";
+            $LAB.script(path).wait(function() {
+                _on_library_loaded();
+            });
+        }
+        function _on_library_loaded() {
+            googletag.cmd.push(function() {
+                $.event.trigger("GPT:libraryLoaded");
+            });
+        }
+        function _listen_for_dfp_events() {
+            googletag.cmd.push(function() {
+                googletag.pubads().addEventListener("slotRenderEnded", function(event) {
+                    _slot_render_ended(event);
+                });
+            });
+        }
+        function _enable_single_request() {
+            googletag.cmd.push(function() {
+                googletag.pubads().collapseEmptyDivs();
+                googletag.pubads().enableSingleRequest();
+                googletag.pubads().disableInitialLoad();
+            });
+        }
+        function _set_targeting() {
+            googletag.cmd.push(function() {
+                var page_config = app.util.page_config(), targeting = page_config.targeting;
+                if (typeof targeting !== "undefined") {
+                    $.each(targeting, function(key, value) {
+                        googletag.pubads().setTargeting(key, value);
+                    });
+                }
+            });
+        }
+        function _set_page_positions() {
+            if (!app.util.is_mobile() || !has_mobile_ads) {
+                _set_desktop_page_positions();
+            }
+        }
+        function _set_desktop_page_positions() {
+            var $units = $(".app_ad_unit");
+            $units.each(function() {
+                var $unit = $(this), type = $unit.data("type");
+                page_positions.push(type);
+            });
+        }
+        function _define_slots_for_page_positions() {
+            var current_position = null;
+            googletag.cmd.push(function() {
+                for (var i = 0; i < page_positions.length; i++) {
+                    _increment_ad_slot(page_positions[i]);
+                    current_position = get_ad_info(page_positions[i]);
+                    if (typeof current_position.type == "undefined") continue;
+                    var $unit = $('.app_ad_unit[data-type="' + current_position.type + '"]');
+                    if ($unit.length < 1) continue;
+                    $unit.html('<div class="app_unit_target" id="' + current_position.id_name + '"></div>');
+                    $unit.addClass("active");
+                    defined_slots[i] = googletag.defineSlot("/" + account + "/" + current_position.slot, current_position.sizes, current_position.id_name).addService(googletag.pubads());
+                }
+                googletag.enableServices();
+                $.event.trigger("GPT:slotsDefined");
+            });
+        }
+        function _display_page_ads() {
+            googletag.cmd.push(function() {
+                googletag.pubads().refresh(defined_slots);
+                for (var n = 0; n < page_positions.length; n++) {
+                    current_position = get_ad_info(page_positions[n]);
+                    if ($("#" + current_position.id_name).length > 0) {
+                        googletag.display(current_position.id_name);
+                    }
+                }
+            });
+        }
+        function _slot_render_ended(unit) {
+            var unit_name = unit.slot.getAdUnitPath().replace("/" + account + "/", "");
+            $.event.trigger("GPT:adUnitRendered", {
+                name: unit_name,
+                size: unit.size
+            });
+        }
+        function _increment_ad_slot(unit) {
+            for (var i = 0; i < _inventory.length; i++) {
+                if (_inventory[i].type !== unit && _inventory[i].slot !== unit) continue;
+                if (typeof _inventory[i].iteration == "undefined") _inventory[i].iteration = 0;
+                _inventory[i].iteration = _inventory[i].iteration + 1;
+                return;
+            }
+        }
+        function get_ad_info(unit) {
+            var return_object = {};
+            for (var i = 0; i < _inventory.length; i++) {
+                if (_inventory[i].type !== unit && _inventory[i].slot !== unit) continue;
+                return_object = _inventory[i];
+                if (typeof return_object.use_iterator != "undefined" && !return_object.use_iterator) {
+                    return_object.id_name = return_object.type;
+                } else {
+                    return_object.id_name = return_object.type + "_" + return_object.iteration;
+                }
+                return return_object;
+            }
+            return return_object;
+        }
+        function _get_defined_slot(name) {
+            var defined_slot = null;
+            $.each(defined_slots, function(i, slot) {
+                var unit_name = slot.getAdUnitPath().replace("/" + account + "/", "");
+                if (unit_name === name) {
+                    defined_slot = slot;
+                    return false;
+                }
+            });
+            return defined_slot;
+        }
+        function display_slot(unit) {
+            googletag.cmd.push(function() {
+                var position = get_ad_info(unit), slot = _get_defined_slot(position.slot);
+                googletag.pubads().refresh([ slot ]);
+                googletag.display(position.id_name);
+                remove_defined_slot(position.slot);
+            });
+        }
+        function remove_defined_slot(name) {
+            $.each(defined_slots, function(index, slot) {
+                var unit_name = slot.getAdUnitPath().replace("/" + account + "/", "");
+                if (unit_name === name) defined_slots.remove(index);
+            });
+        }
+        function get_dynamic_inventory() {
+            var dynamic_inventory = [];
+            $.each(_inventory, function(index, position) {
+                if (position.dynamic === true) dynamic_inventory.push(position);
+            });
+            return dynamic_inventory;
+        }
+        return {
+            init: init,
+            get_ad_info: get_ad_info,
+            display_slot: display_slot,
+            remove_defined_slot: remove_defined_slot,
+            get_dynamic_inventory: get_dynamic_inventory
+        };
+    }($);
+    return app;
+}(admanager || {}, jQuery);
+
+var admanager = function(app, $) {
+    app.util = function($) {
+        var _name = "Util", _debug_enable = false;
+        function init() {
+            debug(_name + ": initialized");
+            _init_array_remove();
+            _set_window_request_animation_frame();
+            return app;
+        }
+        function debug(obj) {
+            if (!_debug_enable) return;
+            if (typeof console == "object" && console.log) {
+                console.log(obj);
+            }
+        }
+        function difference(array, values) {
+            var diff = [];
+            $.grep(array, function(element) {
+                if ($.inArray(element, values) === -1) diff.push(element);
+            });
+            return diff;
+        }
+        function is_mobile() {
+            return $(window).width() < 768 ? true : false;
+        }
+        function _set_window_request_animation_frame() {
+            window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame;
+        }
+        function _init_array_remove() {
+            Array.prototype.remove = function(from, to) {
+                var rest = this.slice((to || from) + 1 || this.length);
+                this.length = from < 0 ? this.length + from : from;
+                return this.push.apply(this, rest);
+            };
+        }
+        function page_config() {
+            if (typeof app.config.page_config_selector === "undefined") return {};
+            return $(app.config.page_config_selector).data("page-config");
+        }
+        return {
+            init: init,
+            debug: debug,
+            difference: difference,
+            is_mobile: is_mobile,
+            page_config: page_config
+        };
+    }($);
+    return app;
+}(admanager || {}, jQuery);
 window.AdManager = admanager.bootstrap.init;
