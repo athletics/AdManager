@@ -108,8 +108,15 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		/**
+		 * Get page config
+		 *
+		 * @return object
+		 */
 		function page_config() {
-			return {};
+			if ( typeof app.config.page_config_selector === 'undefined' ) return {};
+
+			return $( app.config.page_config_selector ).data('page-config');
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
