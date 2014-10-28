@@ -161,6 +161,28 @@ var admanager = ( function( app, $ ) {
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Limit Ad Unit Height: Removes Larger Sizes from Inventory
+		 *
+		 * @param  object unit
+		 * @param  int limit
+		 * @return object unit
+		 */
+		function limit_unit_height( unit, limit ) {
+
+			$.each( unit.sizes, function( index, sizes ) {
+				if ( sizes[1] <= limit ) return true;
+
+				unit.sizes.remove( index );
+			} );
+
+			return unit;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 		return {
 			init               : init,
 			debug              : debug,
@@ -169,6 +191,7 @@ var admanager = ( function( app, $ ) {
 			page_config        : page_config,
 			shortest_available : shortest_available,
 			tallest_available  : tallest_available,
+			limit_unit_height  : limit_unit_height
 		};
 
 	}( $ ) );
