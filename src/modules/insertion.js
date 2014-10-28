@@ -127,7 +127,7 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * _ad_unit_markup
 		 *
-		 * @param object unit
+		 * @param string unit
 		 * @param bool disable_float
 		 * @return string
 		 */
