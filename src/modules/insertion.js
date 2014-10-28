@@ -26,7 +26,7 @@ var admanager = ( function( app, $ ) {
 
 			$target = $( app.config.insertion_selector ).first();
 
-			if ( $target.length < 1 ) {
+			if ( $target.length < 1 || ! _is_enabled() ) {
 				_broadcast();
 
 				return app;
@@ -49,6 +49,21 @@ var admanager = ( function( app, $ ) {
 
 			$.event.trigger( 'GPT:unitsInserted' );
 
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Is Insertion Enabled?
+		 *
+		 * @return bool
+		 */
+		function _is_enabled() {
+			var page_config = app.util.page_config();
+
+			if ( typeof page_config.insertion_enabled === 'undefined' ) return false;
+
+			return page_config.insertion_enabled;
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

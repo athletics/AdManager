@@ -74,7 +74,7 @@ var admanager = function(app, $) {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             debug(_name + ": initialized");
             $target = $(app.config.insertion_selector).first();
-            if ($target.length < 1) {
+            if ($target.length < 1 || !_is_enabled()) {
                 _broadcast();
                 return app;
             }
@@ -84,6 +84,11 @@ var admanager = function(app, $) {
         }
         function _broadcast() {
             $.event.trigger("GPT:unitsInserted");
+        }
+        function _is_enabled() {
+            var page_config = app.util.page_config();
+            if (typeof page_config.insertion_enabled === "undefined") return false;
+            return page_config.insertion_enabled;
         }
         function _insert_ad_units() {
             _denote_valid_insertions();
