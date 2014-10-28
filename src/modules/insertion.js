@@ -338,7 +338,6 @@ var admanager = ( function( app, $ ) {
 
 			// nodes after previous unit or all nodes
 			$nodes = ( $prev_unit.length > 0 ) ? $prev_unit.nextAll( $target ) : $target.children();
-			// $nodes = $target.children();
 
 			return $nodes;
 
