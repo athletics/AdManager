@@ -201,6 +201,13 @@ var admanager = function(app, $) {
             $nodes = $prev_unit.length > 0 ? $prev_unit.nextAll($target) : $target.children();
             return $nodes;
         }
+        function _shortest_available(unit) {
+            var shortest = 0;
+            $.each(unit.sizes, function(index, sizes) {
+                if (shortest === 0) shortest = sizes[1]; else if (sizes[1] < shortest) shortest = sizes[1];
+            });
+            return shortest;
+        }
         function _tallest_available(unit) {
             var tallest = 0;
             $.each(unit.sizes, function(index, sizes) {

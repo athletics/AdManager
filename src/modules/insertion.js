@@ -347,6 +347,25 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
+		 * Get Shortest Possible Size for Unit
+		 *
+		 * @param object unit
+		 * @return integer
+		 */
+		function _shortest_available( unit ) {
+			var shortest = 0;
+
+			$.each( unit.sizes, function( index, sizes ) {
+				if ( shortest === 0 ) shortest = sizes[1];
+				else if ( sizes[1] < shortest ) shortest = sizes[1];
+			});
+
+			return shortest;
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
 		 * Get Tallest Possible Size for Unit
 		 *
 		 * @param object unit
