@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.1.0 (2014-10-28)
+ * @version 0.1.1 (2014-10-28)
  */
 var admanager = function(app) {
     if (typeof app.initialized == "undefined") {
@@ -115,14 +115,28 @@ var admanager = function(app, $) {
             return disable_float ? html_disable_float : html;
         }
         function _insert_primary_unit() {
-            var unit = _get_primary_unit(), location = _location_to_insert_ad_unit(unit, {
+            var unit = _get_primary_unit(), tallest = admanager.util.tallest_available(unit), shortest = admanager.util.shortest_available(unit), location = _location_to_insert_ad_unit({
+                height: tallest,
                 limit: 1e3
-            }), markup = _ad_unit_markup(unit.type, location.disable_float);
+            }), markup = null;
+            if (!location) {
+                location = _location_to_insert_ad_unit({
+                    height: shortest,
+                    limit: 1e3,
+                    force: true
+                });
+                if (!location.disable_float) {
+                    unit = admanager.util.limit_unit_height(unit, shortest);
+                }
+            }
+            markup = _ad_unit_markup(unit.type, location.disable_float);
             location.$insert_before.before(markup);
         }
         function _insert_secondary_units() {
             $.each(_inventory, function(index, unit) {
-                var location = _location_to_insert_ad_unit(unit), markup = null;
+                var tallest = admanager.util.tallest_available(unit), location = _location_to_insert_ad_unit({
+                    height: tallest
+                }), markup = null;
                 if (!location) {
                     return false;
                 }
@@ -145,17 +159,20 @@ var admanager = function(app, $) {
             }
             return primary_unit;
         }
-        function _location_to_insert_ad_unit(unit, options) {
+        function _location_to_insert_ad_unit(options) {
             options = options || {};
-            var $nodes = _get_nodes(), $insert_before = null, inserted = [], total_height = 0, valid_height = 0, limit = options.limit ? options.limit : false, margin_difference = 40, needed_height = _tallest_available(unit) - margin_difference, between_units = 800, location_found = false, disable_float = false, maybe_more = true;
+            var $nodes = _get_nodes(), $insert_before = null, inserted = [], total_height = 0, valid_height = 0, limit = options.limit ? options.limit : false, force = options.force ? options.force : false, margin_difference = 40, needed_height = options.height - margin_difference, between_units = 800, location_found = false, disable_float = false, maybe_more = true;
             if ($nodes.length < 1) return false;
             $nodes.each(function(i) {
                 var $this = $(this), $prev = i > 0 ? $nodes.eq(i - 1) : false, offset = $this.offset().top, since = offset - last_position, height = $this.outerHeight(), is_last = $nodes.length - 1 === i;
                 total_height += height;
-                if (limit && (total_height >= limit || is_last)) {
+                if (force && (total_height >= limit || is_last)) {
                     $insert_before = $this;
                     disable_float = true;
                     location_found = true;
+                    return false;
+                } else if (limit && (total_height >= limit || is_last)) {
+                    location_found = false;
                     return false;
                 }
                 if (_is_valid_insertion_location($this)) {
@@ -200,20 +217,6 @@ var admanager = function(app, $) {
             var $prev_unit = $target.find(".app_ad_unit").last(), $nodes = null;
             $nodes = $prev_unit.length > 0 ? $prev_unit.nextAll($target) : $target.children();
             return $nodes;
-        }
-        function _shortest_available(unit) {
-            var shortest = 0;
-            $.each(unit.sizes, function(index, sizes) {
-                if (shortest === 0) shortest = sizes[1]; else if (sizes[1] < shortest) shortest = sizes[1];
-            });
-            return shortest;
-        }
-        function _tallest_available(unit) {
-            var tallest = 0;
-            $.each(unit.sizes, function(index, sizes) {
-                if (sizes[1] > tallest) tallest = sizes[1];
-            });
-            return tallest;
         }
         return {
             init: init
@@ -457,12 +460,36 @@ var admanager = function(app, $) {
             if (typeof config !== "object") return {};
             return config;
         }
+        function shortest_available(unit) {
+            var shortest = 0;
+            $.each(unit.sizes, function(index, sizes) {
+                if (shortest === 0) shortest = sizes[1]; else if (sizes[1] < shortest) shortest = sizes[1];
+            });
+            return shortest;
+        }
+        function tallest_available(unit) {
+            var tallest = 0;
+            $.each(unit.sizes, function(index, sizes) {
+                if (sizes[1] > tallest) tallest = sizes[1];
+            });
+            return tallest;
+        }
+        function limit_unit_height(unit, limit) {
+            $.each(unit.sizes, function(index, sizes) {
+                if (sizes[1] <= limit) return true;
+                unit.sizes.remove(index);
+            });
+            return unit;
+        }
         return {
             init: init,
             debug: debug,
             difference: difference,
             is_mobile: is_mobile,
-            page_config: page_config
+            page_config: page_config,
+            shortest_available: shortest_available,
+            tallest_available: tallest_available,
+            limit_unit_height: limit_unit_height
         };
     }($);
     return app;
