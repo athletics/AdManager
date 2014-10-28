@@ -125,12 +125,50 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		/**
+		 * Get Shortest Possible Size for Unit
+		 *
+		 * @param object unit
+		 * @return integer
+		 */
+		function shortest_available( unit ) {
+			var shortest = 0;
+
+			$.each( unit.sizes, function( index, sizes ) {
+				if ( shortest === 0 ) shortest = sizes[1];
+				else if ( sizes[1] < shortest ) shortest = sizes[1];
+			});
+
+			return shortest;
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Get Tallest Possible Size for Unit
+		 *
+		 * @param object unit
+		 * @return integer
+		 */
+		function tallest_available( unit ) {
+			var tallest = 0;
+
+			$.each( unit.sizes, function( index, sizes ) {
+				if ( sizes[1] > tallest ) tallest = sizes[1];
+			});
+
+			return tallest;
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 		return {
-			init        : init,
-			debug       : debug,
-			difference  : difference,
-			is_mobile   : is_mobile,
-			page_config : page_config
+			init               : init,
+			debug              : debug,
+			difference         : difference,
+			is_mobile          : is_mobile,
+			page_config        : page_config,
+			shortest_available : shortest_available,
+			tallest_available  : tallest_available,
 		};
 
 	}( $ ) );
