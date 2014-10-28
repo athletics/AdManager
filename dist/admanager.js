@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.1.0 (2014-10-27)
+ * @version 0.1.0 (2014-10-28)
  */
 var admanager = function(app) {
     if (typeof app.initialized == "undefined") {
@@ -115,14 +115,14 @@ var admanager = function(app, $) {
             return disable_float ? html_disable_float : html;
         }
         function _insert_primary_unit() {
-            var unit = _get_primary_unit(), location = _location_to_insert_ad_unit({
+            var unit = _get_primary_unit(), location = _location_to_insert_ad_unit(unit, {
                 limit: 1e3
             }), markup = _ad_unit_markup(unit.type, location.disable_float);
             location.$insert_before.before(markup);
         }
         function _insert_secondary_units() {
             $.each(_inventory, function(index, unit) {
-                var location = _location_to_insert_ad_unit(), markup = null;
+                var location = _location_to_insert_ad_unit(unit), markup = null;
                 if (!location) {
                     return false;
                 }
@@ -145,9 +145,9 @@ var admanager = function(app, $) {
             }
             return primary_unit;
         }
-        function _location_to_insert_ad_unit(options) {
+        function _location_to_insert_ad_unit(unit, options) {
             options = options || {};
-            var $nodes = _get_nodes(), $insert_before = null, inserted = [], total_height = 0, valid_height = 0, limit = options.limit ? options.limit : false, needed_height = 560, between_units = 800, location_found = false, disable_float = false, maybe_more = true;
+            var $nodes = _get_nodes(), $insert_before = null, inserted = [], total_height = 0, valid_height = 0, limit = options.limit ? options.limit : false, margin_difference = 40, needed_height = _tallest_available(unit) - margin_difference, between_units = 800, location_found = false, disable_float = false, maybe_more = true;
             if ($nodes.length < 1) return false;
             $nodes.each(function(i) {
                 var $this = $(this), $prev = i > 0 ? $nodes.eq(i - 1) : false, offset = $this.offset().top, since = offset - last_position, height = $this.outerHeight(), is_last = $nodes.length - 1 === i;
@@ -203,7 +203,7 @@ var admanager = function(app, $) {
         }
         function _tallest_available(unit) {
             var tallest = 0;
-            $.each(units.sizes, function(index, sizes) {
+            $.each(unit.sizes, function(index, sizes) {
                 if (sizes[1] > tallest) tallest = sizes[1];
             });
             return tallest;
