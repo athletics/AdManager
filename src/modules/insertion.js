@@ -149,14 +149,36 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		/**
+		 * Insert Primary Unit: Unit most display above the fold
+		 */
 		function _insert_primary_unit() {
 
 			var unit = _get_primary_unit(),
-				location = _location_to_insert_ad_unit(unit, {
+				tallest = admanager.util.tallest_available( unit ),
+				shortest = admanager.util.shortest_available( unit ),
+
+				location = _location_to_insert_ad_unit( {
+					height: tallest,
 					limit: 1000
-				}),
-				markup = _ad_unit_markup( unit.type, location.disable_float )
+				} ),
+				markup = null
 			;
+
+			if ( ! location ) {
+				location = _location_to_insert_ad_unit( {
+					height: shortest,
+					limit: 1000,
+					force: true
+				} );
+
+				if ( ! location.disable_float ) {
+					// unset large sizes
+					unit = admanager.util.limit_unit_height( unit, shortest );
+				}
+			}
+
+			markup = _ad_unit_markup( unit.type, location.disable_float );
 
 			location.$insert_before.before( markup );
 
@@ -168,7 +190,10 @@ var admanager = ( function( app, $ ) {
 
 			$.each( _inventory, function( index, unit ) {
 
-				var location = _location_to_insert_ad_unit(unit),
+				var tallest = admanager.util.tallest_available( unit ),
+					location = _location_to_insert_ad_unit( {
+						height: tallest
+					} ),
 					markup = null
 				;
 
@@ -215,11 +240,10 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * _location_to_insert_ad_unit
 		 *
-		 * @param object unit
 		 * @param object options
 		 * @return object
 		 */
-		function _location_to_insert_ad_unit( unit, options ) {
+		function _location_to_insert_ad_unit( options ) {
 
 			options = options || {};
 
@@ -230,8 +254,9 @@ var admanager = ( function( app, $ ) {
 				total_height = 0,
 				valid_height = 0,
 				limit = options.limit ? options.limit : false,
+				force = options.force ? options.force : false,
 				margin_difference = 40,
-				needed_height = _tallest_available(unit) - margin_difference,
+				needed_height = options.height - margin_difference,
 				between_units = 800,
 
 				location_found = false,
@@ -241,22 +266,28 @@ var admanager = ( function( app, $ ) {
 
 			if ( $nodes.length < 1 ) return false;
 
-			$nodes.each(function(i) {
+			$nodes.each( function( i ) {
 
 				var $this = $(this),
 					$prev = i > 0 ? $nodes.eq( i - 1 ) : false,
 					offset = $this.offset().top,
 					since = offset - last_position,
 					height = $this.outerHeight(),
-					is_last = ($nodes.length - 1) === i
+					is_last = ( $nodes.length - 1 ) === i
 				;
 
 				total_height += height;
 
-				if ( limit && (total_height >= limit || is_last) ) {
+				if ( force && ( total_height >= limit || is_last ) ) {
 					$insert_before = $this;
 					disable_float = true;
 					location_found = true;
+
+					return false;
+				}
+
+				else if ( limit && ( total_height >= limit || is_last ) ) {
+					location_found = false;
 
 					return false;
 				}
@@ -271,7 +302,7 @@ var admanager = ( function( app, $ ) {
 					}
 
 					if ( valid_height >= needed_height ) {
-						if ( limit === false && (since < between_units) ) {
+						if ( limit === false && ( since < between_units ) ) {
 							valid_height = 0;
 							$insert_before = null;
 							return true;
@@ -286,7 +317,7 @@ var admanager = ( function( app, $ ) {
 					$insert_before = null;
 				}
 
-			});
+			} );
 
 			if ( ! location_found ) {
 				return false;
