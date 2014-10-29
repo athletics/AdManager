@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.1.1 (2014-10-28)
+ * @version 0.1.2 (2014-10-29)
  */
 var admanager = function(app) {
     if (typeof app.initialized == "undefined") {
@@ -69,20 +69,23 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.insertion = function($) {
-        var _name = "Insertion", debug = null, $target = null, insert_after = false, _inventory = [], last_position = 0, odd = true;
+        var _name = "Insertion", debug = null, $target = null, $denoted = null, in_content = false, insert_after = false, _inventory = [], last_position = 0, odd = true;
         function init() {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             debug(_name + ": initialized");
-            $target = $(app.config.insertion_selector).first();
             if (!_is_enabled()) {
                 _broadcast();
                 return app;
             }
-            if ($target.length < 1) {
-                $target = $(".app_ad_insert_after");
+            $target = $(app.config.insertion_selector).first();
+            $denoted = $(".app_ad_insert_after");
+            if ($target.length > 0) {
+                in_content = true;
+            }
+            if ($denoted.length > 0) {
                 insert_after = true;
             }
-            if ($target.length < 1) {
+            if (!in_content && !insert_after) {
                 _broadcast();
                 return app;
             }
@@ -99,11 +102,12 @@ var admanager = function(app, $) {
             return page_config.insertion_enabled;
         }
         function _insert_ad_units() {
-            if (!insert_after) {
+            if (in_content) {
                 _denote_valid_insertions();
                 _insert_primary_unit();
                 _insert_secondary_units();
-            } else {
+            }
+            if (insert_after) {
                 _insert_after_units();
             }
             _broadcast();
@@ -162,7 +166,7 @@ var admanager = function(app, $) {
             });
         }
         function _insert_after_units() {
-            $target.each(function() {
+            $denoted.each(function() {
                 var unit = _get_next_unit(), markup = null;
                 if (!unit) return false;
                 markup = _ad_unit_markup(unit.type, true);
