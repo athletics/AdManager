@@ -12,6 +12,7 @@ var admanager = ( function( app, $ ) {
 			debug = null,
 
 			$target = null,
+			insert_after = false,
 			_inventory = [],
 			last_position = 0,
 			odd = true
@@ -26,9 +27,18 @@ var admanager = ( function( app, $ ) {
 
 			$target = $( app.config.insertion_selector ).first();
 
-			if ( $target.length < 1 || ! _is_enabled() ) {
+			if ( ! _is_enabled() ) {
 				_broadcast();
+				return app;
+			}
 
+			if ( $target.length < 1 ) {
+				$target = $('.app_ad_insert_after');
+				insert_after = true;
+			}
+
+			if ( $target.length < 1 ) {
+				_broadcast();
 				return app;
 			}
 
@@ -70,10 +80,17 @@ var admanager = ( function( app, $ ) {
 
 		function _insert_ad_units() {
 
-			_denote_valid_insertions();
+			if ( ! insert_after ) {
 
-			_insert_primary_unit();
-			_insert_secondary_units();
+				_denote_valid_insertions();
+
+				_insert_primary_unit();
+				_insert_secondary_units();
+
+			}
+			else {
+				_insert_after_units();
+			}
 
 			_broadcast();
 
@@ -221,6 +238,39 @@ var admanager = ( function( app, $ ) {
 
 			} );
 
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _insert_after_units() {
+
+			$target.each( function() {
+				var unit = _get_next_unit(),
+					markup = null
+				;
+
+				if ( ! unit ) return false;
+
+				markup = _ad_unit_markup( unit.type, true );
+
+				$(this).after( markup );
+			} );
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _get_next_unit() {
+			var next_unit = false;
+
+			$.each( _inventory, function( index, unit ) {
+				if ( $('[data-type="' + unit.type + '"]').length !== 0 ) return true;
+
+				next_unit = unit;
+				return false;
+			} );
+
+			return next_unit;
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

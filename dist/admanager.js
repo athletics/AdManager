@@ -69,12 +69,20 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.insertion = function($) {
-        var _name = "Insertion", debug = null, $target = null, _inventory = [], last_position = 0, odd = true;
+        var _name = "Insertion", debug = null, $target = null, insert_after = false, _inventory = [], last_position = 0, odd = true;
         function init() {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             debug(_name + ": initialized");
             $target = $(app.config.insertion_selector).first();
-            if ($target.length < 1 || !_is_enabled()) {
+            if (!_is_enabled()) {
+                _broadcast();
+                return app;
+            }
+            if ($target.length < 1) {
+                $target = $(".app_ad_insert_after");
+                insert_after = true;
+            }
+            if ($target.length < 1) {
                 _broadcast();
                 return app;
             }
@@ -91,9 +99,13 @@ var admanager = function(app, $) {
             return page_config.insertion_enabled;
         }
         function _insert_ad_units() {
-            _denote_valid_insertions();
-            _insert_primary_unit();
-            _insert_secondary_units();
+            if (!insert_after) {
+                _denote_valid_insertions();
+                _insert_primary_unit();
+                _insert_secondary_units();
+            } else {
+                _insert_after_units();
+            }
             _broadcast();
         }
         function _denote_valid_insertions() {
@@ -148,6 +160,23 @@ var admanager = function(app, $) {
                 markup = _ad_unit_markup(unit.type, location.disable_float);
                 location.$insert_before.before(markup);
             });
+        }
+        function _insert_after_units() {
+            $target.each(function() {
+                var unit = _get_next_unit(), markup = null;
+                if (!unit) return false;
+                markup = _ad_unit_markup(unit.type, true);
+                $(this).after(markup);
+            });
+        }
+        function _get_next_unit() {
+            var next_unit = false;
+            $.each(_inventory, function(index, unit) {
+                if ($('[data-type="' + unit.type + '"]').length !== 0) return true;
+                next_unit = unit;
+                return false;
+            });
+            return next_unit;
         }
         function _get_primary_unit() {
             var primary_unit = false;
