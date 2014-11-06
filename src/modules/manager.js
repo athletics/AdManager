@@ -25,6 +25,8 @@ var admanager = ( function( app, $ ) {
 			debug = admanager.util.debug ? admanager.util.debug : function(){};
 			debug( _name + ': initialized' );
 
+			if ( ! app.util.enabled() ) return app;
+
 			_inventory = _get_available_sizes( app.config.inventory );
 			account = app.config.account;
 

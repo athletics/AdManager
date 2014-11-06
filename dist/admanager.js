@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.1.2 (2014-10-29)
+ * @version 0.1.3 (2014-11-06)
  */
 var admanager = function(app) {
     if (typeof app.initialized == "undefined") {
@@ -269,6 +269,7 @@ var admanager = function(app, $) {
         function init() {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             debug(_name + ": initialized");
+            if (!app.util.enabled()) return app;
             _inventory = _get_available_sizes(app.config.inventory);
             account = app.config.account;
             has_mobile_ads = typeof app.config.has_mobile_ads !== "undefined" ? app.config.has_mobile_ads : has_mobile_ads;
@@ -472,6 +473,11 @@ var admanager = function(app, $) {
                 console.log(obj);
             }
         }
+        function enabled() {
+            var config = page_config();
+            if (typeof config.admanager_enabled !== "undefined") return true;
+            return config.admanager_enabled;
+        }
         function difference(array, values) {
             var diff = [];
             $.grep(array, function(element) {
@@ -522,6 +528,7 @@ var admanager = function(app, $) {
         return {
             init: init,
             debug: debug,
+            enabled: enabled,
             difference: difference,
             is_mobile: is_mobile,
             page_config: page_config,
