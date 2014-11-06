@@ -42,6 +42,23 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
+		 * Check if is enabled for page
+		 *
+		 * @return bool
+		 */
+		function enabled() {
+
+			var config = page_config();
+
+			if ( typeof config.admanager_enabled !== 'undefined' ) return true;
+
+			return config.admanager_enabled;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
 		 * Return difference between arrays
 		 *
 		 * @param  array array
@@ -186,6 +203,7 @@ var admanager = ( function( app, $ ) {
 		return {
 			init               : init,
 			debug              : debug,
+			enabled            : enabled,
 			difference         : difference,
 			is_mobile          : is_mobile,
 			page_config        : page_config,
