@@ -50,7 +50,7 @@ var admanager = ( function( app, $ ) {
 
 			var config = page_config();
 
-			if ( typeof config.admanager_enabled !== 'undefined' ) return true;
+			if ( typeof config.admanager_enabled === 'undefined' ) return true;
 
 			return config.admanager_enabled;
 
