@@ -225,21 +225,6 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _set_page_positions() {
 
-			if ( ! app.util.is_mobile() || ! has_mobile_ads ) {
-
-				_set_desktop_page_positions();
-
-			}
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Set Desktop Page Positions
-		 */
-		function _set_desktop_page_positions() {
-
 			var $units = $('.app_ad_unit')
 			;
 
