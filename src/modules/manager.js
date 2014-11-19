@@ -246,10 +246,10 @@ var admanager = ( function( app, $ ) {
 			$units.each(function() {
 
 				var $unit = $(this),
-					type = $unit.data('type')
+					id = $unit.data('id')
 				;
 
-				page_positions.push( type );
+				page_positions.push( id );
 
 			});
 
@@ -272,11 +272,11 @@ var admanager = ( function( app, $ ) {
 
 					current_position = get_ad_info( page_positions[i] );
 
-					if ( typeof current_position.type == 'undefined' ) continue;
+					if ( typeof current_position.id == 'undefined' ) continue;
 
 					// find the empty container div on the page. we
 					// will dynamically instantiate the unique ad unit.
-					var $unit = $('.app_ad_unit[data-type="'+ current_position.type +'"]')
+					var $unit = $('.app_ad_unit[data-id="'+ current_position.id +'"]')
 					;
 
 					if ( $unit.length < 1 ) continue;
@@ -364,7 +364,7 @@ var admanager = ( function( app, $ ) {
 		function _increment_ad_slot( unit ) {
 
 			for (var i = 0; i < _inventory.length; i++) {
-				if ( _inventory[i].type !== unit && _inventory[i].slot !== unit ) continue;
+				if ( _inventory[i].id !== unit && _inventory[i].slot !== unit ) continue;
 
 				if ( typeof _inventory[i].iteration == 'undefined' ) _inventory[i].iteration = 0;
 
@@ -389,7 +389,7 @@ var admanager = ( function( app, $ ) {
 			var return_object = {};
 
 			for ( var i = 0; i < _inventory.length; i++ ) {
-				if ( _inventory[i].type !== unit && _inventory[i].slot !== unit ) continue;
+				if ( _inventory[i].id !== unit && _inventory[i].slot !== unit ) continue;
 
 				// build return object
 				return_object = _inventory[i];
@@ -397,10 +397,10 @@ var admanager = ( function( app, $ ) {
 				// determine the object's id_name
 				if (typeof return_object.use_iterator != 'undefined' && !return_object.use_iterator) {
 					// don't use the iterator
-					return_object.id_name = return_object.type;
+					return_object.id_name = return_object.id;
 				} else {
 					// use the iterator
-					return_object.id_name = return_object.type + '_' + return_object.iteration;
+					return_object.id_name = return_object.id + '_' + return_object.iteration;
 				}
 
 				return return_object;

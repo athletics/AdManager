@@ -179,8 +179,8 @@ var admanager = ( function( app, $ ) {
 
 			var type = admanager.util.is_mobile() ? 'mobile' : 'desktop',
 				alignment = odd ? 'odd' : 'even',
-				html = '<div class="app_ad_unit in_content '+ alignment + ' ' + type +'" data-type="'+ unit +'"></div>',
-				html_disable_float =	'<div class="app_ad_unit disable_float '+ type +'" data-type="'+ unit +'"></div>'
+				html = '<div class="app_ad_unit in_content '+ alignment + ' ' + type +'" data-id="'+ unit +'"></div>',
+				html_disable_float =	'<div class="app_ad_unit disable_float '+ type +'" data-id="'+ unit +'"></div>'
 			;
 
 			if ( ! disable_float ) odd = ! odd;
@@ -220,7 +220,7 @@ var admanager = ( function( app, $ ) {
 				}
 			}
 
-			markup = _ad_unit_markup( unit.type, location.disable_float );
+			markup = _ad_unit_markup( unit.id, location.disable_float );
 
 			location.$insert_before.before( markup );
 
@@ -243,7 +243,7 @@ var admanager = ( function( app, $ ) {
 					return false;
 				}
 
-				markup = _ad_unit_markup( unit.type, location.disable_float );
+				markup = _ad_unit_markup( unit.id, location.disable_float );
 				location.$insert_before.before( markup );
 
 			} );
@@ -261,7 +261,7 @@ var admanager = ( function( app, $ ) {
 
 				if ( ! unit ) return false;
 
-				markup = _ad_unit_markup( unit.type, true );
+				markup = _ad_unit_markup( unit.id, true );
 
 				$(this).after( markup );
 			} );
@@ -274,7 +274,7 @@ var admanager = ( function( app, $ ) {
 			var next_unit = false;
 
 			$.each( _inventory, function( index, unit ) {
-				if ( $('[data-type="' + unit.type + '"]').length !== 0 ) return true;
+				if ( $('[data-id="' + unit.id + '"]').length !== 0 ) return true;
 
 				next_unit = unit;
 				return false;

@@ -18,7 +18,7 @@ The inventory is an array of objects
 | Key          | Type    |
 | ------------ | ------- |
 | `slot`       | string  |
-| `type`       | string  |
+| `id`         | string  |
 | `iteration`* | integer |
 | `sizes`      | array   |
 | `dynamic`    | boolean |
@@ -33,7 +33,7 @@ __* Optional__
 	inventory: [
 		{
 			slot: 'Unit_Name_in_DFP',
-			type: 'unit_data_id',
+			id: 'unit_data_id',
 			iteration : 0,
 			sizes: [
 				[300, 250],

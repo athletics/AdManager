@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.1.3 (2014-11-06)
+ * @version 0.1.4 (2014-11-19)
  */
 var admanager = function(app) {
     if (typeof app.initialized == "undefined") {
@@ -131,7 +131,7 @@ var admanager = function(app, $) {
         }
         function _ad_unit_markup(unit, disable_float) {
             disable_float = disable_float || false;
-            var type = admanager.util.is_mobile() ? "mobile" : "desktop", alignment = odd ? "odd" : "even", html = '<div class="app_ad_unit in_content ' + alignment + " " + type + '" data-type="' + unit + '"></div>', html_disable_float = '<div class="app_ad_unit disable_float ' + type + '" data-type="' + unit + '"></div>';
+            var type = admanager.util.is_mobile() ? "mobile" : "desktop", alignment = odd ? "odd" : "even", html = '<div class="app_ad_unit in_content ' + alignment + " " + type + '" data-id="' + unit + '"></div>', html_disable_float = '<div class="app_ad_unit disable_float ' + type + '" data-id="' + unit + '"></div>';
             if (!disable_float) odd = !odd;
             return disable_float ? html_disable_float : html;
         }
@@ -150,7 +150,7 @@ var admanager = function(app, $) {
                     unit = admanager.util.limit_unit_height(unit, shortest);
                 }
             }
-            markup = _ad_unit_markup(unit.type, location.disable_float);
+            markup = _ad_unit_markup(unit.id, location.disable_float);
             location.$insert_before.before(markup);
         }
         function _insert_secondary_units() {
@@ -161,7 +161,7 @@ var admanager = function(app, $) {
                 if (!location) {
                     return false;
                 }
-                markup = _ad_unit_markup(unit.type, location.disable_float);
+                markup = _ad_unit_markup(unit.id, location.disable_float);
                 location.$insert_before.before(markup);
             });
         }
@@ -169,14 +169,14 @@ var admanager = function(app, $) {
             $denoted.each(function() {
                 var unit = _get_next_unit(), markup = null;
                 if (!unit) return false;
-                markup = _ad_unit_markup(unit.type, true);
+                markup = _ad_unit_markup(unit.id, true);
                 $(this).after(markup);
             });
         }
         function _get_next_unit() {
             var next_unit = false;
             $.each(_inventory, function(index, unit) {
-                if ($('[data-type="' + unit.type + '"]').length !== 0) return true;
+                if ($('[data-id="' + unit.id + '"]').length !== 0) return true;
                 next_unit = unit;
                 return false;
             });
@@ -354,8 +354,8 @@ var admanager = function(app, $) {
         function _set_desktop_page_positions() {
             var $units = $(".app_ad_unit");
             $units.each(function() {
-                var $unit = $(this), type = $unit.data("type");
-                page_positions.push(type);
+                var $unit = $(this), id = $unit.data("id");
+                page_positions.push(id);
             });
         }
         function _define_slots_for_page_positions() {
@@ -364,8 +364,8 @@ var admanager = function(app, $) {
                 for (var i = 0; i < page_positions.length; i++) {
                     _increment_ad_slot(page_positions[i]);
                     current_position = get_ad_info(page_positions[i]);
-                    if (typeof current_position.type == "undefined") continue;
-                    var $unit = $('.app_ad_unit[data-type="' + current_position.type + '"]');
+                    if (typeof current_position.id == "undefined") continue;
+                    var $unit = $('.app_ad_unit[data-id="' + current_position.id + '"]');
                     if ($unit.length < 1) continue;
                     $unit.html('<div class="app_unit_target" id="' + current_position.id_name + '"></div>');
                     $unit.addClass("active");
@@ -395,7 +395,7 @@ var admanager = function(app, $) {
         }
         function _increment_ad_slot(unit) {
             for (var i = 0; i < _inventory.length; i++) {
-                if (_inventory[i].type !== unit && _inventory[i].slot !== unit) continue;
+                if (_inventory[i].id !== unit && _inventory[i].slot !== unit) continue;
                 if (typeof _inventory[i].iteration == "undefined") _inventory[i].iteration = 0;
                 _inventory[i].iteration = _inventory[i].iteration + 1;
                 return;
@@ -404,12 +404,12 @@ var admanager = function(app, $) {
         function get_ad_info(unit) {
             var return_object = {};
             for (var i = 0; i < _inventory.length; i++) {
-                if (_inventory[i].type !== unit && _inventory[i].slot !== unit) continue;
+                if (_inventory[i].id !== unit && _inventory[i].slot !== unit) continue;
                 return_object = _inventory[i];
                 if (typeof return_object.use_iterator != "undefined" && !return_object.use_iterator) {
-                    return_object.id_name = return_object.type;
+                    return_object.id_name = return_object.id;
                 } else {
-                    return_object.id_name = return_object.type + "_" + return_object.iteration;
+                    return_object.id_name = return_object.id + "_" + return_object.iteration;
                 }
                 return return_object;
             }
