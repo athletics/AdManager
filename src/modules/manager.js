@@ -225,7 +225,8 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _set_page_positions() {
 
-			var $units = $('.app_ad_unit')
+			var type = typeof app.config.type !== 'undefined' ? app.config.type : false,
+				$units = ! type ? $('.app_ad_unit') : $('.app_ad_unit[data-type="' + type + '"]')
 			;
 
 			$units.each(function() {

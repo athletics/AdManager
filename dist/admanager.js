@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.1.4 (2014-11-19)
+ * @version 0.1.5 (2014-11-19)
  */
 var admanager = function(app) {
     if (typeof app.initialized == "undefined") {
@@ -347,7 +347,7 @@ var admanager = function(app, $) {
             });
         }
         function _set_page_positions() {
-            var $units = $(".app_ad_unit");
+            var type = typeof app.config.type !== "undefined" ? app.config.type : false, $units = !type ? $(".app_ad_unit") : $('.app_ad_unit[data-type="' + type + '"]');
             $units.each(function() {
                 var $unit = $(this), id = $unit.data("id");
                 page_positions.push(id);
