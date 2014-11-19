@@ -200,6 +200,29 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		/**
+		 * Get Unit Type
+		 *
+		 * @param string id
+		 * @return string type
+		 */
+		function get_unit_type( id ) {
+
+			var type = '';
+
+			$.each( app.config.inventory, function( index, unit ) {
+				if ( unit.id !== id ) continue;
+
+				type = unit.type;
+				return false;
+			} );
+
+			return type;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 		return {
 			init               : init,
 			debug              : debug,
@@ -209,7 +232,8 @@ var admanager = ( function( app, $ ) {
 			page_config        : page_config,
 			shortest_available : shortest_available,
 			tallest_available  : tallest_available,
-			limit_unit_height  : limit_unit_height
+			limit_unit_height  : limit_unit_height,
+			get_unit_type      : get_unit_type
 		};
 
 	}( $ ) );
