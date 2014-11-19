@@ -81,19 +81,6 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Is Mobile
-		 *
-		 * @return bool
-		 */
-		function is_mobile() {
-
-			return $(window).width() < 768 ? true : false;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
 		 * Set window.requestAnimationFrame
 		 *
 		 * requestAnimationFrame Firefox 23 / IE 10 / Chrome / Safari 7 (incl. iOS)
@@ -228,7 +215,6 @@ var admanager = ( function( app, $ ) {
 			debug              : debug,
 			enabled            : enabled,
 			difference         : difference,
-			is_mobile          : is_mobile,
 			page_config        : page_config,
 			shortest_available : shortest_available,
 			tallest_available  : tallest_available,

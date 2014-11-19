@@ -169,18 +169,18 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * _ad_unit_markup
 		 *
-		 * @param string unit
+		 * @param string unit_id
 		 * @param bool disable_float
 		 * @return string
 		 */
-		function _ad_unit_markup( unit, disable_float ) {
+		function _ad_unit_markup( unit_id, disable_float ) {
 
 			disable_float = disable_float || false;
 
-			var type = admanager.util.is_mobile() ? 'mobile' : 'desktop',
+			var type = app.util.get_unit_type( unit_id ),
 				alignment = odd ? 'odd' : 'even',
-				html = '<div class="app_ad_unit in_content '+ alignment + ' ' + type +'" data-id="'+ unit +'"></div>',
-				html_disable_float =	'<div class="app_ad_unit disable_float '+ type +'" data-id="'+ unit +'"></div>'
+				html = '<div class="app_ad_unit in_content '+ alignment + '" data-type="' + type +'" data-id="'+ unit_id +'"></div>',
+				html_disable_float = '<div class="app_ad_unit disable_float" data-type="'+ type +'" data-id="'+ unit_id +'"></div>'
 			;
 
 			if ( ! disable_float ) odd = ! odd;
