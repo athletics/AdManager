@@ -265,14 +265,13 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.manager = function($) {
-        var _name = "Manager", debug = null, defined_slots = [], page_positions = [], _inventory = [], account = null, has_mobile_ads = true;
+        var _name = "Manager", debug = null, defined_slots = [], page_positions = [], _inventory = [], account = null;
         function init() {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             debug(_name + ": initialized");
             if (!app.util.enabled()) return app;
             _inventory = _get_available_sizes(app.config.inventory);
             account = app.config.account;
-            has_mobile_ads = typeof app.config.has_mobile_ads !== "undefined" ? app.config.has_mobile_ads : has_mobile_ads;
             _listen_for_custom_events();
             return app;
         }

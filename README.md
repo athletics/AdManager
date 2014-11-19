@@ -9,7 +9,7 @@
 | `account`            | integer |
 | `inventory`          | array   |
 | `insertion_selector` | string  |
-| `has_mobile_ads`     | boolean |
+| `type`*              | string |
 
 #### Inventory
 

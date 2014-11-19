@@ -14,8 +14,7 @@ var admanager = ( function( app, $ ) {
 			defined_slots = [],
 			page_positions = [],
 			_inventory = [],
-			account = null,
-			has_mobile_ads = true
+			account = null
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -29,8 +28,6 @@ var admanager = ( function( app, $ ) {
 
 			_inventory = _get_available_sizes( app.config.inventory );
 			account = app.config.account;
-
-			has_mobile_ads = typeof app.config.has_mobile_ads !== 'undefined' ? app.config.has_mobile_ads : has_mobile_ads;
 
 			_listen_for_custom_events();
 
