@@ -195,7 +195,7 @@ var admanager = ( function( app, $ ) {
 		 */
 		function get_unit_type( id ) {
 
-			var type = '';
+			var type = 'default';
 
 			$.each( app.config.inventory, function( index, unit ) {
 				if ( unit.id !== id ) return true;

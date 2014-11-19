@@ -26,7 +26,7 @@ var admanager = ( function( app, $ ) {
 
 			if ( ! app.util.enabled() ) return app;
 
-			_inventory = _get_available_sizes( app.config.inventory );
+			_inventory = _get_inventory();
 			account = app.config.account;
 
 			_listen_for_custom_events();
@@ -69,6 +69,37 @@ var admanager = ( function( app, $ ) {
 
 				})
 			;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Get Inventory
+		 *
+		 * @return object
+		 */
+		function _get_inventory() {
+			return _get_available_sizes( _inventory_clean_types( app.config.inventory ) );
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Add default unit type if not set
+		 *
+		 * @param array _inventory
+		 * @return array _inventory
+		 */
+		function _inventory_clean_types( _inventory ) {
+
+			for (var i = 0; i < _inventory.length; i++) {
+				if ( typeof _inventory[i].type !== 'undefined' ) continue;
+
+				_inventory[i].type = 'default';
+			}
+
+			return _inventory;
 
 		}
 
