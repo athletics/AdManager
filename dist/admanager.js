@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.1.5 (2014-11-19)
+ * @version 0.2.0 (2014-11-19)
  */
 var admanager = function(app) {
     if (typeof app.initialized == "undefined") {
@@ -129,9 +129,9 @@ var admanager = function(app, $) {
         function _is_valid_insertion_location($element) {
             return $element.data("valid-location");
         }
-        function _ad_unit_markup(unit, disable_float) {
+        function _ad_unit_markup(unit_id, disable_float) {
             disable_float = disable_float || false;
-            var type = admanager.util.is_mobile() ? "mobile" : "desktop", alignment = odd ? "odd" : "even", html = '<div class="app_ad_unit in_content ' + alignment + " " + type + '" data-id="' + unit + '"></div>', html_disable_float = '<div class="app_ad_unit disable_float ' + type + '" data-id="' + unit + '"></div>';
+            var type = app.util.get_unit_type(unit_id), alignment = odd ? "odd" : "even", html = '<div class="app_ad_unit in_content ' + alignment + '" data-type="' + type + '" data-id="' + unit_id + '"></div>', html_disable_float = '<div class="app_ad_unit disable_float" data-type="' + type + '" data-id="' + unit_id + '"></div>';
             if (!disable_float) odd = !odd;
             return disable_float ? html_disable_float : html;
         }
@@ -270,7 +270,7 @@ var admanager = function(app, $) {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             debug(_name + ": initialized");
             if (!app.util.enabled()) return app;
-            _inventory = _get_available_sizes(app.config.inventory);
+            _inventory = _get_inventory();
             account = app.config.account;
             _listen_for_custom_events();
             return app;
@@ -290,6 +290,16 @@ var admanager = function(app, $) {
                 debug(_name + ": GPT:slotsDefined");
                 _display_page_ads();
             });
+        }
+        function _get_inventory() {
+            return _get_available_sizes(_inventory_clean_types(app.config.inventory));
+        }
+        function _inventory_clean_types(_inventory) {
+            for (var i = 0; i < _inventory.length; i++) {
+                if (typeof _inventory[i].type !== "undefined") continue;
+                _inventory[i].type = "default";
+            }
+            return _inventory;
         }
         function _get_available_sizes(_inventory) {
             var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
@@ -483,9 +493,6 @@ var admanager = function(app, $) {
             });
             return diff;
         }
-        function is_mobile() {
-            return $(window).width() < 768 ? true : false;
-        }
         function _set_window_request_animation_frame() {
             window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame;
         }
@@ -524,7 +531,7 @@ var admanager = function(app, $) {
             return unit;
         }
         function get_unit_type(id) {
-            var type = "";
+            var type = "default";
             $.each(app.config.inventory, function(index, unit) {
                 if (unit.id !== id) return true;
                 type = unit.type;
@@ -537,7 +544,6 @@ var admanager = function(app, $) {
             debug: debug,
             enabled: enabled,
             difference: difference,
-            is_mobile: is_mobile,
             page_config: page_config,
             shortest_available: shortest_available,
             tallest_available: tallest_available,
