@@ -435,9 +435,13 @@ var admanager = function(app, $) {
             });
         }
         function get_dynamic_inventory() {
-            var dynamic_inventory = [];
+            var dynamic_inventory = [], type = typeof app.config.type !== "undefined" ? app.config.type : false;
             $.each(_inventory, function(index, position) {
-                if (position.dynamic === true) dynamic_inventory.push(position);
+                if (position.dynamic === true) {
+                    if (!type || type === position.type) {
+                        dynamic_inventory.push(position);
+                    }
+                }
             });
             return dynamic_inventory;
         }
