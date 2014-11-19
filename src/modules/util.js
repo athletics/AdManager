@@ -211,7 +211,7 @@ var admanager = ( function( app, $ ) {
 			var type = '';
 
 			$.each( app.config.inventory, function( index, unit ) {
-				if ( unit.id !== id ) continue;
+				if ( unit.id !== id ) return true;
 
 				type = unit.type;
 				return false;
