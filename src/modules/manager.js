@@ -149,19 +149,33 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _load_library() {
 
+			var googletag,
+					gads,
+					useSSL,
+					node,
+					readyStateLoaded = false
+			;
+
 			window.googletag = window.googletag || {};
-			window.googletag.cmd = window.googletag.cmd || [];
-
-			var useSSL = 'https:' === document.location.protocol,
-				path = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js'
-			;
-
-			$LAB
-				.script( path )
-				.wait(function() {
-					_on_library_loaded();
-				})
-			;
+			googletag = window.googletag;
+			googletag.cmd = googletag.cmd || [];
+			gads = document.createElement("script");
+			gads.async = true;
+			gads.type = "text/javascript";
+			useSSL = "https:" == document.location.protocol;
+			gads.src = (useSSL ? "https:" : "http:") + "//www.googletagservices.com/tag/js/gpt.js";
+			if (gads.addEventListener) {
+				gads.addEventListener("load", _on_library_loaded, false);
+			} else if (gads.readyState) {
+				gads.onreadystatechange = function () { // Legacy IE
+					if (!readyStateLoaded) {
+						readyStateLoaded = true;
+						_on_library_loaded();
+					}
+				}
+			}
+			node = document.getElementsByTagName("script")[0];
+			node.parentNode.insertBefore(gads, node);
 
 		}
 
