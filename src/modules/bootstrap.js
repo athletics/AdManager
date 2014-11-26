@@ -4,15 +4,15 @@
  *		Requires: jQuery
  */
 
-var admanager = ( function( app ) {
+var admanager = (function (app) {
 
-	if ( typeof app.initialized == 'undefined' ) {
+	if (typeof app.initialized === 'undefined') {
 
 		app.initialized = false;
 
 	}
 
-	app.bootstrap = ( function() {
+	app.bootstrap = (function () {
 
 		var _name = 'Bootstrap',
 			$ = null,
@@ -20,61 +20,56 @@ var admanager = ( function( app ) {
 			_init_callbacks = []
 		;
 
-		/* * * * * * * * * * * * * * * * * * * * */
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function init( config ) {
+		function _init(config) {
 
-			if ( app.initialized ) return false; // the app has already been initialized
+			if (app.initialized) return false; // the app has already been initialized
 
 			admanager.config = config || false;
 
-			if ( ! admanager.config ) {
+			if (!admanager.config) {
 				throw new Error('Please provide config');
 			}
 
-			// store ref to jQuery
+			// References
 			$ = jQuery;
+			debug = admanager.util.debug ? admanager.util.debug : function () {};
 
 			app
 				.util.init()
-				.events.init()
 				.manager.init()
 				.insertion.init()
 			;
 
-			debug = admanager.util.debug ? admanager.util.debug : function(){};
-
-			for ( var i = 0; i < _init_callbacks.length; i++ ) {
-
-				_init_callbacks[ i ]();
-
+			for (var i = 0; i < _init_callbacks.length; i++) {
+				_init_callbacks[i]();
 			}
 
-			debug( _name + ': initialized' );
-
+			debug(_name + ': initialized');
 			app.initialized = true;
 
 			return app;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * */
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function register( callback ) {
+		function _register(callback) {
 
-			_init_callbacks.push( callback );
+			_init_callbacks.push(callback);
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * */
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		return {
-			init : init,
-			register : register
+			init : _init,
+			register : _register
 		};
 
 	}());
 
 	return app;
 
-}( admanager || {} ) );
+}(admanager || {}));
