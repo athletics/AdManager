@@ -4,11 +4,5 @@
   "homepage": "https://github.com/athletics/ad-manager",
   "authors": [
     "Athletics"
-  ],
-  "description": "Generic code for GPT ad management",
-  "license": "MIT",
-  "dependencies": {
-    "jquery-cookie": "~1.4.1",
-    "labjs": "*"
-  }
+  ]
 }
