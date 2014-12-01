@@ -6,9 +6,9 @@
   "license": "MIT",
   "main": "dist/admanager.min.js",
   "ignore": [
-	  "bower.json",
-	  "package.json",
-	  "gruntfile.js"
+    "bower.json",
+    "package.json",
+    "gruntfile.js"
   ],
   "authors": [
     "Athletics"
