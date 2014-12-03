@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.2.0 (2014-11-19)
+ * @version 0.2.0 (2014-12-03)
  */
 var admanager = function(app) {
     if (typeof app.initialized == "undefined") {
@@ -319,12 +319,27 @@ var admanager = function(app, $) {
             return _inventory;
         }
         function _load_library() {
+            var googletag, gads, useSSL, node, readyStateLoaded = false;
             window.googletag = window.googletag || {};
-            window.googletag.cmd = window.googletag.cmd || [];
-            var useSSL = "https:" === document.location.protocol, path = (useSSL ? "https:" : "http:") + "//www.googletagservices.com/tag/js/gpt.js";
-            $LAB.script(path).wait(function() {
-                _on_library_loaded();
-            });
+            googletag = window.googletag;
+            googletag.cmd = googletag.cmd || [];
+            gads = document.createElement("script");
+            gads.async = true;
+            gads.type = "text/javascript";
+            useSSL = "https:" == document.location.protocol;
+            gads.src = (useSSL ? "https:" : "http:") + "//www.googletagservices.com/tag/js/gpt.js";
+            if (gads.addEventListener) {
+                gads.addEventListener("load", _on_library_loaded, false);
+            } else if (gads.readyState) {
+                gads.onreadystatechange = function() {
+                    if (!readyStateLoaded) {
+                        readyStateLoaded = true;
+                        _on_library_loaded();
+                    }
+                };
+            }
+            node = document.getElementsByTagName("script")[0];
+            node.parentNode.insertBefore(gads, node);
         }
         function _on_library_loaded() {
             googletag.cmd.push(function() {
