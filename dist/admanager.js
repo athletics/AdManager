@@ -40,7 +40,7 @@ var admanager = function(app) {
 
 var admanager = function(app, $) {
     app.insertion = function($) {
-        var _name = "Insertion", debug = null, $context = null, $local_context = null, _in_content = false, _inventory = [], _last_position = 0, _odd = true, _local_context = null, _defaults = {
+        var _name = "Insertion", debug = null, $context = null, $local_context = null, _in_content = false, _inventory = [], _odd = true, _local_context = null, _defaults = {
             px_between_units: 800,
             ad_height_limit: 1e3,
             insert_exclusion: [ "img", "iframe", "video", "audio", ".video", ".audio", ".app_ad_unit" ]
@@ -184,15 +184,14 @@ var admanager = function(app, $) {
                 $nodes: $nodes,
                 force: options.force ? options.force : false,
                 limit: options.limit ? options.limit : false,
-                last_position: _last_position,
                 height: options.height
             });
             if ($nodes.length < 1) return false;
             $.each($nodes, function(i, node) {
-                var exit = node_search.verify_node(i, $(node));
-                if (exit === true) {
+                var exit_loop = node_search.verify_node(i, $(node));
+                if (exit_loop === true) {
                     return false;
-                } else {
+                } else if (exit_loop === false) {
                     return true;
                 }
             });
@@ -214,12 +213,12 @@ var admanager = function(app, $) {
             this.disable_float = false;
             this.location_found = false;
             this.valid_height = 0;
-            this.exit = false;
+            this.exit_loop = false;
             this.height = options.height;
             this.force = options.force;
             this.limit = options.limit;
             this.$nodes = options.$nodes;
-            this.last_position = options.last_position;
+            this.last_position = 0;
             this.needed_height = options.height - this.margin_difference;
         }
         NodeSearch.prototype.set_last_position = function() {
@@ -233,21 +232,17 @@ var admanager = function(app, $) {
             }
         };
         NodeSearch.prototype.verify_node = function(index, $node) {
-            var $prev = index > 0 ? this.$nodes.eq(index - 1) : false, offset = $node.offset().top, since = offset - this.last_position, height = $node.outerHeight(), is_last = this.$nodes.length - 1 === index;
-            this.exit = false;
+            var since = $node.offset().top - this.last_position, height = $node.outerHeight(), is_last = this.$nodes.length - 1 === index;
             this.total_height += height;
             if (this.force && (this.total_height >= this.limit || is_last)) {
                 this.$insert_before = $node;
                 this.disable_float = true;
                 this.location_found = true;
-                this.exit = true;
-                return this.exit;
+                this.exit_loop = true;
             } else if (this.limit && (this.total_height >= this.limit || is_last)) {
                 this.location_found = false;
-                this.exit = true;
-                return this.exit;
-            }
-            if (_is_valid_insertion_location($node)) {
+                this.exit_loop = true;
+            } else if (_is_valid_insertion_location($node)) {
                 this.valid_height += height;
                 this.inserted.push($node);
                 if (this.$insert_before === null) {
@@ -257,16 +252,16 @@ var admanager = function(app, $) {
                     if (this.limit === false && since < _defaults.px_between_units) {
                         this.valid_height = 0;
                         this.$insert_before = null;
-                        return this.exit;
                     }
                     this.location_found = true;
-                    this.exit = true;
-                    return this.exit;
+                    this.exit_loop = true;
                 }
             } else {
                 this.valid_height = 0;
                 this.$insert_before = null;
+                this.exit_loop = null;
             }
+            return this.exit_loop;
         };
         function _is_this_an_ad($el) {
             if (!$el) return false;
