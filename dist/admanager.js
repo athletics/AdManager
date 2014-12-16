@@ -41,6 +41,7 @@ var admanager = function(app) {
 var admanager = function(app, $) {
     app.insertion = function($) {
         var _name = "Insertion", debug = null, $context = null, $local_context = null, _in_content = false, _inventory = [], _last_position = 0, _odd = true, _local_context = null, _defaults = {
+            px_between_units: 800,
             ad_height_limit: 1e3,
             insert_exclusion: [ "img", "iframe", "video", "audio", ".video", ".audio", ".app_ad_unit" ]
         };
@@ -179,54 +180,94 @@ var admanager = function(app, $) {
         }
         function _find_insertion_location(options) {
             options = options || {};
-            var $nodes = _get_nodes(), $insert_before = null, inserted = [], total_height = 0, valid_height = 0, limit = options.limit ? options.limit : false, force = options.force ? options.force : false, margin_difference = 40, needed_height = options.height - margin_difference, between_units = 800, location_found = false, disable_float = false, maybe_more = true;
+            var $nodes = _get_nodes(), node_search = new NodeSearch({
+                $nodes: $nodes,
+                force: options.force ? options.force : false,
+                limit: options.limit ? options.limit : false,
+                last_position: _last_position,
+                height: options.height
+            });
             if ($nodes.length < 1) return false;
-            $nodes.each(function(i, j) {
-                var $this = $(this), $prev = i > 0 ? $nodes.eq(i - 1) : false, offset = $this.offset().top, since = offset - _last_position, height = $this.outerHeight(), is_last = $nodes.length - 1 === i;
-                total_height += height;
-                if (force && (total_height >= limit || is_last)) {
-                    $insert_before = $this;
-                    disable_float = true;
-                    location_found = true;
+            $.each($nodes, function(i, node) {
+                var exit = node_search.verify_node(i, $(node));
+                if (exit === true) {
                     return false;
-                } else if (limit && (total_height >= limit || is_last)) {
-                    location_found = false;
-                    return false;
-                }
-                if (_is_valid_insertion_location($this)) {
-                    valid_height += height;
-                    inserted.push($this);
-                    if ($insert_before === null) {
-                        $insert_before = $this;
-                    }
-                    if (valid_height >= needed_height) {
-                        if (limit === false && since < between_units) {
-                            valid_height = 0;
-                            $insert_before = null;
-                            return true;
-                        }
-                        location_found = true;
-                        return false;
-                    }
                 } else {
-                    valid_height = 0;
-                    $insert_before = null;
+                    return true;
                 }
             });
-            if (!location_found) {
+            if (!node_search.location_found) {
                 return false;
             }
-            if (inserted.length > 0) {
-                $.each(inserted, function(index, item) {
+            node_search.mark_valid_nodes();
+            node_search.set_last_position();
+            return {
+                $insert_before: node_search.$insert_before,
+                disable_float: node_search.disable_float
+            };
+        }
+        function NodeSearch(options) {
+            this.total_height = 0;
+            this.margin_difference = 40;
+            this.inserted = [];
+            this.$insert_before = null;
+            this.disable_float = false;
+            this.location_found = false;
+            this.valid_height = 0;
+            this.exit = false;
+            this.height = options.height;
+            this.force = options.force;
+            this.limit = options.limit;
+            this.$nodes = options.$nodes;
+            this.last_position = options.last_position;
+            this.needed_height = options.height - this.margin_difference;
+        }
+        NodeSearch.prototype.set_last_position = function() {
+            this.last_position = this.$insert_before.offset().top + this.needed_height;
+        };
+        NodeSearch.prototype.mark_valid_nodes = function() {
+            if (this.inserted.length > 0) {
+                $.each(this.inserted, function(index, item) {
                     $(item).data("valid-location", false);
                 });
             }
-            _last_position = $insert_before.offset().top + needed_height;
-            return {
-                $insert_before: $insert_before,
-                disable_float: disable_float
-            };
-        }
+        };
+        NodeSearch.prototype.verify_node = function(index, $node) {
+            var $prev = index > 0 ? this.$nodes.eq(index - 1) : false, offset = $node.offset().top, since = offset - this.last_position, height = $node.outerHeight(), is_last = this.$nodes.length - 1 === index;
+            this.exit = false;
+            this.total_height += height;
+            if (this.force && (this.total_height >= this.limit || is_last)) {
+                this.$insert_before = $node;
+                this.disable_float = true;
+                this.location_found = true;
+                this.exit = true;
+                return this.exit;
+            } else if (this.limit && (this.total_height >= this.limit || is_last)) {
+                this.location_found = false;
+                this.exit = true;
+                return this.exit;
+            }
+            if (_is_valid_insertion_location($node)) {
+                this.valid_height += height;
+                this.inserted.push($node);
+                if (this.$insert_before === null) {
+                    this.$insert_before = $node;
+                }
+                if (this.valid_height >= this.needed_height) {
+                    if (this.limit === false && since < _defaults.px_between_units) {
+                        this.valid_height = 0;
+                        this.$insert_before = null;
+                        return this.exit;
+                    }
+                    this.location_found = true;
+                    this.exit = true;
+                    return this.exit;
+                }
+            } else {
+                this.valid_height = 0;
+                this.$insert_before = null;
+            }
+        };
         function _is_this_an_ad($el) {
             if (!$el) return false;
             return $el.is(_defaults.ad_selector);
@@ -380,7 +421,6 @@ var admanager = function(app, $) {
                 for (var i = 0; i < _page_positions.length; i++) {
                     _increment_ad_slot(_page_positions[i]);
                     current_position = _get_ad_info(_page_positions[i]);
-                    debug(current_position);
                     if (typeof current_position.id == "undefined") continue;
                     $unit = $context.find(_defaults.ad_selector + '[data-id="' + current_position.id + '"]');
                     $unit_target = $("<div/>");
