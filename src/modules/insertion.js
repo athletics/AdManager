@@ -18,6 +18,7 @@ var admanager = (function (app, $) {
 			_odd = true,
 			_local_context = null,
 			_defaults = {
+				ad_height_limit: 1000,
 				insert_exclusion: [
 					'img',
 					'iframe',
@@ -51,8 +52,7 @@ var admanager = (function (app, $) {
 				.on('GPT:initSequence', function () {
 
 					debug(_name + ': GPT:initSequence');
-
-					/* 
+					/** 
 					 * Begin qualification procedure when the DOM is ready
 					 */
 					_qualify_context();
@@ -77,8 +77,6 @@ var admanager = (function (app, $) {
 		 */
 
 		function _qualify_context() {
-
-			// debug(_name + ': _qualify_context()');
 
 			var inventory_data = app.manager.get_dynamic_inventory();
 
@@ -168,16 +166,10 @@ var admanager = (function (app, $) {
 				;
 
 				$.each(excluded, function (index, item) {
-
 					if ($element.is(item) || $element.find(item).length > 0) {
-
-						// not valid
-						valid = false;
-
-						// break loop
-						return false;
+						valid = false; // not valid
+						return false; // break loop
 					}
-
 				} );
 
 				if ($prev && $prev.is('p') && $prev.find('img').length === 1) valid = false;
@@ -248,17 +240,17 @@ var admanager = (function (app, $) {
 			var unit = _get_primary_unit(),
 				tallest = admanager.util.tallest_available(unit),
 				shortest = admanager.util.shortest_available(unit),
-				location = _location_to_insert_ad_unit({
+				location = _find_insertion_location({
 					height: tallest,
-					limit: 1000
+					limit: _defaults.ad_height_limit
 				}),
 				markup = null
 			;
 
 			if (!location) {
-				location = _location_to_insert_ad_unit({
+				location = _find_insertion_location({
 					height: shortest,
-					limit: 1000,
+					limit: _defaults.ad_height_limit,
 					force: true
 				});
 
@@ -281,7 +273,7 @@ var admanager = (function (app, $) {
 			$.each(_inventory, function (index, unit) {
 
 				var tallest = admanager.util.tallest_available(unit),
-					location = _location_to_insert_ad_unit({
+					location = _find_insertion_location({
 						height: tallest
 					}),
 					markup = null
@@ -348,12 +340,12 @@ var admanager = (function (app, $) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * _location_to_insert_ad_unit
+		 * _find_insertion_location
 		 *
 		 * @param object options
-		 * @return object
+		 * @return object or boolean:false
 		 */
-		function _location_to_insert_ad_unit(options) {
+		function _find_insertion_location(options) {
 
 			options = options || {};
 
@@ -387,19 +379,15 @@ var admanager = (function (app, $) {
 				total_height += height;
 
 				if (force && (total_height >= limit || is_last)) {
-
 					$insert_before = $this;
 					disable_float = true;
 					location_found = true;
 					return false;
-
 				}
 
 				else if (limit && (total_height >= limit || is_last)) {
-
 					location_found = false;
 					return false;
-
 				}
 
 				if (_is_valid_insertion_location($this)) {
@@ -412,21 +400,16 @@ var admanager = (function (app, $) {
 					}
 
 					if (valid_height >= needed_height) {
-
 						if (limit === false && (since < between_units)) {
 							valid_height = 0;
 							$insert_before = null;
 							return true;
 						}
-
 						location_found = true;
 						return false;
-
 					}
 
-				}
-
-				else {
+				} else {
 
 					valid_height = 0;
 					$insert_before = null;

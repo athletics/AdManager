@@ -1,7 +1,7 @@
 /**
  *		Name: Ad Manager
  *
- *		Requires: app, app.util, app.insertion, app.events, jQuery
+ *		Requires: app, app.util, app.insertion, jQuery
  */
 
 var admanager = (function (app, $) {
@@ -15,9 +15,9 @@ var admanager = (function (app, $) {
 			_inventory = [],
 			_account = null,
 			_defaults = {
-				ad_class:             'app_ad_unit',
-				ad_unit_target_class: 'app_unit_target',
-				ad_selector:          '.'
+				ad_class:             'app_ad_unit',      // Outer ad wrap
+				ad_unit_target_class: 'app_unit_target',  // Inner ad wrap
+				ad_selector:          ''                  // Leave blank
 			}
 		;
 
@@ -30,7 +30,7 @@ var admanager = (function (app, $) {
 
 			if (!_is_enabled()) return app;
 
-			_defaults.ad_selector += _defaults.ad_class;
+			_defaults.ad_selector = '.' + _defaults.ad_class;
 			_inventory = _get_inventory();
 			_account = app.config.account;
 			_bind_handlers();
@@ -93,7 +93,9 @@ var admanager = (function (app, $) {
 		 * @return object
 		 */
 		function _get_inventory() {
+
 			return _get_available_sizes(_inventory_clean_types(app.config.inventory));
+
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
