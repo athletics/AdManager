@@ -311,7 +311,6 @@ var admanager = (function (app, $) {
 
 					_increment_ad_slot(_page_positions[i]);
 					current_position = _get_ad_info(_page_positions[i]);
-					debug(current_position);
 
 					if (typeof current_position.id == 'undefined') continue;
 
