@@ -41,6 +41,7 @@ var admanager = function(app) {
 var admanager = function(app, $) {
     app.insertion = function($) {
         var _name = "Insertion", debug = null, $context = null, $local_context = null, _in_content = false, _inventory = [], _last_position = 0, _odd = true, _local_context = null, _defaults = {
+            ad_height_limit: 1e3,
             insert_exclusion: [ "img", "iframe", "video", "audio", ".video", ".audio", ".app_ad_unit" ]
         };
         function _init() {
@@ -123,14 +124,14 @@ var admanager = function(app, $) {
             return $html;
         }
         function _insert_primary_unit() {
-            var unit = _get_primary_unit(), tallest = admanager.util.tallest_available(unit), shortest = admanager.util.shortest_available(unit), location = _location_to_insert_ad_unit({
+            var unit = _get_primary_unit(), tallest = admanager.util.tallest_available(unit), shortest = admanager.util.shortest_available(unit), location = _find_insertion_location({
                 height: tallest,
-                limit: 1e3
+                limit: _defaults.ad_height_limit
             }), markup = null;
             if (!location) {
-                location = _location_to_insert_ad_unit({
+                location = _find_insertion_location({
                     height: shortest,
-                    limit: 1e3,
+                    limit: _defaults.ad_height_limit,
                     force: true
                 });
                 if (!location.disable_float) {
@@ -142,7 +143,7 @@ var admanager = function(app, $) {
         }
         function _insert_secondary_units() {
             $.each(_inventory, function(index, unit) {
-                var tallest = admanager.util.tallest_available(unit), location = _location_to_insert_ad_unit({
+                var tallest = admanager.util.tallest_available(unit), location = _find_insertion_location({
                     height: tallest
                 }), markup = null;
                 if (!location) {
@@ -176,7 +177,7 @@ var admanager = function(app, $) {
             }
             return primary_unit;
         }
-        function _location_to_insert_ad_unit(options) {
+        function _find_insertion_location(options) {
             options = options || {};
             var $nodes = _get_nodes(), $insert_before = null, inserted = [], total_height = 0, valid_height = 0, limit = options.limit ? options.limit : false, force = options.force ? options.force : false, margin_difference = 40, needed_height = options.height - margin_difference, between_units = 800, location_found = false, disable_float = false, maybe_more = true;
             if ($nodes.length < 1) return false;
@@ -251,13 +252,13 @@ var admanager = function(app, $) {
         var _name = "Manager", debug = null, _defined_slots = [], _page_positions = [], _inventory = [], _account = null, _defaults = {
             ad_class: "app_ad_unit",
             ad_unit_target_class: "app_unit_target",
-            ad_selector: "."
+            ad_selector: ""
         };
         function _init() {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             debug(_name + ": initialized");
             if (!_is_enabled()) return app;
-            _defaults.ad_selector += _defaults.ad_class;
+            _defaults.ad_selector = "." + _defaults.ad_class;
             _inventory = _get_inventory();
             _account = app.config.account;
             _bind_handlers();
