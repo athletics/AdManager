@@ -4,18 +4,15 @@
  *		Requires: jQuery
  */
 
-var admanager = (function (app) {
+var admanager = (function (app, $) {
 
 	if (typeof app.initialized === 'undefined') {
-
 		app.initialized = false;
-
 	}
 
-	app.bootstrap = (function () {
+	app.bootstrap = (function ($) {
 
 		var _name = 'Bootstrap',
-			$ = null,
 			debug = null,
 			_init_callbacks = []
 		;
@@ -32,8 +29,6 @@ var admanager = (function (app) {
 				throw new Error('Please provide config');
 			}
 
-			// References
-			$ = jQuery;
 			debug = admanager.util.debug ? admanager.util.debug : function () {};
 
 			app
@@ -72,4 +67,4 @@ var admanager = (function (app) {
 
 	return app;
 
-}(admanager || {}));
+}(admanager || {}, jQuery));

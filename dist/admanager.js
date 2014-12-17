@@ -5,19 +5,18 @@
  * @see https://github.com/athletics/ad-manager
  * @version 0.2.0 (2014-12-17)
  */
-var admanager = function(app) {
+var admanager = function(app, $) {
     if (typeof app.initialized === "undefined") {
         app.initialized = false;
     }
-    app.bootstrap = function() {
-        var _name = "Bootstrap", $ = null, debug = null, _init_callbacks = [];
+    app.bootstrap = function($) {
+        var _name = "Bootstrap", debug = null, _init_callbacks = [];
         function _init(config) {
             if (app.initialized) return false;
             admanager.config = config || false;
             if (!admanager.config) {
                 throw new Error("Please provide config");
             }
-            $ = jQuery;
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             app.util.init().manager.init().insertion.init();
             for (var i = 0; i < _init_callbacks.length; i++) {
@@ -36,7 +35,7 @@ var admanager = function(app) {
         };
     }();
     return app;
-}(admanager || {});
+}(admanager || {}, jQuery);
 
 var admanager = function(app, $) {
     app.insertion = function($) {
@@ -153,15 +152,6 @@ var admanager = function(app, $) {
                 markup = _ad_unit_markup(unit.id, location.disable_float);
                 location.$insert_before.before(markup);
             });
-        }
-        function _get_next_unit() {
-            var next_unit = false;
-            $.each(_inventory, function(index, unit) {
-                if ($('[data-id="' + unit.id + '"]').length !== 0) return true;
-                next_unit = unit;
-                return false;
-            });
-            return next_unit;
         }
         function _get_primary_unit() {
             var primary_unit = false;
