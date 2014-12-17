@@ -4,9 +4,9 @@
  *		Requires: app, jQuery
  */
 
-var admanager = ( function( app, $ ) {
+var admanager = (function (app, $) {
 
-	app.util = ( function( $ ) {
+	app.util = (function ($) {
 
 		var _name = 'Util',
 			_debug_enable = false
@@ -14,45 +14,23 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function init() {
+		function _init() {
 
-			debug( _name + ': initialized' );
-
+			debug(_name + ': initialized');
 			_init_array_remove();
-			_set_window_request_animation_frame();
-
 			return app;
 
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function debug( obj ) {
+		function debug(obj) {
 
-			if ( ! _debug_enable ) return;
+			if (!_debug_enable) return;
 
-			if ( ( typeof console == "object" ) && ( console.log ) ) {
-
-				console.log( obj );
-
+			if ((typeof console == "object") && (console.log)) {
+				console.log(obj);
 			}
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		/**
-		 * Check if is enabled for page
-		 *
-		 * @return bool
-		 */
-		function enabled() {
-
-			var config = page_config();
-
-			if ( typeof config.admanager_enabled === 'undefined' ) return true;
-
-			return config.admanager_enabled;
 
 		}
 
@@ -65,13 +43,12 @@ var admanager = ( function( app, $ ) {
 		 * @param  array values
 		 * @return array diff
 		 */
-		function difference( array, values ) {
+		function _difference(array, values) {
 
-			var diff = []
-			;
+			var diff = [];
 
-			$.grep( array, function( element ) {
-				if ( $.inArray( element, values ) === -1 ) diff.push( element );
+			$.grep(array, function (element) {
+				if ($.inArray(element, values) === -1) diff.push(element);
 			});
 
 			return diff;
@@ -80,29 +57,10 @@ var admanager = ( function( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		/**
-		 * Set window.requestAnimationFrame
-		 *
-		 * requestAnimationFrame Firefox 23 / IE 10 / Chrome / Safari 7 (incl. iOS)
-		 * mozRequestAnimationFrame Firefox < 23
-		 * webkitRequestAnimationFrame Older versions of Safari / Chrome
-		 */
-		function _set_window_request_animation_frame() {
-
-			window.requestAnimationFrame = window.requestAnimationFrame ||
-				window.mozRequestAnimationFrame ||
-				window.webkitRequestAnimationFrame ||
-				window.oRequestAnimationFrame
-			;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 		function _init_array_remove() {
 
 			// Array Remove - By John Resig (MIT Licensed)
-			Array.prototype.remove = function(from, to) {
+			Array.prototype.remove = function (from, to) {
 				var rest = this.slice((to || from) + 1 || this.length);
 				this.length = from < 0 ? this.length + from : from;
 				return this.push.apply(this, rest);
@@ -113,18 +71,58 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Get page config
+		 * Import JSON page config data from DOM
 		 *
+		 * This imports inline JSON via data attribute 
+		 * and extends an existing config with it.
+		 *
+		 * @param object options.$context
+		 * @param string options.attr_name
 		 * @return object
 		 */
-		function page_config() {
-			if ( typeof app.config.page_config_selector === 'undefined' ) return {};
+		function _import_config(options) {
 
-			var config = $( app.config.page_config_selector ).data('page-config');
+			var $context = options.$context,
+				attr_name = options.attr_name,
+				exist_config = options.exist_config,
+				selector,
+				new_config,
+				data = {};
 
-			if ( typeof config !== 'object' ) return {};
+			selector = '*[data-' + attr_name + ']';
+			new_config = $.extend({}, exist_config);
+			data = $context.find(selector).data(attr_name);
 
-			return config;
+			if (typeof new_config === 'object') {
+				new_config = $.extend(new_config, data);
+			}
+
+			return new_config;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Returns the DOM wrapper context for the ads
+		 *
+		 * In standard applications this remains constant,
+		 * but in infinite scroll applications, this needs to be dynamic.
+		 * If the config does not provide one, the default value is 'body'.
+		 *
+		 * @return array $(selector)
+		 *
+		 * TODO: 
+		 * Add optional dynamically-determined context,
+		 * for use in multi-segment infinite scroll
+		 *
+		 */
+
+		function _get_context() {
+
+			var selector = app.config.context || 'body';
+			return $(selector);
+
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -135,15 +133,17 @@ var admanager = ( function( app, $ ) {
 		 * @param object unit
 		 * @return integer
 		 */
-		function shortest_available( unit ) {
+		function _shortest_available(unit) {
+
 			var shortest = 0;
 
-			$.each( unit.sizes, function( index, sizes ) {
-				if ( shortest === 0 ) shortest = sizes[1];
-				else if ( sizes[1] < shortest ) shortest = sizes[1];
+			$.each(unit.sizes, function (index, sizes) {
+				if (shortest === 0) shortest = sizes[1];
+				else if (sizes[1] < shortest) shortest = sizes[1];
 			});
 
 			return shortest;
+
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -154,14 +154,16 @@ var admanager = ( function( app, $ ) {
 		 * @param object unit
 		 * @return integer
 		 */
-		function tallest_available( unit ) {
+		function _tallest_available(unit) {
+
 			var tallest = 0;
 
-			$.each( unit.sizes, function( index, sizes ) {
-				if ( sizes[1] > tallest ) tallest = sizes[1];
+			$.each(unit.sizes, function (index, sizes) {
+				if (sizes[1] > tallest) tallest = sizes[1];
 			});
 
 			return tallest;
+
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -173,13 +175,12 @@ var admanager = ( function( app, $ ) {
 		 * @param  int limit
 		 * @return object unit
 		 */
-		function limit_unit_height( unit, limit ) {
+		function _limit_unit_height(unit, limit) {
 
-			$.each( unit.sizes, function( index, sizes ) {
-				if ( sizes[1] <= limit ) return true;
-
-				unit.sizes.remove( index );
-			} );
+			$.each(unit.sizes, function (index, sizes) {
+				if (sizes[1] <= limit) return true;
+				unit.sizes.remove(index);
+			});
 
 			return unit;
 
@@ -193,16 +194,15 @@ var admanager = ( function( app, $ ) {
 		 * @param string id
 		 * @return string type
 		 */
-		function get_unit_type( id ) {
+		function _get_unit_type(id) {
 
 			var type = 'default';
 
-			$.each( app.config.inventory, function( index, unit ) {
-				if ( unit.id !== id ) return true;
-
+			$.each(app.config.inventory, function (index, unit) {
+				if (unit.id !== id) return true;
 				type = unit.type;
 				return false;
-			} );
+			});
 
 			return type;
 
@@ -211,19 +211,19 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		return {
-			init               : init,
+			init               : _init,
 			debug              : debug,
-			enabled            : enabled,
-			difference         : difference,
-			page_config        : page_config,
-			shortest_available : shortest_available,
-			tallest_available  : tallest_available,
-			limit_unit_height  : limit_unit_height,
-			get_unit_type      : get_unit_type
+			difference         : _difference,
+			import_config      : _import_config,
+			shortest_available : _shortest_available,
+			tallest_available  : _tallest_available,
+			limit_unit_height  : _limit_unit_height,
+			get_unit_type      : _get_unit_type,
+			get_context        : _get_context
 		};
 
-	}( $ ) );
+	} ($));
 
 	return app;
 
-}( admanager || {}, jQuery ) );
+} (admanager || {}, jQuery));
