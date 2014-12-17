@@ -1,35 +1,40 @@
 /**
  *		Name: Ad Manager
  *
- *		Requires: app, app.util, app.config, app.insertion, app.events, jQuery
+ *		Requires: app, app.util, app.insertion, jQuery
  */
 
-var admanager = ( function( app, $ ) {
+var admanager = (function (app, $) {
 
-	app.manager = ( function( $ ) {
+	app.manager = (function ($) {
 
 		var _name = 'Manager',
 			debug = null,
-
-			defined_slots = [],
-			page_positions = [],
+			_defined_slots = [],
+			_page_positions = [],
 			_inventory = [],
-			account = null
+			_account = null,
+			_defaults = {
+				ad_class:             'app_ad_unit',      // Outer ad wrap
+				ad_unit_target_class: 'app_unit_target',  // Inner ad wrap
+				ad_selector:          ''                  // Leave blank
+			}
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function init() {
+		function _init() {
 
-			debug = admanager.util.debug ? admanager.util.debug : function(){};
-			debug( _name + ': initialized' );
+			debug = admanager.util.debug ? admanager.util.debug : function () {};
+			debug(_name + ': initialized');
 
-			if ( ! app.util.enabled() ) return app;
+			if (!_is_enabled()) return app;
 
+			_defaults.ad_selector = '.' + _defaults.ad_class;
 			_inventory = _get_inventory();
-			account = app.config.account;
-
-			_listen_for_custom_events();
+			_account = app.config.account;
+			_bind_handlers();
+			_load_library();
 
 			return app;
 
@@ -40,35 +45,35 @@ var admanager = ( function( app, $ ) {
 		/**
 		 * Bind to custom jQuery events
 		 */
-		function _listen_for_custom_events() {
+		function _bind_handlers() {
 
 			$(document)
-				.on('GPT:unitsInserted', function() {
-
+				.on('GPT:unitsInserted', function () {
 					debug(_name + ': GPT:unitsInserted');
-
-					_load_library();
-
 				})
-				.on('GPT:libraryLoaded', function() {
-
+				.on('GPT:libraryLoaded', function () {
 					debug(_name + ': GPT:libraryLoaded');
-
-					_listen_for_dfp_events();
-					_enable_single_request();
-					_set_targeting();
-					_set_page_positions();
-					_define_slots_for_page_positions();
-
+					_init_sequence();
 				})
-				.on('GPT:slotsDefined', function() {
-
+				.on('GPT:slotsDefined', function () {
 					debug(_name + ': GPT:slotsDefined');
-
 					_display_page_ads();
-
 				})
 			;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _init_sequence() {
+
+			$.event.trigger('GPT:initSequence');
+
+			_listen_for_dfp_events();
+			_enable_single_request();
+			_set_targeting();
+			_set_page_positions();
+			_define_slots_for_page_positions();
 
 		}
 
@@ -80,7 +85,9 @@ var admanager = ( function( app, $ ) {
 		 * @return object
 		 */
 		function _get_inventory() {
-			return _get_available_sizes( _inventory_clean_types( app.config.inventory ) );
+
+			return _get_available_sizes(_inventory_clean_types(app.config.inventory));
+
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -91,14 +98,12 @@ var admanager = ( function( app, $ ) {
 		 * @param array _inventory
 		 * @return array _inventory
 		 */
-		function _inventory_clean_types( _inventory ) {
+		function _inventory_clean_types(_inventory) {
 
 			for (var i = 0; i < _inventory.length; i++) {
-				if ( typeof _inventory[i].type !== 'undefined' ) continue;
-
+				if (typeof _inventory[i].type !== 'undefined') continue;
 				_inventory[i].type = 'default';
 			}
-
 			return _inventory;
 
 		}
@@ -111,30 +116,24 @@ var admanager = ( function( app, $ ) {
 		 * @param array _inventory
 		 * @return array _inventory
 		 */
-		function _get_available_sizes( _inventory ) {
+		function _get_available_sizes(_inventory) {
 
-			var width = ( window.innerWidth > 0 ) ? window.innerWidth : screen.width
-			;
+			var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
 
-			if ( width > 1024 ) return _inventory;
+			if (width > 1024) return _inventory;
 
-			if ( width >= 768 && width <= 1024 ) {
+			if (width >= 768 && width <= 1024) {
+
 				var max = 980;
 
 				for (var i = 0; i < _inventory.length; i++) {
-
 					var sizes_to_remove = [];
-
 					for (var j = 0; j < _inventory[i].sizes.length; j++) {
-
-						if ( _inventory[i].sizes[j][0] > max ) {
-							sizes_to_remove.push( _inventory[i].sizes[j] );
+						if (_inventory[i].sizes[j][0] > max) {
+							sizes_to_remove.push(_inventory[i].sizes[j]);
 						}
-
 					}
-
-					_inventory[i].sizes = app.util.difference( _inventory[i].sizes, sizes_to_remove );
-
+					_inventory[i].sizes = app.util.difference(_inventory[i].sizes, sizes_to_remove);
 				}
 			}
 
@@ -148,6 +147,8 @@ var admanager = ( function( app, $ ) {
 		 * Request GPT library
 		 */
 		function _load_library() {
+
+			// debug(_name + ': _load_library()');
 
 			var googletag,
 					gads,
@@ -186,9 +187,9 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _on_library_loaded() {
 
-			googletag.cmd.push( function(){
-				$.event.trigger( 'GPT:libraryLoaded' );
-			} );
+			googletag.cmd.push(function () {
+				$.event.trigger('GPT:libraryLoaded');
+			});
 
 		}
 
@@ -199,14 +200,12 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _listen_for_dfp_events() {
 
-			googletag.cmd.push(function() {
-
+			googletag.cmd.push(function () {
 				googletag.pubads()
-					.addEventListener('slotRenderEnded', function(event) {
+					.addEventListener('slotRenderEnded', function (event) {
 						_slot_render_ended(event);
 					})
 				;
-
 			});
 
 		}
@@ -222,7 +221,7 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _enable_single_request() {
 
-			googletag.cmd.push(function() {
+			googletag.cmd.push(function () {
 				// https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_collapseEmptyDivs
 				googletag.pubads().collapseEmptyDivs();
 
@@ -243,15 +242,15 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _set_targeting() {
 
-			googletag.cmd.push(function() {
+			googletag.cmd.push(function () {
 
-				var page_config = app.util.page_config(),
+				var page_config = _get_config(),
 					targeting = page_config.targeting
 				;
 
 				// Set targeting
 				if (typeof targeting !== 'undefined') {
-					$.each( targeting, function( key, value ) {
+					$.each(targeting, function (key, value) {
 						googletag.pubads().setTargeting(key, value);
 					});
 				}
@@ -267,18 +266,21 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _set_page_positions() {
 
-			var type = typeof app.config.type !== 'undefined' ? app.config.type : false,
-				$units = ! type ? $('.app_ad_unit') : $('.app_ad_unit[data-type="' + type + '"]')
+			var client_type = typeof app.config.client_type !== 'undefined' ? app.config.client_type : false,
+				$context = app.util.get_context(),
+				$units = null,
+				selector = _defaults.ad_selector
 			;
 
-			$units.each(function() {
+			if (client_type !== false) {
+				selector += '[data-client-type="' + client_type + '"]';
+			}
 
-				var $unit = $(this),
-					id = $unit.data('id')
-				;
+			$units = $context.find(selector);
 
-				page_positions.push( id );
-
+			$units.each(function () {
+				var id = $(this).data('id');
+				_page_positions.push(id);
 			});
 
 		}
@@ -290,36 +292,38 @@ var admanager = ( function( app, $ ) {
 		 */
 		function _define_slots_for_page_positions() {
 
-			var current_position = null
-			;
+			googletag.cmd.push(function () {
 
-			googletag.cmd.push(function() {
-				for (var i = 0; i < page_positions.length; i++) {
+				var current_position = null,
+					$context = app.util.get_context(),
+					$unit,
+					$unit_target;
 
-					_increment_ad_slot( page_positions[i] );
+				for (var i = 0; i < _page_positions.length; i++) {
 
-					current_position = get_ad_info( page_positions[i] );
+					_increment_ad_slot(_page_positions[i]);
+					current_position = _get_ad_info(_page_positions[i]);
 
-					if ( typeof current_position.id == 'undefined' ) continue;
+					if (typeof current_position.id == 'undefined') continue;
 
 					// find the empty container div on the page. we
 					// will dynamically instantiate the unique ad unit.
-					var $unit = $('.app_ad_unit[data-id="'+ current_position.id +'"]')
-					;
+					$unit = $context.find(_defaults.ad_selector + '[data-id="' + current_position.id + '"]');
+					$unit_target = $('<div/>');
 
-					if ( $unit.length < 1 ) continue;
+					if ($unit.length < 1) continue;
 
 					// generate new div
-					$unit.html(
-						'<div class="app_unit_target" id="'+ current_position.id_name +'"></div>'
-					);
+					$unit_target.addClass(_defaults.ad_unit_target_class);
+					$unit_target.attr('id', current_position.id_name);
+					$unit.append($unit_target);
 
 					// activate
 					$unit.addClass('active');
 
-					defined_slots[i] = googletag
+					_defined_slots[i] = googletag
 						.defineSlot(
-							'/' + account + '/' + current_position.slot,
+							'/' + _account + '/' + current_position.slot,
 							current_position.sizes,
 							current_position.id_name
 						)
@@ -331,7 +335,7 @@ var admanager = ( function( app, $ ) {
 				// Enables GPT services for defined slots
 				googletag.enableServices();
 
-				$.event.trigger( 'GPT:slotsDefined' );
+				$.event.trigger('GPT:slotsDefined');
 
 			});
 
@@ -341,21 +345,20 @@ var admanager = ( function( app, $ ) {
 
 		function _display_page_ads() {
 
-			googletag.cmd.push(function() {
+			googletag.cmd.push(function () {
 
 				// Fetch and display ads for defined_slots
-				googletag.pubads().refresh( defined_slots );
+				googletag.pubads().refresh(_defined_slots);
 
 				// lastly, run display code
-				for (var n = 0; n < page_positions.length; n++) {
+				for (var n = 0; n < _page_positions.length; n++) {
 
-					current_position = get_ad_info( page_positions[n] );
+					current_position = _get_ad_info(_page_positions[n]);
 
-					if ( $('#' + current_position.id_name).length > 0 ) {
-						googletag.display(
-							current_position.id_name
-						);
+					if ($('#' + current_position.id_name).length > 0) {
+						googletag.display(current_position.id_name);
 					}
+
 				}
 
 			});
@@ -370,15 +373,15 @@ var admanager = ( function( app, $ ) {
 		 * @see https://developers.google.com/doubleclick-gpt/reference
 		 * @param object unit
 		 */
-		function _slot_render_ended( unit ) {
+		function _slot_render_ended(unit) {
 
-			var unit_name = unit.slot.getAdUnitPath().replace('/' + account + '/', '')
+			var unit_name = unit.slot.getAdUnitPath().replace('/' + _account + '/', '')
 			;
 
-			$.event.trigger( 'GPT:adUnitRendered', {
+			$.event.trigger('GPT:adUnitRendered', {
 				'name': unit_name,
 				'size': unit.size
-			} );
+			});
 
 		}
 
@@ -389,12 +392,12 @@ var admanager = ( function( app, $ ) {
 		 *
 		 * @param string unit
 		 */
-		function _increment_ad_slot( unit ) {
+		function _increment_ad_slot(unit) {
 
 			for (var i = 0; i < _inventory.length; i++) {
-				if ( _inventory[i].id !== unit && _inventory[i].slot !== unit ) continue;
+				if (_inventory[i].id !== unit && _inventory[i].slot !== unit) continue;
 
-				if ( typeof _inventory[i].iteration == 'undefined' ) _inventory[i].iteration = 0;
+				if (typeof _inventory[i].iteration == 'undefined') _inventory[i].iteration = 0;
 
 				// increment
 				_inventory[i].iteration = _inventory[i].iteration + 1;
@@ -412,12 +415,12 @@ var admanager = ( function( app, $ ) {
 		 * @param string unit
 		 * @return object
 		 */
-		function get_ad_info( unit ) {
+		function _get_ad_info(unit) {
 
 			var return_object = {};
 
-			for ( var i = 0; i < _inventory.length; i++ ) {
-				if ( _inventory[i].id !== unit && _inventory[i].slot !== unit ) continue;
+			for (var i = 0; i < _inventory.length; i++) {
+				if (_inventory[i].id !== unit && _inventory[i].slot !== unit) continue;
 
 				// build return object
 				return_object = _inventory[i];
@@ -445,16 +448,13 @@ var admanager = ( function( app, $ ) {
 		 * @param string name
 		 * @return object defined_slot
 		 */
-		function _get_defined_slot( name ) {
+		function _get_defined_slot(name) {
 
-			var defined_slot = null
-			;
+			var defined_slot = null;
 
-			$.each( defined_slots, function( i, slot ) {
-				var unit_name = slot.getAdUnitPath().replace('/' + account + '/', '')
-				;
-
-				if ( unit_name === name ) {
+			$.each(_defined_slots, function (i, slot) {
+				var unit_name = slot.getAdUnitPath().replace('/' + _account + '/', '');
+				if (unit_name === name) {
 					defined_slot = slot;
 					return false;
 				}
@@ -467,22 +467,19 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * display_slot
+		 * _display_slot
 		 *
 		 * @param string unit [type or slot]
 		 */
-		function display_slot( unit ) {
+		function _display_slot(unit) {
 
-			googletag.cmd.push(function() {
-
-				var position = get_ad_info( unit ),
-					slot = _get_defined_slot( position.slot )
+			googletag.cmd.push(function () {
+				var position = _get_ad_info(unit),
+					slot = _get_defined_slot(position.slot)
 				;
-
-				googletag.pubads().refresh( [slot] );
-				googletag.display( position.id_name );
-				remove_defined_slot( position.slot );
-
+				googletag.pubads().refresh([slot]);
+				googletag.display(position.id_name);
+				_remove_defined_slot(position.slot);
 			});
 
 		}
@@ -490,58 +487,123 @@ var admanager = ( function( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * remove_defined_slot
+		 * _remove_defined_slot
 		 *
 		 * @param string name
 		 * @return object defined_slot
 		 */
-		function remove_defined_slot( name ) {
+		function _remove_defined_slot(name) {
 
-			$.each( defined_slots, function( index, slot ) {
-
-				var unit_name = slot.getAdUnitPath().replace('/' + account + '/', '')
-				;
-
-				if ( unit_name === name ) defined_slots.remove(index);
-
+			$.each(_defined_slots, function (index, slot) {
+				var unit_name = slot.getAdUnitPath().replace('/' + _account + '/', '');
+				if (unit_name === name) _defined_slots.remove(index);
 			} );
 
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function get_dynamic_inventory() {
+		function _get_dynamic_inventory() {
 
-			var dynamic_inventory = [],
-				type = typeof app.config.type !== 'undefined' ? app.config.type : false
-			;
+			var dynamic_items = [],
+				type = typeof app.config.client_type !== 'undefined' ? app.config.client_type : false,
+				local_context;
 
-			$.each( _inventory, function( index, position ) {
-
-				if ( position.dynamic === true ) {
-					if ( ! type || type === position.type ) {
-						dynamic_inventory.push( position );
+			$.each(_inventory, function (index, position) {
+				if ((typeof position.dynamic !== 'undefined') && (position.dynamic === true)) {
+					if (!type || type === position.type) {
+						dynamic_items.push(position);
+						local_context = position.local_context;
 					}
 				}
-
 			} );
 
-			return dynamic_inventory;
+			return {
+				dynamic_items: dynamic_items,
+				local_context: local_context
+			};
 
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _get_config() {
+			return app.config;
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Check if the Ad Manager is enabled for page
+		 *
+		 * @return bool
+		 */
+		function _is_enabled() {
+
+			var $context = app.util.get_context(),
+				attr_name = 'page-ad-config'
+			;
+
+			if (typeof app.config.page_config_attr !== 'undefined') {
+				attr_name = app.config.page_config_attr;
+			}
+
+			app.config = app.util.import_config({
+				$context: $context,
+				attr_name: attr_name,
+				exist_config: app.config
+			});
+
+			if (typeof app.config.enabled === 'undefined') return true;
+
+			return app.config.enabled;
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		/**
+		 * Empties all ads in a given context
+		 *
+		 * @param object options.$context
+		 * @param bool   options.remove_container
+		 */
+		function _empty_ads(options) {
+
+			var $context = options.$context,
+				remove_container = options.remove_container || false;
+
+			$context.find(_defaults.ad_selector).empty();
+
+			if (remove_container) {
+				$context.find(_defaults.ad_selector).remove();
+			}
+
+		}
+
+		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		function _get_defaults() {
+			return _defaults
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		return {
-			init                  : init,
-			get_ad_info           : get_ad_info,
-			display_slot          : display_slot,
-			remove_defined_slot   : remove_defined_slot,
-			get_dynamic_inventory : get_dynamic_inventory
+			init                  : _init,
+			is_enabled            : _is_enabled,
+			get_config            : _get_config,
+			get_defaults          : _get_defaults,
+			get_ad_info           : _get_ad_info,
+			display_slot          : _display_slot,
+			remove_defined_slot   : _remove_defined_slot,
+			get_dynamic_inventory : _get_dynamic_inventory,
+			init_sequence         : _init_sequence,
+			empty_ads             : _empty_ads
 		};
 
-	}( $ ) );
+	}($));
 
 	return app;
 
-}( admanager || {}, jQuery ) );
+}(admanager || {}, jQuery));
