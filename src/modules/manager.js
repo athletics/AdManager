@@ -49,23 +49,15 @@ var admanager = (function (app, $) {
 
 			$(document)
 				.on('GPT:unitsInserted', function () {
-
 					debug(_name + ': GPT:unitsInserted');
-
 				})
 				.on('GPT:libraryLoaded', function () {
-
 					debug(_name + ': GPT:libraryLoaded');
-
 					_init_sequence();
-
 				})
 				.on('GPT:slotsDefined', function () {
-
 					debug(_name + ': GPT:slotsDefined');
-
 					_display_page_ads();
-
 				})
 			;
 
@@ -592,9 +584,7 @@ var admanager = (function (app, $) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		function _get_defaults() {
-
-			return _defaults;
-
+			return _defaults
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

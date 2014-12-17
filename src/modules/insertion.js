@@ -74,6 +74,8 @@ var admanager = (function (app, $) {
 		/* 
 		 * First qualify the DOM context where ads are to be inserted
 		 * to determine if insertion should proceed.
+		 *
+		 * @return object
 		 */
 
 		function _qualify_context() {
@@ -234,6 +236,7 @@ var admanager = (function (app, $) {
 
 		/**
 		 * Insert Primary Unit: Unit most display above the fold
+		 *
 		 */
 		function _insert_primary_unit() {
 
@@ -268,6 +271,11 @@ var admanager = (function (app, $) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+		/**
+		 * Insert Secondary Unit: Ad units that commonly appear below the fold 
+		 *
+		 *
+		 */
 		function _insert_secondary_units() {
 
 			$.each(_inventory, function (index, unit) {
@@ -287,25 +295,6 @@ var admanager = (function (app, $) {
 				location.$insert_before.before(markup);
 
 			} );
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function _get_next_unit() {
-
-			var next_unit = false;
-
-			$.each(_inventory, function (index, unit) {
-
-				if ($('[data-id="' + unit.id + '"]').length !== 0) return true;
-
-				next_unit = unit;
-				return false;
-
-			} );
-
-			return next_unit;
 
 		}
 
