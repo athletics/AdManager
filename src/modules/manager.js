@@ -173,7 +173,7 @@ var admanager = (function (app, $) {
 						readyStateLoaded = true;
 						_on_library_loaded();
 					}
-				}
+				};
 			}
 			node = document.getElementsByTagName("script")[0];
 			node.parentNode.insertBefore(gads, node);
@@ -584,7 +584,7 @@ var admanager = (function (app, $) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		function _get_defaults() {
-			return _defaults
+			return _defaults;
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
