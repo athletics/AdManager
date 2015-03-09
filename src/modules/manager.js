@@ -375,12 +375,18 @@ var admanager = (function (app, $) {
 		 */
 		function _slot_render_ended(unit) {
 
-			var unit_name = unit.slot.getAdUnitPath().replace('/' + _account + '/', '')
+			var unit_name = unit.slot.getAdUnitPath().replace('/' + _account + '/', ''),
+				ad_info = _get_ad_info(unit_name)
 			;
 
 			$.event.trigger('GPT:adUnitRendered', {
-				'name': unit_name,
-				'size': unit.size
+				name: unit_name,
+				id: ad_info.id,
+				size: unit.size,
+				isEmpty: unit.isEmpty,
+				creativeId: unit.creativeId,
+				lineItemId: unit.lineItemId,
+				serviceName: unit.serviceName
 			});
 
 		}
