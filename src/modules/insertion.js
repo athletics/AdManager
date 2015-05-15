@@ -4,9 +4,9 @@
  *		Requires: app, app.util, jQuery
  */
 
-var admanager = (function (app, $) {
+var admanager = ( function ( app, $ ) {
 
-	app.insertion = (function ($) {
+	app.insertion = ( function ( $ ) {
 
 		var _name = 'Insertion',
 			debug = null,
@@ -36,9 +36,9 @@ var admanager = (function (app, $) {
 		function _init() {
 
 			debug = admanager.util.debug ? admanager.util.debug : function () {};
-			debug(_name + ': initialized');
+			debug( _name + ': initialized' );
 
-			_defaults = $.extend(_defaults, app.manager.get_defaults());
+			_defaults = $.extend( _defaults, app.manager.get_defaults() );
 
 			_bind_handlers();
 
@@ -48,16 +48,16 @@ var admanager = (function (app, $) {
 
 		function _bind_handlers() {
 
-			$(document)
-				.on('GPT:initSequence', function () {
+			$( document )
+				.on( 'GPT:initSequence', function () {
 
-					debug(_name + ': GPT:initSequence');
-					/** 
+					debug( _name + ': GPT:initSequence' );
+					/**
 					 * Begin qualification procedure when the DOM is ready
 					 */
 					_qualify_context();
 
-				});
+				} );
 
 		}
 
@@ -71,7 +71,7 @@ var admanager = (function (app, $) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		/* 
+		/*
 		 * First qualify the DOM context where ads are to be inserted
 		 * to determine if insertion should proceed.
 		 *
@@ -83,24 +83,24 @@ var admanager = (function (app, $) {
 			var inventory_data = app.manager.get_dynamic_inventory();
 
 			_set_context();
-			_inventory = (_inventory.length > 0) ? _inventory : inventory_data.dynamic_items;
-			_local_context = (_local_context) ? _local_context : inventory_data.local_context;
+			_inventory = ( _inventory.length > 0 ) ? _inventory : inventory_data.dynamic_items;
+			_local_context = ( _local_context ) ? _local_context : inventory_data.local_context;
 
 			// Return if empty
-			if (_inventory.length < 1) {
+			if ( _inventory.length < 1 ) {
 				_broadcast();
 				return app;
 			}
 
-			$local_context = $context.find(_local_context).first();
+			$local_context = $context.find( _local_context ).first();
 
 			// Detect a local context
-			if ($local_context.length > 0) {
+			if ( $local_context.length > 0 ) {
 				_in_content = true;
 			}
 
 			// Return if there is no insertion selector
-			if (!_in_content) {
+			if ( ! _in_content ) {
 				_broadcast();
 				return app;
 			}
@@ -117,7 +117,7 @@ var admanager = (function (app, $) {
 		 */
 		function _broadcast() {
 
-			$.event.trigger('GPT:unitsInserted');
+			$.event.trigger( 'GPT:unitsInserted' );
 
 		}
 
@@ -132,7 +132,7 @@ var admanager = (function (app, $) {
 
 			var page_config = app.manager.get_config();
 
-			if (typeof page_config.insertion_enabled === 'undefined') return false;
+			if ( typeof page_config.insertion_enabled === 'undefined' ) return false;
 
 			return page_config.insertion_enabled;
 
@@ -142,7 +142,7 @@ var admanager = (function (app, $) {
 
 		function _insert_ad_units() {
 
-			if (_in_content) {
+			if ( _in_content ) {
 				_denote_valid_insertions();
 				_insert_primary_unit();
 				_insert_secondary_units();
@@ -160,23 +160,23 @@ var admanager = (function (app, $) {
 				excluded = app.config.insert_exclusion || _defaults.insert_exclusion
 			;
 
-			$nodes.each(function (i) {
+			$nodes.each( function ( i ) {
 
-				var $element = $(this),
+				var $element = $( this ),
 					$prev = i > 0 ? $nodes.eq(i - 1) : false,
 					valid = true
 				;
 
-				$.each(excluded, function (index, item) {
-					if ($element.is(item) || $element.find(item).length > 0) {
+				$.each( excluded, function ( index, item ) {
+					if ( $element.is( item ) || $element.find( item ).length > 0 ) {
 						valid = false; // not valid
 						return false; // break loop
 					}
 				} );
 
-				if ($prev && $prev.is('p') && $prev.find('img').length === 1) valid = false;
+				if ( $prev && $prev.is( 'p' ) && $prev.find( 'img' ).length === 1 ) valid = false;
 
-				$element.attr('data-valid-location', valid);
+				$element.attr( 'data-valid-location', valid );
 
 			} );
 
@@ -190,9 +190,9 @@ var admanager = (function (app, $) {
 		 * @param  object $element
 		 * @return bool
 		 */
-		function _is_valid_insertion_location($element) {
+		function _is_valid_insertion_location( $element ) {
 
-			return $element.data('valid-location');
+			return $element.data( 'valid-location' );
 
 		}
 
@@ -205,28 +205,28 @@ var admanager = (function (app, $) {
 		 * @param bool disable_float
 		 * @return string
 		 */
-		function _ad_unit_markup(unit_id, disable_float) {
+		function _ad_unit_markup( unit_id, disable_float ) {
 
 			var float_disable = disable_float || false,
-				type = app.util.get_unit_type(unit_id),
+				type = app.util.get_unit_type( unit_id ),
 				alignment = _odd ? 'odd' : 'even',
-				$html= $('<div/>');
+				$html= $( '<div />' );
 
 			$html
-				.addClass(_defaults.ad_class)
-				.attr('data-id', unit_id)
-				.attr('data-client-type', type);
+				.addClass( _defaults.ad_class )
+				.attr( 'data-id', unit_id )
+				.attr( 'data-client-type', type );
 
-			if (float_disable) {
+			if ( float_disable ) {
 				$html
-					.addClass('disable_float');
+					.addClass( 'disable_float') ;
 			} else {
 				$html
-					.addClass('in_content')
-					.addClass(alignment);
+					.addClass( 'in_content' )
+					.addClass( alignment );
 			}
 
-			if (!float_disable) _odd = !_odd;
+			if ( ! float_disable ) _odd = ! _odd;
 
 			return $html;
 
@@ -241,58 +241,58 @@ var admanager = (function (app, $) {
 		function _insert_primary_unit() {
 
 			var unit = _get_primary_unit(),
-				tallest = admanager.util.tallest_available(unit),
-				shortest = admanager.util.shortest_available(unit),
-				location = _find_insertion_location({
+				tallest = admanager.util.tallest_available( unit ),
+				shortest = admanager.util.shortest_available( unit ),
+				location = _find_insertion_location( {
 					height: tallest,
 					limit: _defaults.ad_height_limit
-				}),
+				} ),
 				markup = null
 			;
 
-			if (!location) {
-				location = _find_insertion_location({
+			if ( ! location ) {
+				location = _find_insertion_location( {
 					height: shortest,
 					limit: _defaults.ad_height_limit,
 					force: true
-				});
+				} );
 
-				if (!location.disable_float) {
+				if ( ! location.disable_float ) {
 					// unset large sizes
-					unit = admanager.util.limit_unit_height(unit, shortest);
+					unit = admanager.util.limit_unit_height( unit, shortest );
 				}
 			}
 
-			markup = _ad_unit_markup(unit.id, location.disable_float);
+			markup = _ad_unit_markup( unit.id, location.disable_float );
 
-			location.$insert_before.before(markup);
+			location.$insert_before.before( markup );
 
 		}
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		/**
-		 * Insert Secondary Unit: Ad units that commonly appear below the fold 
+		 * Insert Secondary Unit: Ad units that commonly appear below the fold
 		 *
 		 *
 		 */
 		function _insert_secondary_units() {
 
-			$.each(_inventory, function (index, unit) {
+			$.each( _inventory, function ( index, unit ) {
 
-				var tallest = admanager.util.tallest_available(unit),
-					location = _find_insertion_location({
+				var tallest = admanager.util.tallest_available( unit ),
+					location = _find_insertion_location( {
 						height: tallest
-					}),
+					} ),
 					markup = null
 				;
 
-				if (!location) {
+				if ( ! location ) {
 					return false;
 				}
 
-				markup = _ad_unit_markup(unit.id, location.disable_float);
-				location.$insert_before.before(markup);
+				markup = _ad_unit_markup( unit.id, location.disable_float );
+				location.$insert_before.before( markup );
 
 			} );
 
@@ -304,19 +304,19 @@ var admanager = (function (app, $) {
 
 			var primary_unit = false;
 
-			$.each(_inventory, function (index, unit) {
+			$.each( _inventory, function ( index, unit ) {
 
-				if (unit.primary === true) {
+				if ( unit.primary === true ) {
 					primary_unit = unit;
-					_inventory.remove(index);
+					_inventory.remove( index );
 					return false;
 				}
 
 			} );
 
-			if (!primary_unit) {
+			if ( ! primary_unit ) {
 				primary_unit = _inventory[0];
-				_inventory.remove(0);
+				_inventory.remove( 0 );
 			}
 
 			return primary_unit;
@@ -331,35 +331,35 @@ var admanager = (function (app, $) {
 		 * @param object options
 		 * @return object or boolean:false
 		 */
-		function _find_insertion_location(options) {
+		function _find_insertion_location( options ) {
 
 			options = options || {};
 
 			var $nodes = _get_nodes(),
-				node_search = new NodeSearch({
+				node_search = new NodeSearch( {
 					$nodes: $nodes,
 					force: options.force ? options.force : false,
 					limit: options.limit ? options.limit : false,
 					height: options.height
-				})
+				} )
 			;
 
-			if ($nodes.length < 1) return false;
+			if ( $nodes.length < 1 ) return false;
 
 			// Loop through each node as necessary
-			$.each($nodes, function (i, node) {
+			$.each( $nodes, function ( i, node ) {
 
-				var exit_loop = node_search.verify_node(i, $(node));
+				var exit_loop = node_search.verify_node( i, $( node ) );
 
-				if (exit_loop === true) {
+				if ( exit_loop === true ) {
 					return false;
-				} else if (exit_loop === false) {
+				} else if ( exit_loop === false ) {
 					return true;
 				}
 
-			});
+			} );
 
-			if (!node_search.location_found) {
+			if ( ! node_search.location_found ) {
 				return false;
 			}
 
@@ -367,8 +367,8 @@ var admanager = (function (app, $) {
 			node_search.set_last_position();
 
 			return {
-				'$insert_before' : node_search.$insert_before,
-				'disable_float' : node_search.disable_float
+				'$insert_before': node_search.$insert_before,
+				'disable_float': node_search.disable_float
 			};
 
 		}
@@ -379,7 +379,7 @@ var admanager = (function (app, $) {
 		 * Search object used for determining insertion points
 		 *
 		 */
-		function NodeSearch(options) {
+		function NodeSearch( options ) {
 
 			this.total_height = 0;
 			this.margin_difference = 40;
@@ -418,10 +418,10 @@ var admanager = (function (app, $) {
 		 */
 		NodeSearch.prototype.mark_valid_nodes = function () {
 
-			if (this.inserted.length > 0) {
-				$.each(this.inserted, function (index, item) {
-					$(item).data('valid-location', false);
-				});
+			if ( this.inserted.length > 0 ) {
+				$.each( this.inserted, function ( index, item ) {
+					$( item ).data( 'valid-location', false) ;
+				} );
 			}
 
 		};
@@ -433,38 +433,38 @@ var admanager = (function (app, $) {
 		 *
 		 * @return boolean
 		 */
-		NodeSearch.prototype.verify_node = function (index, $node) {
+		NodeSearch.prototype.verify_node = function ( index, $node ) {
 
 			var since = $node.offset().top - this.last_position,
 				height = $node.outerHeight(),
-				is_last = (this.$nodes.length - 1) === index;
+				is_last = ( this.$nodes.length - 1 ) === index;
 
 			this.total_height += height;
 
-			if (this.force && (this.total_height >= this.limit || is_last)) {
+			if ( this.force && ( this.total_height >= this.limit || is_last ) ) {
 
 				this.$insert_before = $node;
 				this.disable_float = true;
 				this.location_found = true;
 				this.exit_loop = true;
 
-			} else if (this.limit && (this.total_height >= this.limit || is_last)) {
+			} else if ( this.limit && ( this.total_height >= this.limit || is_last ) ) {
 
 				this.location_found = false;
 				this.exit_loop = true;
 
-			} else if (_is_valid_insertion_location($node)) {
+			} else if ( _is_valid_insertion_location( $node ) ) {
 
 				this.valid_height += height;
-				this.inserted.push($node);
+				this.inserted.push( $node );
 
-				if (this.$insert_before === null) {
+				if ( this.$insert_before === null ) {
 					this.$insert_before = $node;
 				}
 
-				if (this.valid_height >= this.needed_height) {
+				if ( this.valid_height >= this.needed_height ) {
 
-					if (this.limit === false && (since < _defaults.px_between_units)) {
+					if ( this.limit === false && ( since < _defaults.px_between_units ) ) {
 
 						this.valid_height = 0;
 						this.$insert_before = null;
@@ -496,11 +496,11 @@ var admanager = (function (app, $) {
 		 * @param mixed $el
 		 * @return bool
 		 */
-		function _is_this_an_ad($el) {
+		function _is_this_an_ad( $el ) {
 
-			if (!$el) return false;
+			if ( ! $el ) return false;
 
-			return $el.is(_defaults.ad_selector);
+			return $el.is( _defaults.ad_selector );
 
 		}
 
@@ -513,12 +513,12 @@ var admanager = (function (app, $) {
 		 */
 		function _get_nodes() {
 
-			var $prev_unit = $local_context.find(_defaults.ad_selector).last(),
+			var $prev_unit = $local_context.find( _defaults.ad_selector ).last(),
 				$nodes = null;
 
 			// nodes after previous unit or all nodes
-			if ($prev_unit.length > 0) {
-				$nodes = $prev_unit.nextAll($local_context);
+			if ( $prev_unit.length > 0 ) {
+				$nodes = $prev_unit.nextAll( $local_context );
 			} else {
 				$nodes = $local_context.children();
 			}
@@ -530,11 +530,11 @@ var admanager = (function (app, $) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		return {
-			init : _init
+			init: _init
 		};
 
-	} ($));
+	}( $ ) );
 
 	return app;
 
-} (admanager || {}, jQuery));
+}( admanager || {}, jQuery ) );

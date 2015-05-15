@@ -4,9 +4,9 @@
  *		Requires: app, jQuery
  */
 
-var admanager = (function (app, $) {
+var admanager = ( function ( app, $ ) {
 
-	app.util = (function ($) {
+	app.util = ( function ( $ ) {
 
 		var _name = 'Util',
 			_debug_enable = false
@@ -16,7 +16,7 @@ var admanager = (function (app, $) {
 
 		function _init() {
 
-			debug(_name + ': initialized');
+			debug( _name + ': initialized' );
 			_init_array_remove();
 			return app;
 
@@ -24,12 +24,12 @@ var admanager = (function (app, $) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function debug(obj) {
+		function debug( obj ) {
 
-			if (!_debug_enable) return;
+			if ( !_debug_enable ) return;
 
-			if ((typeof console == "object") && (console.log)) {
-				console.log(obj);
+			if ( ( typeof console == "object" ) && ( console.log ) ) {
+				console.log( obj );
 			}
 
 		}
@@ -43,13 +43,13 @@ var admanager = (function (app, $) {
 		 * @param  array values
 		 * @return array diff
 		 */
-		function _difference(array, values) {
+		function _difference( array, values ) {
 
 			var diff = [];
 
-			$.grep(array, function (element) {
-				if ($.inArray(element, values) === -1) diff.push(element);
-			});
+			$.grep( array, function ( element ) {
+				if ( $.inArray( element, values ) === -1 ) diff.push( element );
+			} );
 
 			return diff;
 
@@ -59,11 +59,11 @@ var admanager = (function (app, $) {
 
 		function _init_array_remove() {
 
-			// Array Remove - By John Resig (MIT Licensed)
-			Array.prototype.remove = function (from, to) {
-				var rest = this.slice((to || from) + 1 || this.length);
+			// Array Remove - By John Resig ( MIT Licensed )
+			Array.prototype.remove = function ( from, to ) {
+				var rest = this.slice( ( to || from ) + 1 || this.length );
 				this.length = from < 0 ? this.length + from : from;
-				return this.push.apply(this, rest);
+				return this.push.apply( this, rest );
 			};
 
 		}
@@ -73,14 +73,14 @@ var admanager = (function (app, $) {
 		/**
 		 * Import JSON page config data from DOM
 		 *
-		 * This imports inline JSON via data attribute 
+		 * This imports inline JSON via data attribute
 		 * and extends an existing config with it.
 		 *
 		 * @param object options.$context
 		 * @param string options.attr_name
 		 * @return object
 		 */
-		function _import_config(options) {
+		function _import_config( options ) {
 
 			var $context = options.$context,
 				attr_name = options.attr_name,
@@ -90,11 +90,11 @@ var admanager = (function (app, $) {
 				data = {};
 
 			selector = '*[data-' + attr_name + ']';
-			new_config = $.extend({}, exist_config);
-			data = $context.find(selector).data(attr_name);
+			new_config = $.extend( {}, exist_config );
+			data = $context.find( selector ).data( attr_name );
 
-			if (typeof new_config === 'object') {
-				new_config = $.extend(new_config, data);
+			if ( typeof new_config === 'object' ) {
+				new_config = $.extend( new_config, data );
 			}
 
 			return new_config;
@@ -110,9 +110,9 @@ var admanager = (function (app, $) {
 		 * but in infinite scroll applications, this needs to be dynamic.
 		 * If the config does not provide one, the default value is 'body'.
 		 *
-		 * @return array $(selector)
+		 * @return array $( selector )
 		 *
-		 * TODO: 
+		 * TODO:
 		 * Add optional dynamically-determined context,
 		 * for use in multi-segment infinite scroll
 		 *
@@ -121,7 +121,7 @@ var admanager = (function (app, $) {
 		function _get_context() {
 
 			var selector = app.config.context || 'body';
-			return $(selector);
+			return $( selector );
 
 		}
 
@@ -133,14 +133,14 @@ var admanager = (function (app, $) {
 		 * @param object unit
 		 * @return integer
 		 */
-		function _shortest_available(unit) {
+		function _shortest_available( unit ) {
 
 			var shortest = 0;
 
-			$.each(unit.sizes, function (index, sizes) {
-				if (shortest === 0) shortest = sizes[1];
-				else if (sizes[1] < shortest) shortest = sizes[1];
-			});
+			$.each( unit.sizes, function ( index, sizes ) {
+				if ( shortest === 0 ) shortest = sizes[1];
+				else if ( sizes[1] < shortest ) shortest = sizes[1];
+			} );
 
 			return shortest;
 
@@ -154,13 +154,13 @@ var admanager = (function (app, $) {
 		 * @param object unit
 		 * @return integer
 		 */
-		function _tallest_available(unit) {
+		function _tallest_available( unit ) {
 
 			var tallest = 0;
 
-			$.each(unit.sizes, function (index, sizes) {
-				if (sizes[1] > tallest) tallest = sizes[1];
-			});
+			$.each( unit.sizes, function ( index, sizes ) {
+				if ( sizes[1] > tallest ) tallest = sizes[1];
+			} );
 
 			return tallest;
 
@@ -175,12 +175,12 @@ var admanager = (function (app, $) {
 		 * @param  int limit
 		 * @return object unit
 		 */
-		function _limit_unit_height(unit, limit) {
+		function _limit_unit_height( unit, limit ) {
 
-			$.each(unit.sizes, function (index, sizes) {
-				if (sizes[1] <= limit) return true;
-				unit.sizes.remove(index);
-			});
+			$.each( unit.sizes, function ( index, sizes ) {
+				if ( sizes[1] <= limit ) return true;
+				unit.sizes.remove( index );
+			} );
 
 			return unit;
 
@@ -194,15 +194,15 @@ var admanager = (function (app, $) {
 		 * @param string id
 		 * @return string type
 		 */
-		function _get_unit_type(id) {
+		function _get_unit_type( id ) {
 
 			var type = 'default';
 
-			$.each(app.config.inventory, function (index, unit) {
-				if (unit.id !== id) return true;
+			$.each( app.config.inventory, function ( index, unit ) {
+				if ( unit.id !== id ) return true;
 				type = unit.type;
 				return false;
-			});
+			} );
 
 			return type;
 
@@ -222,8 +222,8 @@ var admanager = (function (app, $) {
 			get_context        : _get_context
 		};
 
-	} ($));
+	} ( $ ) );
 
 	return app;
 
-} (admanager || {}, jQuery));
+} ( admanager || {}, jQuery ) );
