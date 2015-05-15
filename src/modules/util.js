@@ -26,7 +26,7 @@ var admanager = ( function ( app, $ ) {
 
 		function debug( obj ) {
 
-			if ( !_debug_enable ) return;
+			if ( ! _debug_enable ) return;
 
 			if ( ( typeof console == 'object' ) && ( console.log ) ) {
 				console.log( obj );
@@ -59,7 +59,7 @@ var admanager = ( function ( app, $ ) {
 
 		function _init_array_remove() {
 
-			// Array Remove - By John Resig ( MIT Licensed )
+			// Array Remove - By John Resig (MIT Licensed)
 			Array.prototype.remove = function ( from, to ) {
 				var rest = this.slice( ( to || from ) + 1 || this.length );
 				this.length = from < 0 ? this.length + from : from;
