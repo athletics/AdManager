@@ -160,13 +160,13 @@ var admanager = ( function ( app, $ ) {
 			window.googletag = window.googletag || {};
 			googletag = window.googletag;
 			googletag.cmd = googletag.cmd || [];
-			gads = document.createElement( "script" );
+			gads = document.createElement( 'script' );
 			gads.async = true;
-			gads.type = "text/javascript";
-			useSSL = "https:" == document.location.protocol;
-			gads.src = ( useSSL ? "https:" : "http:" ) + "//www.googletagservices.com/tag/js/gpt.js";
+			gads.type = 'text/javascript';
+			useSSL = 'https:' == document.location.protocol;
+			gads.src = ( useSSL ? 'https:' : 'http:' ) + '//www.googletagservices.com/tag/js/gpt.js';
 			if ( gads.addEventListener ) {
-				gads.addEventListener( "load", _on_library_loaded, false );
+				gads.addEventListener( 'load', _on_library_loaded, false );
 			} else if ( gads.readyState ) {
 				gads.onreadystatechange = function () { // Legacy IE
 					if ( ! readyStateLoaded ) {
@@ -175,7 +175,7 @@ var admanager = ( function ( app, $ ) {
 					}
 				};
 			}
-			node = document.getElementsByTagName( "script" )[0];
+			node = document.getElementsByTagName( 'script' )[0];
 			node.parentNode.insertBefore( gads, node );
 
 		}

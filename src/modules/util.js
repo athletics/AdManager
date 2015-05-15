@@ -28,7 +28,7 @@ var admanager = ( function ( app, $ ) {
 
 			if ( !_debug_enable ) return;
 
-			if ( ( typeof console == "object" ) && ( console.log ) ) {
+			if ( ( typeof console == 'object' ) && ( console.log ) ) {
 				console.log( obj );
 			}
 
