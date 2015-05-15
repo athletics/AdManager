@@ -1,0 +1,17 @@
+{
+	"preset": "wordpress",
+	"requireLineFeedAtFileEnd": null,
+	"disallowSpacesInAnonymousFunctionExpression": null,
+	"disallowSpacesInFunctionExpression": null,
+	"disallowSpacesInNamedFunctionExpression": {
+		"beforeOpeningRoundBrace": true
+	},
+	"disallowSpacesInFunctionDeclaration": {
+		"beforeOpeningRoundBrace": true
+	},
+	"requireSpacesInNamedFunctionExpression": null,
+	"requireSpacesInAnonymousFunctionExpression": {
+		"beforeOpeningRoundBrace": true,
+		"beforeOpeningCurlyBrace": true
+	}
+}
