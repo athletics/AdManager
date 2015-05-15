@@ -322,7 +322,7 @@ var admanager = ( function ( app, $ ) {
 					$unit.addClass( 'active' );
 
 					_defined_slots[ i ] = googletag
-						.defineSlot( 
+						.defineSlot(
 							'/' + _account + '/' + current_position.slot,
 							current_position.sizes,
 							current_position.id_name
