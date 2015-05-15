@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.2.1 (2015-03-09)
+ * @version 0.2.1 ( 2015-05-15 )
  */
 var admanager = function(app, $) {
     if (typeof app.initialized === "undefined") {
@@ -113,7 +113,7 @@ var admanager = function(app, $) {
             return $element.data("valid-location");
         }
         function _ad_unit_markup(unit_id, disable_float) {
-            var float_disable = disable_float || false, type = app.util.get_unit_type(unit_id), alignment = _odd ? "odd" : "even", $html = $("<div/>");
+            var float_disable = disable_float || false, type = app.util.get_unit_type(unit_id), alignment = _odd ? "odd" : "even", $html = $("<div />");
             $html.addClass(_defaults.ad_class).attr("data-id", unit_id).attr("data-client-type", type);
             if (float_disable) {
                 $html.addClass("disable_float");
@@ -456,7 +456,7 @@ var admanager = function(app, $) {
             for (var i = 0; i < _inventory.length; i++) {
                 if (_inventory[i].id !== unit && _inventory[i].slot !== unit) continue;
                 return_object = _inventory[i];
-                if (typeof return_object.use_iterator != "undefined" && !return_object.use_iterator) {
+                if (typeof return_object.use_iterator !== "undefined" && !return_object.use_iterator) {
                     return_object.id_name = return_object.id;
                 } else {
                     return_object.id_name = return_object.id + "_" + return_object.iteration;

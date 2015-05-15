@@ -1,16 +1,16 @@
-module.exports = function(grunt) {
+module.exports = function( grunt ) {
 
 	'use strict';
 
-	grunt.initConfig({
-		pkg: grunt.file.readJSON('package.json'),
+	grunt.initConfig( {
+		pkg: grunt.file.readJSON( 'package.json' ),
 		comments: {
 			banner: '/**\n' +
 				' * <%= pkg.name %> - <%= pkg.description %>\n' +
 				' *\n' +
 				' * @author <%= pkg.author.name %> - <%= pkg.author.url %>\n' +
 				' * @see <%= pkg.homepage %>\n' +
-				' * @version <%= pkg.version %> (<%= grunt.template.today("yyyy-mm-dd") %>)\n' +
+				' * @version <%= pkg.version %> ( <%= grunt.template.today( "yyyy-mm-dd" ) %> )\n' +
 				' */\n',
 			footer: '\nwindow.AdManager = admanager.bootstrap.init;'
 		},
@@ -52,16 +52,16 @@ module.exports = function(grunt) {
 					'<%= paths.modules %>/*',
 					'<%= paths.bower %>/*'
 				],
-				tasks: ['uglify'],
-			},
-		},
-	});
+				tasks: [ 'uglify' ]
+			}
+		}
+	} );
 
 	// grunt plugins
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
+	grunt.loadNpmTasks( 'grunt-contrib-watch' );
 
 	// Tasks
-	grunt.registerTask('default', ['uglify', 'watch']);
+	grunt.registerTask( 'default', [ 'uglify', 'watch' ] );
 
 };
