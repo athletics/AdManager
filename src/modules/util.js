@@ -26,7 +26,9 @@ var admanager = ( function ( app, $ ) {
 
 		function debug( obj ) {
 
-			if ( ! _debug_enable ) return;
+			if ( ! _debug_enable ) {
+				return;
+			}
 
 			if ( ( typeof console == 'object' ) && ( console.log ) ) {
 				console.log( obj );
@@ -48,7 +50,9 @@ var admanager = ( function ( app, $ ) {
 			var diff = [];
 
 			$.grep( array, function ( element ) {
-				if ( $.inArray( element, values ) === -1 ) diff.push( element );
+				if ( $.inArray( element, values ) === -1 ) {
+					diff.push( element );
+				}
 			} );
 
 			return diff;
@@ -138,8 +142,11 @@ var admanager = ( function ( app, $ ) {
 			var shortest = 0;
 
 			$.each( unit.sizes, function ( index, sizes ) {
-				if ( shortest === 0 ) shortest = sizes[1];
-				else if ( sizes[1] < shortest ) shortest = sizes[1];
+				if ( shortest === 0 ) {
+					shortest = sizes[1];
+				} else if ( sizes[1] < shortest ) {
+					shortest = sizes[1];
+				}
 			} );
 
 			return shortest;
@@ -159,7 +166,9 @@ var admanager = ( function ( app, $ ) {
 			var tallest = 0;
 
 			$.each( unit.sizes, function ( index, sizes ) {
-				if ( sizes[1] > tallest ) tallest = sizes[1];
+				if ( sizes[1] > tallest ) {
+					tallest = sizes[1];
+				}
 			} );
 
 			return tallest;
@@ -178,7 +187,9 @@ var admanager = ( function ( app, $ ) {
 		function _limit_unit_height( unit, limit ) {
 
 			$.each( unit.sizes, function ( index, sizes ) {
-				if ( sizes[1] <= limit ) return true;
+				if ( sizes[1] <= limit ) {
+					return true;
+				}
 				unit.sizes.remove( index );
 			} );
 
@@ -199,7 +210,9 @@ var admanager = ( function ( app, $ ) {
 			var type = 'default';
 
 			$.each( app.config.inventory, function ( index, unit ) {
-				if ( unit.id !== id ) return true;
+				if ( unit.id !== id ) {
+					return true;
+				}
 				type = unit.type;
 				return false;
 			} );

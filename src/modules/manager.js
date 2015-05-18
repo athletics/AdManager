@@ -28,7 +28,9 @@ var admanager = ( function ( app, $ ) {
 			debug = admanager.util.debug ? admanager.util.debug : function () {};
 			debug( _name + ': initialized' );
 
-			if ( ! _is_enabled() ) return app;
+			if ( ! _is_enabled() ) {
+				return app;
+			}
 
 			_defaults.ad_selector = '.' + _defaults.ad_class;
 			_inventory = _get_inventory();
@@ -101,7 +103,9 @@ var admanager = ( function ( app, $ ) {
 		function _inventory_clean_types( _inventory ) {
 
 			for ( var i = 0; i < _inventory.length; i++ ) {
-				if ( typeof _inventory[ i ].type !== 'undefined' ) continue;
+				if ( typeof _inventory[ i ].type !== 'undefined' ) {
+					continue;
+				}
 				_inventory[ i ].type = 'default';
 			}
 			return _inventory;
@@ -120,7 +124,9 @@ var admanager = ( function ( app, $ ) {
 
 			var width = ( window.innerWidth > 0 ) ? window.innerWidth : screen.width;
 
-			if ( width > 1024 ) return _inventory;
+			if ( width > 1024 ) {
+				return _inventory;
+			}
 
 			if ( width >= 768 && width <= 1024 ) {
 
@@ -304,14 +310,18 @@ var admanager = ( function ( app, $ ) {
 					_increment_ad_slot( _page_positions[ i ] );
 					current_position = _get_ad_info( _page_positions[ i ] );
 
-					if ( typeof current_position.id == 'undefined' ) continue;
+					if ( typeof current_position.id == 'undefined' ) {
+						continue;
+					}
 
 					// find the empty container div on the page. we
 					// will dynamically instantiate the unique ad unit.
 					$unit = $context.find( _defaults.ad_selector + '[data-id="' + current_position.id + '"]' );
 					$unit_target = $( '<div/>' );
 
-					if ( $unit.length < 1 ) continue;
+					if ( $unit.length < 1 ) {
+						continue;
+					}
 
 					// generate new div
 					$unit_target.addClass( _defaults.ad_unit_target_class );
@@ -401,7 +411,9 @@ var admanager = ( function ( app, $ ) {
 		function _increment_ad_slot( unit ) {
 
 			for ( var i = 0; i < _inventory.length; i++ ) {
-				if ( _inventory[ i ].id !== unit && _inventory[ i ].slot !== unit ) continue;
+				if ( _inventory[ i ].id !== unit && _inventory[ i ].slot !== unit ) {
+					continue;
+				}
 
 				if ( typeof _inventory[ i ].iteration == 'undefined' ) _inventory[ i ].iteration = 0;
 
@@ -426,7 +438,9 @@ var admanager = ( function ( app, $ ) {
 			var return_object = {};
 
 			for ( var i = 0; i < _inventory.length; i++ ) {
-				if ( _inventory[ i ].id !== unit && _inventory[ i ].slot !== unit ) continue;
+				if ( _inventory[ i ].id !== unit && _inventory[ i ].slot !== unit ) {
+					continue;
+				}
 
 				// build return object
 				return_object = _inventory[ i ];
@@ -502,7 +516,9 @@ var admanager = ( function ( app, $ ) {
 
 			$.each( _defined_slots, function ( index, slot ) {
 				var unit_name = slot.getAdUnitPath().replace( '/' + _account + '/', '' );
-				if ( unit_name === name ) _defined_slots.remove( index );
+				if ( unit_name === name ) {
+					_defined_slots.remove( index );
+				}
 			} );
 
 		}
@@ -560,7 +576,9 @@ var admanager = ( function ( app, $ ) {
 				exist_config: app.config
 			} );
 
-			if ( typeof app.config.enabled === 'undefined' ) return true;
+			if ( typeof app.config.enabled === 'undefined' ) {
+				return true;
+			}
 
 			return app.config.enabled;
 
