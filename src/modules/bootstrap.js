@@ -21,7 +21,10 @@ var admanager = ( function ( app, $ ) {
 
 		function _init( config ) {
 
-			if ( app.initialized ) return false; // the app has already been initialized
+			if ( app.initialized ) {
+				// the app has already been initialized
+				return false;
+			}
 
 			admanager.config = config || false;
 

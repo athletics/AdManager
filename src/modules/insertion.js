@@ -132,7 +132,9 @@ var admanager = ( function ( app, $ ) {
 
 			var page_config = app.manager.get_config();
 
-			if ( typeof page_config.insertion_enabled === 'undefined' ) return false;
+			if ( typeof page_config.insertion_enabled === 'undefined' ) {
+				return false;
+			}
 
 			return page_config.insertion_enabled;
 
@@ -174,7 +176,9 @@ var admanager = ( function ( app, $ ) {
 					}
 				} );
 
-				if ( $prev && $prev.is( 'p' ) && $prev.find( 'img' ).length === 1 ) valid = false;
+				if ( $prev && $prev.is( 'p' ) && $prev.find( 'img' ).length === 1 ) {
+					valid = false;
+				}
 
 				$element.attr( 'data-valid-location', valid );
 
@@ -226,7 +230,9 @@ var admanager = ( function ( app, $ ) {
 					.addClass( alignment );
 			}
 
-			if ( ! float_disable ) _odd = ! _odd;
+			if ( ! float_disable ) {
+				_odd = ! _odd;
+			}
 
 			return $html;
 
@@ -344,7 +350,9 @@ var admanager = ( function ( app, $ ) {
 				} )
 			;
 
-			if ( $nodes.length < 1 ) return false;
+			if ( $nodes.length < 1 ) {
+				return false;
+			}
 
 			// Loop through each node as necessary
 			$.each( $nodes, function ( i, node ) {
@@ -498,7 +506,9 @@ var admanager = ( function ( app, $ ) {
 		 */
 		function _is_this_an_ad( $el ) {
 
-			if ( ! $el ) return false;
+			if ( ! $el ) {
+				return false;
+			}
 
 			return $el.is( _defaults.ad_selector );
 

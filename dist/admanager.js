@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.2.1 ( 2015-05-15 )
+ * @version 0.2.1 ( 2015-05-18 )
  */
 var admanager = function(app, $) {
     if (typeof app.initialized === "undefined") {
@@ -12,7 +12,9 @@ var admanager = function(app, $) {
     app.bootstrap = function($) {
         var _name = "Bootstrap", debug = null, _init_callbacks = [];
         function _init(config) {
-            if (app.initialized) return false;
+            if (app.initialized) {
+                return false;
+            }
             admanager.config = config || false;
             if (!admanager.config) {
                 throw new Error("Please provide config");
@@ -84,7 +86,9 @@ var admanager = function(app, $) {
         }
         function _is_enabled() {
             var page_config = app.manager.get_config();
-            if (typeof page_config.insertion_enabled === "undefined") return false;
+            if (typeof page_config.insertion_enabled === "undefined") {
+                return false;
+            }
             return page_config.insertion_enabled;
         }
         function _insert_ad_units() {
@@ -105,7 +109,9 @@ var admanager = function(app, $) {
                         return false;
                     }
                 });
-                if ($prev && $prev.is("p") && $prev.find("img").length === 1) valid = false;
+                if ($prev && $prev.is("p") && $prev.find("img").length === 1) {
+                    valid = false;
+                }
                 $element.attr("data-valid-location", valid);
             });
         }
@@ -120,7 +126,9 @@ var admanager = function(app, $) {
             } else {
                 $html.addClass("in_content").addClass(alignment);
             }
-            if (!float_disable) _odd = !_odd;
+            if (!float_disable) {
+                _odd = !_odd;
+            }
             return $html;
         }
         function _insert_primary_unit() {
@@ -176,7 +184,9 @@ var admanager = function(app, $) {
                 limit: options.limit ? options.limit : false,
                 height: options.height
             });
-            if ($nodes.length < 1) return false;
+            if ($nodes.length < 1) {
+                return false;
+            }
             $.each($nodes, function(i, node) {
                 var exit_loop = node_search.verify_node(i, $(node));
                 if (exit_loop === true) {
@@ -254,7 +264,9 @@ var admanager = function(app, $) {
             return this.exit_loop;
         };
         function _is_this_an_ad($el) {
-            if (!$el) return false;
+            if (!$el) {
+                return false;
+            }
             return $el.is(_defaults.ad_selector);
         }
         function _get_nodes() {
@@ -283,7 +295,9 @@ var admanager = function(app, $) {
         function _init() {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             debug(_name + ": initialized");
-            if (!_is_enabled()) return app;
+            if (!_is_enabled()) {
+                return app;
+            }
             _defaults.ad_selector = "." + _defaults.ad_class;
             _inventory = _get_inventory();
             _account = app.config.account;
@@ -315,14 +329,18 @@ var admanager = function(app, $) {
         }
         function _inventory_clean_types(_inventory) {
             for (var i = 0; i < _inventory.length; i++) {
-                if (typeof _inventory[i].type !== "undefined") continue;
+                if (typeof _inventory[i].type !== "undefined") {
+                    continue;
+                }
                 _inventory[i].type = "default";
             }
             return _inventory;
         }
         function _get_available_sizes(_inventory) {
             var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
-            if (width > 1024) return _inventory;
+            if (width > 1024) {
+                return _inventory;
+            }
             if (width >= 768 && width <= 1024) {
                 var max = 980;
                 for (var i = 0; i < _inventory.length; i++) {
@@ -406,10 +424,14 @@ var admanager = function(app, $) {
                 for (var i = 0; i < _page_positions.length; i++) {
                     _increment_ad_slot(_page_positions[i]);
                     current_position = _get_ad_info(_page_positions[i]);
-                    if (typeof current_position.id == "undefined") continue;
+                    if (typeof current_position.id == "undefined") {
+                        continue;
+                    }
                     $unit = $context.find(_defaults.ad_selector + '[data-id="' + current_position.id + '"]');
                     $unit_target = $("<div/>");
-                    if ($unit.length < 1) continue;
+                    if ($unit.length < 1) {
+                        continue;
+                    }
                     $unit_target.addClass(_defaults.ad_unit_target_class);
                     $unit_target.attr("id", current_position.id_name);
                     $unit.append($unit_target);
@@ -445,7 +467,9 @@ var admanager = function(app, $) {
         }
         function _increment_ad_slot(unit) {
             for (var i = 0; i < _inventory.length; i++) {
-                if (_inventory[i].id !== unit && _inventory[i].slot !== unit) continue;
+                if (_inventory[i].id !== unit && _inventory[i].slot !== unit) {
+                    continue;
+                }
                 if (typeof _inventory[i].iteration == "undefined") _inventory[i].iteration = 0;
                 _inventory[i].iteration = _inventory[i].iteration + 1;
                 return;
@@ -454,7 +478,9 @@ var admanager = function(app, $) {
         function _get_ad_info(unit) {
             var return_object = {};
             for (var i = 0; i < _inventory.length; i++) {
-                if (_inventory[i].id !== unit && _inventory[i].slot !== unit) continue;
+                if (_inventory[i].id !== unit && _inventory[i].slot !== unit) {
+                    continue;
+                }
                 return_object = _inventory[i];
                 if (typeof return_object.use_iterator !== "undefined" && !return_object.use_iterator) {
                     return_object.id_name = return_object.id;
@@ -487,7 +513,9 @@ var admanager = function(app, $) {
         function _remove_defined_slot(name) {
             $.each(_defined_slots, function(index, slot) {
                 var unit_name = slot.getAdUnitPath().replace("/" + _account + "/", "");
-                if (unit_name === name) _defined_slots.remove(index);
+                if (unit_name === name) {
+                    _defined_slots.remove(index);
+                }
             });
         }
         function _get_dynamic_inventory() {
@@ -518,7 +546,9 @@ var admanager = function(app, $) {
                 attr_name: attr_name,
                 exist_config: app.config
             });
-            if (typeof app.config.enabled === "undefined") return true;
+            if (typeof app.config.enabled === "undefined") {
+                return true;
+            }
             return app.config.enabled;
         }
         function _empty_ads(options) {
@@ -556,7 +586,9 @@ var admanager = function(app, $) {
             return app;
         }
         function debug(obj) {
-            if (!_debug_enable) return;
+            if (!_debug_enable) {
+                return;
+            }
             if (typeof console == "object" && console.log) {
                 console.log(obj);
             }
@@ -564,7 +596,9 @@ var admanager = function(app, $) {
         function _difference(array, values) {
             var diff = [];
             $.grep(array, function(element) {
-                if ($.inArray(element, values) === -1) diff.push(element);
+                if ($.inArray(element, values) === -1) {
+                    diff.push(element);
+                }
             });
             return diff;
         }
@@ -592,20 +626,28 @@ var admanager = function(app, $) {
         function _shortest_available(unit) {
             var shortest = 0;
             $.each(unit.sizes, function(index, sizes) {
-                if (shortest === 0) shortest = sizes[1]; else if (sizes[1] < shortest) shortest = sizes[1];
+                if (shortest === 0) {
+                    shortest = sizes[1];
+                } else if (sizes[1] < shortest) {
+                    shortest = sizes[1];
+                }
             });
             return shortest;
         }
         function _tallest_available(unit) {
             var tallest = 0;
             $.each(unit.sizes, function(index, sizes) {
-                if (sizes[1] > tallest) tallest = sizes[1];
+                if (sizes[1] > tallest) {
+                    tallest = sizes[1];
+                }
             });
             return tallest;
         }
         function _limit_unit_height(unit, limit) {
             $.each(unit.sizes, function(index, sizes) {
-                if (sizes[1] <= limit) return true;
+                if (sizes[1] <= limit) {
+                    return true;
+                }
                 unit.sizes.remove(index);
             });
             return unit;
@@ -613,7 +655,9 @@ var admanager = function(app, $) {
         function _get_unit_type(id) {
             var type = "default";
             $.each(app.config.inventory, function(index, unit) {
-                if (unit.id !== id) return true;
+                if (unit.id !== id) {
+                    return true;
+                }
                 type = unit.type;
                 return false;
             });
