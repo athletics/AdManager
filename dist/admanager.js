@@ -10,8 +10,8 @@ var admanager = function(app, $) {
         app.initialized = false;
     }
     app.bootstrap = function($) {
-        var _name = "Bootstrap", debug = null, _init_callbacks = [];
-        function _init(config) {
+        var name = "Bootstrap", debug = null, initCallbacks = [];
+        function init(config) {
             if (app.initialized) {
                 return false;
             }
@@ -21,19 +21,19 @@ var admanager = function(app, $) {
             }
             debug = admanager.util.debug ? admanager.util.debug : function() {};
             app.util.init().manager.init().insertion.init();
-            for (var i = 0; i < _init_callbacks.length; i++) {
-                _init_callbacks[i]();
+            for (var i = 0; i < initCallbacks.length; i++) {
+                initCallbacks[i]();
             }
-            debug(_name + ": initialized");
+            debug(name + ": initialized");
             app.initialized = true;
             return app;
         }
-        function _register(callback) {
-            _init_callbacks.push(callback);
+        function register(callback) {
+            initCallbacks.push(callback);
         }
         return {
-            init: _init,
-            register: _register
+            init: init,
+            register: register
         };
     }();
     return app;
@@ -41,66 +41,66 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.insertion = function($) {
-        var _name = "Insertion", debug = null, $context = null, $local_context = null, _in_content = false, _inventory = [], _odd = true, _local_context = null, _defaults = {
-            px_between_units: 800,
-            ad_height_limit: 1e3,
-            insert_exclusion: [ "img", "iframe", "video", "audio", ".video", ".audio", ".app_ad_unit" ]
+        var name = "Insertion", debug = null, $context = null, $localContext = null, inContent = false, inventory = [], odd = true, localContext = null, defaults = {
+            pxBetweenUnits: 800,
+            adHeightLimit: 1e3,
+            insertExclusion: [ "img", "iframe", "video", "audio", ".video", ".audio", ".app_ad_unit" ]
         };
-        function _init() {
+        function init() {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
-            debug(_name + ": initialized");
-            _defaults = $.extend(_defaults, app.manager.get_defaults());
-            _bind_handlers();
+            debug(name + ": initialized");
+            defaults = $.extend(defaults, app.manager.getDefaults());
+            bindHandlers();
         }
-        function _bind_handlers() {
+        function bindHandlers() {
             $(document).on("GPT:initSequence", function() {
-                debug(_name + ": GPT:initSequence");
-                _qualify_context();
+                debug(name + ": GPT:initSequence");
+                qualifyContext();
             });
         }
-        function _set_context() {
-            $context = app.util.get_context();
+        function setContext() {
+            $context = app.util.getContext();
         }
-        function _qualify_context() {
-            var inventory_data = app.manager.get_dynamic_inventory();
-            _set_context();
-            _inventory = _inventory.length > 0 ? _inventory : inventory_data.dynamic_items;
-            _local_context = _local_context ? _local_context : inventory_data.local_context;
-            if (_inventory.length < 1) {
-                _broadcast();
+        function qualifyContext() {
+            var inventoryData = app.manager.getDynamicInventory();
+            setContext();
+            inventory = inventory.length > 0 ? inventory : inventoryData.dynamicItems;
+            localContext = localContext ? localContext : inventoryData.localContext;
+            if (inventory.length < 1) {
+                broadcast();
                 return app;
             }
-            $local_context = $context.find(_local_context).first();
-            if ($local_context.length > 0) {
-                _in_content = true;
+            $localContext = $context.find(localContext).first();
+            if ($localContext.length > 0) {
+                inContent = true;
             }
-            if (!_in_content) {
-                _broadcast();
+            if (!inContent) {
+                broadcast();
                 return app;
             }
-            _insert_ad_units();
+            insertAdUnits();
             return app;
         }
-        function _broadcast() {
+        function broadcast() {
             $.event.trigger("GPT:unitsInserted");
         }
-        function _is_enabled() {
-            var page_config = app.manager.get_config();
-            if (typeof page_config.insertion_enabled === "undefined") {
+        function isEnabled() {
+            var pageConfig = app.manager.getConfig();
+            if (typeof pageConfig.insertionEnabled === "undefined") {
                 return false;
             }
-            return page_config.insertion_enabled;
+            return pageConfig.insertionEnabled;
         }
-        function _insert_ad_units() {
-            if (_in_content) {
-                _denote_valid_insertions();
-                _insert_primary_unit();
-                _insert_secondary_units();
+        function insertAdUnits() {
+            if (inContent) {
+                denoteValidInsertions();
+                insertPrimaryUnit();
+                insertSecondaryUnits();
             }
-            _broadcast();
+            broadcast();
         }
-        function _denote_valid_insertions() {
-            var $nodes = $local_context.children(), excluded = app.config.insert_exclusion || _defaults.insert_exclusion;
+        function denoteValidInsertions() {
+            var $nodes = $localContext.children(), excluded = app.config.insertExclusion || defaults.insertExclusion;
             $nodes.each(function(i) {
                 var $element = $(this), $prev = i > 0 ? $nodes.eq(i - 1) : false, valid = true;
                 $.each(excluded, function(index, item) {
@@ -115,70 +115,70 @@ var admanager = function(app, $) {
                 $element.attr("data-valid-location", valid);
             });
         }
-        function _is_valid_insertion_location($element) {
+        function isValidInsertionLocation($element) {
             return $element.data("valid-location");
         }
-        function _ad_unit_markup(unit_id, disable_float) {
-            var float_disable = disable_float || false, type = app.util.get_unit_type(unit_id), alignment = _odd ? "odd" : "even", $html = $("<div />");
-            $html.addClass(_defaults.ad_class).attr("data-id", unit_id).attr("data-client-type", type);
-            if (float_disable) {
-                $html.addClass("disable_float");
+        function adUnitMarkup(unitId, disableFloat) {
+            var floatDisable = disableFloat || false, type = app.util.getUnitType(unitId), alignment = odd ? "odd" : "even", $html = $("<div />");
+            $html.addClass(defaults.adClass).attr("data-id", unitId).attr("data-client-type", type);
+            if (floatDisable) {
+                $html.addClass("disableFloat");
             } else {
-                $html.addClass("in_content").addClass(alignment);
+                $html.addClass("inContent").addClass(alignment);
             }
-            if (!float_disable) {
-                _odd = !_odd;
+            if (!floatDisable) {
+                odd = !odd;
             }
             return $html;
         }
-        function _insert_primary_unit() {
-            var unit = _get_primary_unit(), tallest = admanager.util.tallest_available(unit), shortest = admanager.util.shortest_available(unit), location = _find_insertion_location({
+        function insertPrimaryUnit() {
+            var unit = getPrimaryUnit(), tallest = admanager.util.tallestAvailable(unit), shortest = admanager.util.shortestAvailable(unit), location = findInsertionLocation({
                 height: tallest,
-                limit: _defaults.ad_height_limit
+                limit: defaults.adHeightLimit
             }), markup = null;
             if (!location) {
-                location = _find_insertion_location({
+                location = findInsertionLocation({
                     height: shortest,
-                    limit: _defaults.ad_height_limit,
+                    limit: defaults.adHeightLimit,
                     force: true
                 });
-                if (!location.disable_float) {
-                    unit = admanager.util.limit_unit_height(unit, shortest);
+                if (!location.disableFloat) {
+                    unit = admanager.util.limitUnitHeight(unit, shortest);
                 }
             }
-            markup = _ad_unit_markup(unit.id, location.disable_float);
-            location.$insert_before.before(markup);
+            markup = adUnitMarkup(unit.id, location.disableFloat);
+            location.$insertBefore.before(markup);
         }
-        function _insert_secondary_units() {
-            $.each(_inventory, function(index, unit) {
-                var tallest = admanager.util.tallest_available(unit), location = _find_insertion_location({
+        function insertSecondaryUnits() {
+            $.each(inventory, function(index, unit) {
+                var tallest = admanager.util.tallestAvailable(unit), location = findInsertionLocation({
                     height: tallest
                 }), markup = null;
                 if (!location) {
                     return false;
                 }
-                markup = _ad_unit_markup(unit.id, location.disable_float);
-                location.$insert_before.before(markup);
+                markup = adUnitMarkup(unit.id, location.disableFloat);
+                location.$insertBefore.before(markup);
             });
         }
-        function _get_primary_unit() {
-            var primary_unit = false;
-            $.each(_inventory, function(index, unit) {
+        function getPrimaryUnit() {
+            var primaryUnit = false;
+            $.each(inventory, function(index, unit) {
                 if (unit.primary === true) {
-                    primary_unit = unit;
-                    _inventory.remove(index);
+                    primaryUnit = unit;
+                    inventory.remove(index);
                     return false;
                 }
             });
-            if (!primary_unit) {
-                primary_unit = _inventory[0];
-                _inventory.remove(0);
+            if (!primaryUnit) {
+                primaryUnit = inventory[0];
+                inventory.remove(0);
             }
-            return primary_unit;
+            return primaryUnit;
         }
-        function _find_insertion_location(options) {
+        function findInsertionLocation(options) {
             options = options || {};
-            var $nodes = _get_nodes(), node_search = new NodeSearch({
+            var $nodes = getNodes(), nodeSearch = new NodeSearch({
                 $nodes: $nodes,
                 force: options.force ? options.force : false,
                 limit: options.limit ? options.limit : false,
@@ -188,98 +188,98 @@ var admanager = function(app, $) {
                 return false;
             }
             $.each($nodes, function(i, node) {
-                var exit_loop = node_search.verify_node(i, $(node));
-                if (exit_loop === true) {
+                var exitLoop = nodeSearch.verifyNode(i, $(node));
+                if (exitLoop === true) {
                     return false;
-                } else if (exit_loop === false) {
+                } else if (exitLoop === false) {
                     return true;
                 }
             });
-            if (!node_search.location_found) {
+            if (!nodeSearch.locationFound) {
                 return false;
             }
-            node_search.mark_valid_nodes();
-            node_search.set_last_position();
+            nodeSearch.markValidNodes();
+            nodeSearch.setLastPosition();
             return {
-                $insert_before: node_search.$insert_before,
-                disable_float: node_search.disable_float
+                $insertBefore: nodeSearch.$insertBefore,
+                disableFloat: nodeSearch.disableFloat
             };
         }
         function NodeSearch(options) {
-            this.total_height = 0;
-            this.margin_difference = 40;
+            this.totalHeight = 0;
+            this.marginDifference = 40;
             this.inserted = [];
-            this.$insert_before = null;
-            this.disable_float = false;
-            this.location_found = false;
-            this.valid_height = 0;
-            this.exit_loop = false;
+            this.$insertBefore = null;
+            this.disableFloat = false;
+            this.locationFound = false;
+            this.validHeight = 0;
+            this.exitLoop = false;
             this.height = options.height;
             this.force = options.force;
             this.limit = options.limit;
             this.$nodes = options.$nodes;
-            this.last_position = 0;
-            this.needed_height = options.height - this.margin_difference;
+            this.lastPosition = 0;
+            this.neededheight = options.height - this.marginDifference;
         }
-        NodeSearch.prototype.set_last_position = function() {
-            this.last_position = this.$insert_before.offset().top + this.needed_height;
+        NodeSearch.prototype.setLastPosition = function() {
+            this.lastPosition = this.$insertBefore.offset().top + this.neededheight;
         };
-        NodeSearch.prototype.mark_valid_nodes = function() {
+        NodeSearch.prototype.markValidNodes = function() {
             if (this.inserted.length > 0) {
                 $.each(this.inserted, function(index, item) {
                     $(item).data("valid-location", false);
                 });
             }
         };
-        NodeSearch.prototype.verify_node = function(index, $node) {
-            var since = $node.offset().top - this.last_position, height = $node.outerHeight(), is_last = this.$nodes.length - 1 === index;
-            this.total_height += height;
-            if (this.force && (this.total_height >= this.limit || is_last)) {
-                this.$insert_before = $node;
-                this.disable_float = true;
-                this.location_found = true;
-                this.exit_loop = true;
-            } else if (this.limit && (this.total_height >= this.limit || is_last)) {
-                this.location_found = false;
-                this.exit_loop = true;
-            } else if (_is_valid_insertion_location($node)) {
-                this.valid_height += height;
+        NodeSearch.prototype.verifyNode = function(index, $node) {
+            var since = $node.offset().top - this.lastPosition, height = $node.outerHeight(), isLast = this.$nodes.length - 1 === index;
+            this.totalHeight += height;
+            if (this.force && (this.totalHeight >= this.limit || isLast)) {
+                this.$insertBefore = $node;
+                this.disableFloat = true;
+                this.locationFound = true;
+                this.exitLoop = true;
+            } else if (this.limit && (this.totalHeight >= this.limit || isLast)) {
+                this.locationFound = false;
+                this.exitLoop = true;
+            } else if (isValidInsertionLocation($node)) {
+                this.validHeight += height;
                 this.inserted.push($node);
-                if (this.$insert_before === null) {
-                    this.$insert_before = $node;
+                if (this.$insertBefore === null) {
+                    this.$insertBefore = $node;
                 }
-                if (this.valid_height >= this.needed_height) {
-                    if (this.limit === false && since < _defaults.px_between_units) {
-                        this.valid_height = 0;
-                        this.$insert_before = null;
+                if (this.validHeight >= this.neededheight) {
+                    if (this.limit === false && since < defaults.pxBetweenUnits) {
+                        this.validHeight = 0;
+                        this.$insertBefore = null;
                     }
-                    this.location_found = true;
-                    this.exit_loop = true;
+                    this.locationFound = true;
+                    this.exitLoop = true;
                 }
             } else {
-                this.valid_height = 0;
-                this.$insert_before = null;
-                this.exit_loop = null;
+                this.validHeight = 0;
+                this.$insertBefore = null;
+                this.exitLoop = null;
             }
-            return this.exit_loop;
+            return this.exitLoop;
         };
-        function _is_this_an_ad($el) {
+        function isThisAnAd($el) {
             if (!$el) {
                 return false;
             }
-            return $el.is(_defaults.ad_selector);
+            return $el.is(defaults.adSelector);
         }
-        function _get_nodes() {
-            var $prev_unit = $local_context.find(_defaults.ad_selector).last(), $nodes = null;
-            if ($prev_unit.length > 0) {
-                $nodes = $prev_unit.nextAll($local_context);
+        function getNodes() {
+            var $prevUnit = $localContext.find(defaults.adSelector).last(), $nodes = null;
+            if ($prevUnit.length > 0) {
+                $nodes = $prevUnit.nextAll($localContext);
             } else {
-                $nodes = $local_context.children();
+                $nodes = $localContext.children();
             }
             return $nodes;
         }
         return {
-            init: _init
+            init: init
         };
     }($);
     return app;
@@ -287,75 +287,75 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.manager = function($) {
-        var _name = "Manager", debug = null, _defined_slots = [], _page_positions = [], _inventory = [], _account = null, _defaults = {
-            ad_class: "app_ad_unit",
-            ad_unit_target_class: "app_unit_target",
-            ad_selector: ""
+        var name = "Manager", debug = null, definedSlots = [], pagePositions = [], inventory = [], account = null, defaults = {
+            adClass: "app_ad_unit",
+            adUnitTargetClass: "app_unit_target",
+            adSelector: ""
         };
-        function _init() {
+        function init() {
             debug = admanager.util.debug ? admanager.util.debug : function() {};
-            debug(_name + ": initialized");
-            if (!_is_enabled()) {
+            debug(name + ": initialized");
+            if (!isEnabled()) {
                 return app;
             }
-            _defaults.ad_selector = "." + _defaults.ad_class;
-            _inventory = _get_inventory();
-            _account = app.config.account;
-            _bind_handlers();
-            _load_library();
+            defaults.adSelector = "." + defaults.adClass;
+            inventory = getInventory();
+            account = app.config.account;
+            bindHandlers();
+            loadLibrary();
             return app;
         }
-        function _bind_handlers() {
+        function bindHandlers() {
             $(document).on("GPT:unitsInserted", function() {
-                debug(_name + ": GPT:unitsInserted");
+                debug(name + ": GPT:unitsInserted");
             }).on("GPT:libraryLoaded", function() {
-                debug(_name + ": GPT:libraryLoaded");
-                _init_sequence();
+                debug(name + ": GPT:libraryLoaded");
+                initSequence();
             }).on("GPT:slotsDefined", function() {
-                debug(_name + ": GPT:slotsDefined");
-                _display_page_ads();
+                debug(name + ": GPT:slotsDefined");
+                displayPageAds();
             });
         }
-        function _init_sequence() {
+        function initSequence() {
             $.event.trigger("GPT:initSequence");
-            _listen_for_dfp_events();
-            _enable_single_request();
-            _set_targeting();
-            _set_page_positions();
-            _define_slots_for_page_positions();
+            listenForDfpEvents();
+            enableSingleRequest();
+            setTargeting();
+            setPagePositions();
+            defineSlotsForPagePositions();
         }
-        function _get_inventory() {
-            return _get_available_sizes(_inventory_clean_types(app.config.inventory));
+        function getInventory() {
+            return getAvailableSizes(inventoryCleanTypes(app.config.inventory));
         }
-        function _inventory_clean_types(_inventory) {
-            for (var i = 0; i < _inventory.length; i++) {
-                if (typeof _inventory[i].type !== "undefined") {
+        function inventoryCleanTypes(inventory) {
+            for (var i = 0; i < inventory.length; i++) {
+                if (typeof inventory[i].type !== "undefined") {
                     continue;
                 }
-                _inventory[i].type = "default";
+                inventory[i].type = "default";
             }
-            return _inventory;
+            return inventory;
         }
-        function _get_available_sizes(_inventory) {
+        function getAvailableSizes(inventory) {
             var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
             if (width > 1024) {
-                return _inventory;
+                return inventory;
             }
             if (width >= 768 && width <= 1024) {
                 var max = 980;
-                for (var i = 0; i < _inventory.length; i++) {
-                    var sizes_to_remove = [];
-                    for (var j = 0; j < _inventory[i].sizes.length; j++) {
-                        if (_inventory[i].sizes[j][0] > max) {
-                            sizes_to_remove.push(_inventory[i].sizes[j]);
+                for (var i = 0; i < inventory.length; i++) {
+                    var sizesToRemove = [];
+                    for (var j = 0; j < inventory[i].sizes.length; j++) {
+                        if (inventory[i].sizes[j][0] > max) {
+                            sizesToRemove.push(inventory[i].sizes[j]);
                         }
                     }
-                    _inventory[i].sizes = app.util.difference(_inventory[i].sizes, sizes_to_remove);
+                    inventory[i].sizes = app.util.difference(inventory[i].sizes, sizesToRemove);
                 }
             }
-            return _inventory;
+            return inventory;
         }
-        function _load_library() {
+        function loadLibrary() {
             var googletag, gads, useSSL, node, readyStateLoaded = false;
             window.googletag = window.googletag || {};
             googletag = window.googletag;
@@ -366,40 +366,40 @@ var admanager = function(app, $) {
             useSSL = "https:" == document.location.protocol;
             gads.src = (useSSL ? "https:" : "http:") + "//www.googletagservices.com/tag/js/gpt.js";
             if (gads.addEventListener) {
-                gads.addEventListener("load", _on_library_loaded, false);
+                gads.addEventListener("load", onLibraryLoaded, false);
             } else if (gads.readyState) {
                 gads.onreadystatechange = function() {
                     if (!readyStateLoaded) {
                         readyStateLoaded = true;
-                        _on_library_loaded();
+                        onLibraryLoaded();
                     }
                 };
             }
             node = document.getElementsByTagName("script")[0];
             node.parentNode.insertBefore(gads, node);
         }
-        function _on_library_loaded() {
+        function onLibraryLoaded() {
             googletag.cmd.push(function() {
                 $.event.trigger("GPT:libraryLoaded");
             });
         }
-        function _listen_for_dfp_events() {
+        function listenForDfpEvents() {
             googletag.cmd.push(function() {
                 googletag.pubads().addEventListener("slotRenderEnded", function(event) {
-                    _slot_render_ended(event);
+                    slotRenderEnded(event);
                 });
             });
         }
-        function _enable_single_request() {
+        function enableSingleRequest() {
             googletag.cmd.push(function() {
                 googletag.pubads().collapseEmptyDivs();
                 googletag.pubads().enableSingleRequest();
                 googletag.pubads().disableInitialLoad();
             });
         }
-        function _set_targeting() {
+        function setTargeting() {
             googletag.cmd.push(function() {
-                var page_config = _get_config(), targeting = page_config.targeting;
+                var pageConfig = getConfig(), targeting = pageConfig.targeting;
                 if (typeof targeting !== "undefined") {
                     $.each(targeting, function(key, value) {
                         googletag.pubads().setTargeting(key, value);
@@ -407,57 +407,57 @@ var admanager = function(app, $) {
                 }
             });
         }
-        function _set_page_positions() {
-            var client_type = typeof app.config.client_type !== "undefined" ? app.config.client_type : false, $context = app.util.get_context(), $units = null, selector = _defaults.ad_selector;
-            if (client_type !== false) {
-                selector += '[data-client-type="' + client_type + '"]';
+        function setPagePositions() {
+            var clientType = typeof app.config.clientType !== "undefined" ? app.config.clientType : false, $context = app.util.getContext(), $units = null, selector = defaults.adSelector;
+            if (clientType !== false) {
+                selector += '[data-client-type="' + clientType + '"]';
             }
             $units = $context.find(selector);
             $units.each(function() {
                 var id = $(this).data("id");
-                _page_positions.push(id);
+                pagePositions.push(id);
             });
         }
-        function _define_slots_for_page_positions() {
+        function defineSlotsForPagePositions() {
             googletag.cmd.push(function() {
-                var current_position = null, $context = app.util.get_context(), $unit, $unit_target;
-                for (var i = 0; i < _page_positions.length; i++) {
-                    _increment_ad_slot(_page_positions[i]);
-                    current_position = _get_ad_info(_page_positions[i]);
-                    if (typeof current_position.id == "undefined") {
+                var currentPosition = null, $context = app.util.getContext(), $unit, $unitTarget;
+                for (var i = 0; i < pagePositions.length; i++) {
+                    incrementAdSlot(pagePositions[i]);
+                    currentPosition = getAdInfo(pagePositions[i]);
+                    if (typeof currentPosition.id == "undefined") {
                         continue;
                     }
-                    $unit = $context.find(_defaults.ad_selector + '[data-id="' + current_position.id + '"]');
-                    $unit_target = $("<div/>");
+                    $unit = $context.find(defaults.adSelector + '[data-id="' + currentPosition.id + '"]');
+                    $unitTarget = $("<div />");
                     if ($unit.length < 1) {
                         continue;
                     }
-                    $unit_target.addClass(_defaults.ad_unit_target_class);
-                    $unit_target.attr("id", current_position.id_name);
-                    $unit.append($unit_target);
+                    $unitTarget.addClass(defaults.adUnitTargetClass);
+                    $unitTarget.attr("id", currentPosition.idName);
+                    $unit.append($unitTarget);
                     $unit.addClass("active");
-                    _defined_slots[i] = googletag.defineSlot("/" + _account + "/" + current_position.slot, current_position.sizes, current_position.id_name).addService(googletag.pubads());
+                    definedSlots[i] = googletag.defineSlot("/" + account + "/" + currentPosition.slot, currentPosition.sizes, currentPosition.idName).addService(googletag.pubads());
                 }
                 googletag.enableServices();
                 $.event.trigger("GPT:slotsDefined");
             });
         }
-        function _display_page_ads() {
+        function displayPageAds() {
             googletag.cmd.push(function() {
-                googletag.pubads().refresh(_defined_slots);
-                for (var n = 0; n < _page_positions.length; n++) {
-                    current_position = _get_ad_info(_page_positions[n]);
-                    if ($("#" + current_position.id_name).length > 0) {
-                        googletag.display(current_position.id_name);
+                googletag.pubads().refresh(definedSlots);
+                for (var n = 0; n < pagePositions.length; n++) {
+                    currentPosition = getAdInfo(pagePositions[n]);
+                    if ($("#" + currentPosition.idName).length > 0) {
+                        googletag.display(currentPosition.idName);
                     }
                 }
             });
         }
-        function _slot_render_ended(unit) {
-            var unit_name = unit.slot.getAdUnitPath().replace("/" + _account + "/", ""), ad_info = _get_ad_info(unit_name);
+        function slotRenderEnded(unit) {
+            var unitName = unit.slot.getAdUnitPath().replace("/" + account + "/", ""), adInfo = getAdInfo(unitName);
             $.event.trigger("GPT:adUnitRendered", {
-                name: unit_name,
-                id: ad_info.id,
+                name: unitName,
+                id: adInfo.id,
                 size: unit.size,
                 isEmpty: unit.isEmpty,
                 creativeId: unit.creativeId,
@@ -465,113 +465,113 @@ var admanager = function(app, $) {
                 serviceName: unit.serviceName
             });
         }
-        function _increment_ad_slot(unit) {
-            for (var i = 0; i < _inventory.length; i++) {
-                if (_inventory[i].id !== unit && _inventory[i].slot !== unit) {
+        function incrementAdSlot(unit) {
+            for (var i = 0; i < inventory.length; i++) {
+                if (inventory[i].id !== unit && inventory[i].slot !== unit) {
                     continue;
                 }
-                if (typeof _inventory[i].iteration == "undefined") _inventory[i].iteration = 0;
-                _inventory[i].iteration = _inventory[i].iteration + 1;
+                if (typeof inventory[i].iteration == "undefined") inventory[i].iteration = 0;
+                inventory[i].iteration = inventory[i].iteration + 1;
                 return;
             }
         }
-        function _get_ad_info(unit) {
-            var return_object = {};
-            for (var i = 0; i < _inventory.length; i++) {
-                if (_inventory[i].id !== unit && _inventory[i].slot !== unit) {
+        function getAdInfo(unit) {
+            var returnObject = {};
+            for (var i = 0; i < inventory.length; i++) {
+                if (inventory[i].id !== unit && inventory[i].slot !== unit) {
                     continue;
                 }
-                return_object = _inventory[i];
-                if (typeof return_object.use_iterator !== "undefined" && !return_object.use_iterator) {
-                    return_object.id_name = return_object.id;
+                returnObject = inventory[i];
+                if (typeof returnObject.useIterator !== "undefined" && !returnObject.useIterator) {
+                    returnObject.idName = returnObject.id;
                 } else {
-                    return_object.id_name = return_object.id + "_" + return_object.iteration;
+                    returnObject.idName = returnObject.id + "_" + returnObject.iteration;
                 }
-                return return_object;
+                return returnObject;
             }
-            return return_object;
+            return returnObject;
         }
-        function _get_defined_slot(name) {
-            var defined_slot = null;
-            $.each(_defined_slots, function(i, slot) {
-                var unit_name = slot.getAdUnitPath().replace("/" + _account + "/", "");
-                if (unit_name === name) {
-                    defined_slot = slot;
+        function getDefinedSlot(name) {
+            var definedSlot = null;
+            $.each(definedSlots, function(i, slot) {
+                var unitName = slot.getAdUnitPath().replace("/" + account + "/", "");
+                if (unitName === name) {
+                    definedSlot = slot;
                     return false;
                 }
             });
-            return defined_slot;
+            return definedSlot;
         }
-        function _display_slot(unit) {
+        function displaySlot(unit) {
             googletag.cmd.push(function() {
-                var position = _get_ad_info(unit), slot = _get_defined_slot(position.slot);
+                var position = getAdInfo(unit), slot = getDefinedSlot(position.slot);
                 googletag.pubads().refresh([ slot ]);
-                googletag.display(position.id_name);
-                _remove_defined_slot(position.slot);
+                googletag.display(position.idName);
+                removeDefinedSlot(position.slot);
             });
         }
-        function _remove_defined_slot(name) {
-            $.each(_defined_slots, function(index, slot) {
-                var unit_name = slot.getAdUnitPath().replace("/" + _account + "/", "");
-                if (unit_name === name) {
-                    _defined_slots.remove(index);
+        function removeDefinedSlot(name) {
+            $.each(definedSlots, function(index, slot) {
+                var unitName = slot.getAdUnitPath().replace("/" + account + "/", "");
+                if (unitName === name) {
+                    definedSlots.remove(index);
                 }
             });
         }
-        function _get_dynamic_inventory() {
-            var dynamic_items = [], type = typeof app.config.client_type !== "undefined" ? app.config.client_type : false, local_context;
-            $.each(_inventory, function(index, position) {
+        function getDynamicInventory() {
+            var dynamicItems = [], type = typeof app.config.clientType !== "undefined" ? app.config.clientType : false, localContext;
+            $.each(inventory, function(index, position) {
                 if (typeof position.dynamic !== "undefined" && position.dynamic === true) {
                     if (!type || type === position.type) {
-                        dynamic_items.push(position);
-                        local_context = position.local_context;
+                        dynamicItems.push(position);
+                        localContext = position.localContext;
                     }
                 }
             });
             return {
-                dynamic_items: dynamic_items,
-                local_context: local_context
+                dynamicItems: dynamicItems,
+                localContext: localContext
             };
         }
-        function _get_config() {
+        function getConfig() {
             return app.config;
         }
-        function _is_enabled() {
-            var $context = app.util.get_context(), attr_name = "page-ad-config";
-            if (typeof app.config.page_config_attr !== "undefined") {
-                attr_name = app.config.page_config_attr;
+        function isEnabled() {
+            var $context = app.util.getContext(), attrName = "page-ad-config";
+            if (typeof app.config.pageConfigAttr !== "undefined") {
+                attrName = app.config.pageConfigAttr;
             }
-            app.config = app.util.import_config({
+            app.config = app.util.importConfig({
                 $context: $context,
-                attr_name: attr_name,
-                exist_config: app.config
+                attrName: attrName,
+                existConfig: app.config
             });
             if (typeof app.config.enabled === "undefined") {
                 return true;
             }
             return app.config.enabled;
         }
-        function _empty_ads(options) {
-            var $context = options.$context, remove_container = options.remove_container || false;
-            $context.find(_defaults.ad_selector).empty();
-            if (remove_container) {
-                $context.find(_defaults.ad_selector).remove();
+        function emptyAds(options) {
+            var $context = options.$context, removeContainer = options.removeContainer || false;
+            $context.find(defaults.adSelector).empty();
+            if (removeContainer) {
+                $context.find(defaults.adSelector).remove();
             }
         }
-        function _get_defaults() {
-            return _defaults;
+        function getDefaults() {
+            return defaults;
         }
         return {
-            init: _init,
-            is_enabled: _is_enabled,
-            get_config: _get_config,
-            get_defaults: _get_defaults,
-            get_ad_info: _get_ad_info,
-            display_slot: _display_slot,
-            remove_defined_slot: _remove_defined_slot,
-            get_dynamic_inventory: _get_dynamic_inventory,
-            init_sequence: _init_sequence,
-            empty_ads: _empty_ads
+            init: init,
+            isEnabled: isEnabled,
+            getConfig: getConfig,
+            getDefaults: getDefaults,
+            getAdInfo: getAdInfo,
+            displaySlot: displaySlot,
+            removeDefinedSlot: removeDefinedSlot,
+            getDynamicInventory: getDynamicInventory,
+            initSequence: initSequence,
+            emptyAds: emptyAds
         };
     }($);
     return app;
@@ -579,21 +579,21 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.util = function($) {
-        var _name = "Util", _debug_enable = false;
-        function _init() {
-            debug(_name + ": initialized");
-            _init_array_remove();
+        var name = "Util", debugEnabled = false;
+        function init() {
+            debug(name + ": initialized");
+            initArrayRemove();
             return app;
         }
         function debug(obj) {
-            if (!_debug_enable) {
+            if (!debugEnabled) {
                 return;
             }
             if (typeof console == "object" && console.log) {
                 console.log(obj);
             }
         }
-        function _difference(array, values) {
+        function difference(array, values) {
             var diff = [];
             $.grep(array, function(element) {
                 if ($.inArray(element, values) === -1) {
@@ -602,28 +602,28 @@ var admanager = function(app, $) {
             });
             return diff;
         }
-        function _init_array_remove() {
+        function initArrayRemove() {
             Array.prototype.remove = function(from, to) {
                 var rest = this.slice((to || from) + 1 || this.length);
                 this.length = from < 0 ? this.length + from : from;
                 return this.push.apply(this, rest);
             };
         }
-        function _import_config(options) {
-            var $context = options.$context, attr_name = options.attr_name, exist_config = options.exist_config, selector, new_config, data = {};
-            selector = "*[data-" + attr_name + "]";
-            new_config = $.extend({}, exist_config);
-            data = $context.find(selector).data(attr_name);
-            if (typeof new_config === "object") {
-                new_config = $.extend(new_config, data);
+        function importConfig(options) {
+            var $context = options.$context, attrName = options.attrName, existConfig = options.existConfig, selector, newConfig, data = {};
+            selector = "*[data-" + attrName + "]";
+            newConfig = $.extend({}, existConfig);
+            data = $context.find(selector).data(attrName);
+            if (typeof newConfig === "object") {
+                newConfig = $.extend(newConfig, data);
             }
-            return new_config;
+            return newConfig;
         }
-        function _get_context() {
+        function getContext() {
             var selector = app.config.context || "body";
             return $(selector);
         }
-        function _shortest_available(unit) {
+        function shortestAvailable(unit) {
             var shortest = 0;
             $.each(unit.sizes, function(index, sizes) {
                 if (shortest === 0) {
@@ -634,7 +634,7 @@ var admanager = function(app, $) {
             });
             return shortest;
         }
-        function _tallest_available(unit) {
+        function tallestAvailable(unit) {
             var tallest = 0;
             $.each(unit.sizes, function(index, sizes) {
                 if (sizes[1] > tallest) {
@@ -643,7 +643,7 @@ var admanager = function(app, $) {
             });
             return tallest;
         }
-        function _limit_unit_height(unit, limit) {
+        function limitUnitHeight(unit, limit) {
             $.each(unit.sizes, function(index, sizes) {
                 if (sizes[1] <= limit) {
                     return true;
@@ -652,7 +652,7 @@ var admanager = function(app, $) {
             });
             return unit;
         }
-        function _get_unit_type(id) {
+        function getUnitType(id) {
             var type = "default";
             $.each(app.config.inventory, function(index, unit) {
                 if (unit.id !== id) {
@@ -664,15 +664,15 @@ var admanager = function(app, $) {
             return type;
         }
         return {
-            init: _init,
+            init: init,
             debug: debug,
-            difference: _difference,
-            import_config: _import_config,
-            shortest_available: _shortest_available,
-            tallest_available: _tallest_available,
-            limit_unit_height: _limit_unit_height,
-            get_unit_type: _get_unit_type,
-            get_context: _get_context
+            difference: difference,
+            importConfig: importConfig,
+            shortestAvailable: shortestAvailable,
+            tallestAvailable: tallestAvailable,
+            limitUnitHeight: limitUnitHeight,
+            getUnitType: getUnitType,
+            getContext: getContext
         };
     }($);
     return app;
