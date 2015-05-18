@@ -8,16 +8,16 @@ var admanager = ( function ( app, $ ) {
 
 	app.util = ( function ( $ ) {
 
-		var _name = 'Util',
-			_debug_enable = false
+		var name = 'Util',
+			debugEnabled = false
 		;
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function _init() {
+		function init() {
 
-			debug( _name + ': initialized' );
-			_init_array_remove();
+			debug( name + ': initialized' );
+			initArrayRemove();
 			return app;
 
 		}
@@ -26,7 +26,7 @@ var admanager = ( function ( app, $ ) {
 
 		function debug( obj ) {
 
-			if ( ! _debug_enable ) {
+			if ( ! debugEnabled ) {
 				return;
 			}
 
@@ -45,7 +45,7 @@ var admanager = ( function ( app, $ ) {
 		 * @param  array values
 		 * @return array diff
 		 */
-		function _difference( array, values ) {
+		function difference( array, values ) {
 
 			var diff = [];
 
@@ -61,7 +61,7 @@ var admanager = ( function ( app, $ ) {
 
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-		function _init_array_remove() {
+		function initArrayRemove() {
 
 			// Array Remove - By John Resig (MIT Licensed)
 			Array.prototype.remove = function ( from, to ) {
@@ -81,27 +81,27 @@ var admanager = ( function ( app, $ ) {
 		 * and extends an existing config with it.
 		 *
 		 * @param object options.$context
-		 * @param string options.attr_name
+		 * @param string options.attrName
 		 * @return object
 		 */
-		function _import_config( options ) {
+		function importConfig( options ) {
 
 			var $context = options.$context,
-				attr_name = options.attr_name,
-				exist_config = options.exist_config,
+				attrName = options.attrName,
+				existConfig = options.existConfig,
 				selector,
-				new_config,
+				newConfig,
 				data = {};
 
-			selector = '*[data-' + attr_name + ']';
-			new_config = $.extend( {}, exist_config );
-			data = $context.find( selector ).data( attr_name );
+			selector = '*[data-' + attrName + ']';
+			newConfig = $.extend( {}, existConfig );
+			data = $context.find( selector ).data( attrName );
 
-			if ( typeof new_config === 'object' ) {
-				new_config = $.extend( new_config, data );
+			if ( typeof newConfig === 'object' ) {
+				newConfig = $.extend( newConfig, data );
 			}
 
-			return new_config;
+			return newConfig;
 
 		}
 
@@ -122,7 +122,7 @@ var admanager = ( function ( app, $ ) {
 		 *
 		 */
 
-		function _get_context() {
+		function getContext() {
 
 			var selector = app.config.context || 'body';
 			return $( selector );
@@ -137,7 +137,7 @@ var admanager = ( function ( app, $ ) {
 		 * @param object unit
 		 * @return integer
 		 */
-		function _shortest_available( unit ) {
+		function shortestAvailable( unit ) {
 
 			var shortest = 0;
 
@@ -161,7 +161,7 @@ var admanager = ( function ( app, $ ) {
 		 * @param object unit
 		 * @return integer
 		 */
-		function _tallest_available( unit ) {
+		function tallestAvailable( unit ) {
 
 			var tallest = 0;
 
@@ -184,7 +184,7 @@ var admanager = ( function ( app, $ ) {
 		 * @param  int limit
 		 * @return object unit
 		 */
-		function _limit_unit_height( unit, limit ) {
+		function limitUnitHeight( unit, limit ) {
 
 			$.each( unit.sizes, function ( index, sizes ) {
 				if ( sizes[1] <= limit ) {
@@ -205,7 +205,7 @@ var admanager = ( function ( app, $ ) {
 		 * @param string id
 		 * @return string type
 		 */
-		function _get_unit_type( id ) {
+		function getUnitType( id ) {
 
 			var type = 'default';
 
@@ -224,15 +224,15 @@ var admanager = ( function ( app, $ ) {
 		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 		return {
-			init               : _init,
-			debug              : debug,
-			difference         : _difference,
-			import_config      : _import_config,
-			shortest_available : _shortest_available,
-			tallest_available  : _tallest_available,
-			limit_unit_height  : _limit_unit_height,
-			get_unit_type      : _get_unit_type,
-			get_context        : _get_context
+			init              : init,
+			debug             : debug,
+			difference        : difference,
+			importConfig      : importConfig,
+			shortestAvailable : shortestAvailable,
+			tallestAvailable  : tallestAvailable,
+			limitUnitHeight   : limitUnitHeight,
+			getUnitType       : getUnitType,
+			getContext        : getContext
 		};
 
 	} ( $ ) );
