@@ -30,7 +30,7 @@ var admanager = ( function ( app, $ ) {
 				return;
 			}
 
-			if ( ( typeof console == 'object' ) && ( console.log ) ) {
+			if ( ( typeof console === 'object' ) && ( console.log ) ) {
 				console.log( obj );
 			}
 

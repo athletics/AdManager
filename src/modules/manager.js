@@ -365,7 +365,7 @@ var admanager = ( function ( app, $ ) {
 
 					currentPosition = getAdInfo( pagePositions[n] );
 
-					if ( $( '#' + currentPosition.idName ).length > 0 ) {
+					if ( $( '#' + currentPosition.idName ).length ) {
 						googletag.display( currentPosition.idName );
 					}
 
@@ -415,7 +415,9 @@ var admanager = ( function ( app, $ ) {
 					continue;
 				}
 
-				if ( typeof inventory[ i ].iteration == 'undefined' ) inventory[ i ].iteration = 0;
+				if ( typeof inventory[ i ].iteration == 'undefined' ) {
+					inventory[ i ].iteration = 0;
+				}
 
 				// increment
 				inventory[ i ].iteration = inventory[ i ].iteration + 1;

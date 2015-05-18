@@ -83,11 +83,11 @@ var admanager = ( function ( app, $ ) {
 			var inventoryData = app.manager.getDynamicInventory();
 
 			setContext();
-			inventory = ( inventory.length > 0 ) ? inventory : inventoryData.dynamicItems;
-			localContext = ( localContext ) ? localContext : inventoryData.localContext;
+			inventory = inventory.length ? inventory : inventoryData.dynamicItems;
+			localContext = localContext ? localContext : inventoryData.localContext;
 
 			// Return if empty
-			if ( inventory.length < 1 ) {
+			if ( ! inventory.length ) {
 				broadcast();
 				return app;
 			}
@@ -95,7 +95,7 @@ var admanager = ( function ( app, $ ) {
 			$localContext = $context.find( localContext ).first();
 
 			// Detect a local context
-			if ( $localContext.length > 0 ) {
+			if ( $localContext.length ) {
 				inContent = true;
 			}
 
@@ -170,7 +170,7 @@ var admanager = ( function ( app, $ ) {
 				;
 
 				$.each( excluded, function ( index, item ) {
-					if ( $element.is( item ) || $element.find( item ).length > 0 ) {
+					if ( $element.is( item ) || $element.find( item ).length ) {
 						valid = false; // not valid
 						return false; // break loop
 					}
@@ -214,7 +214,7 @@ var admanager = ( function ( app, $ ) {
 			var floatDisable = disableFloat || false,
 				type = app.util.getUnitType( unitId ),
 				alignment = odd ? 'odd' : 'even',
-				$html= $( '<div />' );
+				$html = $( '<div />' );
 
 			$html
 				.addClass( defaults.adClass )
@@ -223,7 +223,7 @@ var admanager = ( function ( app, $ ) {
 
 			if ( floatDisable ) {
 				$html
-					.addClass( 'disableFloat') ;
+					.addClass( 'disableFloat' );
 			} else {
 				$html
 					.addClass( 'inContent' )
@@ -310,7 +310,7 @@ var admanager = ( function ( app, $ ) {
 
 			$.each( inventory, function ( index, unit ) {
 
-				if ( unit.primary === true ) {
+				if ( unit.primary ) {
 					primaryUnit = unit;
 					inventory.remove( index );
 					return false;
@@ -348,7 +348,7 @@ var admanager = ( function ( app, $ ) {
 				} )
 			;
 
-			if ( $nodes.length < 1 ) {
+			if ( ! $nodes.length ) {
 				return false;
 			}
 
@@ -357,9 +357,9 @@ var admanager = ( function ( app, $ ) {
 
 				var exitLoop = nodeSearch.verifyNode( i, $( node ) );
 
-				if ( exitLoop === true ) {
+				if ( exitLoop ) {
 					return false;
-				} else if ( exitLoop === false ) {
+				} else if ( ! exitLoop ) {
 					return true;
 				}
 
@@ -422,7 +422,7 @@ var admanager = ( function ( app, $ ) {
 		 */
 		NodeSearch.prototype.markValidNodes = function () {
 
-			if ( this.inserted.length > 0 ) {
+			if ( this.inserted.length ) {
 				$.each( this.inserted, function ( index, item ) {
 					$( item ).data( 'valid-location', false );
 				} );
@@ -468,7 +468,7 @@ var admanager = ( function ( app, $ ) {
 
 				if ( this.validHeight >= this.neededheight ) {
 
-					if ( this.limit === false && ( since < defaults.pxBetweenUnits ) ) {
+					if ( ! this.limit && ( since < defaults.pxBetweenUnits ) ) {
 
 						this.validHeight = 0;
 						this.$insertBefore = null;
@@ -523,7 +523,7 @@ var admanager = ( function ( app, $ ) {
 				$nodes = null;
 
 			// nodes after previous unit or all nodes
-			if ( $prevUnit.length > 0 ) {
+			if ( $prevUnit.length ) {
 				$nodes = $prevUnit.nextAll( $localContext );
 			} else {
 				$nodes = $localContext.children();
