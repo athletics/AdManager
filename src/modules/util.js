@@ -224,15 +224,15 @@ var admanager = ( function ( app, $ ) {
 		//////////////////////////////////////////////////////////////////////////////////////
 
 		return {
-			init              : init,
-			debug             : debug,
-			difference        : difference,
-			importConfig      : importConfig,
-			shortestAvailable : shortestAvailable,
-			tallestAvailable  : tallestAvailable,
-			limitUnitHeight   : limitUnitHeight,
-			getUnitType       : getUnitType,
-			getContext        : getContext
+			init:              init,
+			debug:             debug,
+			difference:        difference,
+			importConfig:      importConfig,
+			shortestAvailable: shortestAvailable,
+			tallestAvailable:  tallestAvailable,
+			limitUnitHeight:   limitUnitHeight,
+			getUnitType:       getUnitType,
+			getContext:        getContext
 		};
 
 	} ( $ ) );

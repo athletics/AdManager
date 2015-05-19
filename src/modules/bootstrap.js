@@ -62,8 +62,8 @@ var admanager = ( function ( app, $ ) {
 		//////////////////////////////////////////////////////////////////////////////////////
 
 		return {
-			init     : init,
-			register : register
+			init:     init,
+			register: register
 		};
 
 	}() );
