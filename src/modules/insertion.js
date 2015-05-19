@@ -1,25 +1,23 @@
 /**
- *		Name: Ad Insertion
- *
- *		Requires: app, app.util, jQuery
+ * Name: Ad Insertion
+ * Requires: app, app.util, jQuery
  */
+var admanager = ( function ( app, $ ) {
 
-var admanager = (function (app, $) {
+	app.insertion = ( function ( $ ) {
 
-	app.insertion = (function ($) {
-
-		var _name = 'Insertion',
+		var name = 'Insertion',
 			debug = null,
 			$context = null,
-			$local_context = null,
-			_in_content = false,
-			_inventory = [],
-			_odd = true,
-			_local_context = null,
-			_defaults = {
-				px_between_units: 800,
-				ad_height_limit: 1000,
-				insert_exclusion: [
+			$localContext = null,
+			inContent = false,
+			inventory = [],
+			odd = true,
+			localContext = null,
+			defaults = {
+				pxBetweenUnits: 800,
+				adHeightLimit: 1000,
+				insertExclusion: [
 					'img',
 					'iframe',
 					'video',
@@ -31,158 +29,162 @@ var admanager = (function (app, $) {
 			}
 		;
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		function _init() {
+		function init() {
 
 			debug = admanager.util.debug ? admanager.util.debug : function () {};
-			debug(_name + ': initialized');
+			debug( name + ': initialized' );
 
-			_defaults = $.extend(_defaults, app.manager.get_defaults());
+			defaults = $.extend( defaults, app.manager.getDefaults() );
 
-			_bind_handlers();
+			bindHandlers();
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		function _bind_handlers() {
+		function bindHandlers() {
 
-			$(document)
-				.on('GPT:initSequence', function () {
+			$( document )
+				.on( 'GPT:initSequence', function () {
 
-					debug(_name + ': GPT:initSequence');
-					/** 
+					debug( name + ': GPT:initSequence' );
+					/**
 					 * Begin qualification procedure when the DOM is ready
 					 */
-					_qualify_context();
+					qualifyContext();
 
-				});
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function _set_context() {
-
-			$context = app.util.get_context();
+				} );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		/* 
+		function setContext() {
+
+			$context = app.util.getContext();
+
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////
+
+		/*
 		 * First qualify the DOM context where ads are to be inserted
 		 * to determine if insertion should proceed.
 		 *
 		 * @return object
 		 */
 
-		function _qualify_context() {
+		function qualifyContext() {
 
-			var inventory_data = app.manager.get_dynamic_inventory();
+			var inventoryData = app.manager.getDynamicInventory();
 
-			_set_context();
-			_inventory = (_inventory.length > 0) ? _inventory : inventory_data.dynamic_items;
-			_local_context = (_local_context) ? _local_context : inventory_data.local_context;
+			setContext();
+			inventory = inventory.length ? inventory : inventoryData.dynamicItems;
+			localContext = localContext ? localContext : inventoryData.localContext;
 
 			// Return if empty
-			if (_inventory.length < 1) {
-				_broadcast();
+			if ( ! inventory.length ) {
+				broadcast();
 				return app;
 			}
 
-			$local_context = $context.find(_local_context).first();
+			$localContext = $context.find( localContext ).first();
 
 			// Detect a local context
-			if ($local_context.length > 0) {
-				_in_content = true;
+			if ( $localContext.length ) {
+				inContent = true;
 			}
 
 			// Return if there is no insertion selector
-			if (!_in_content) {
-				_broadcast();
+			if ( ! inContent ) {
+				broadcast();
 				return app;
 			}
 
-			_insert_ad_units();
+			insertAdUnits();
 			return app;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Ad units have been inserted / proceed
 		 */
-		function _broadcast() {
+		function broadcast() {
 
-			$.event.trigger('GPT:unitsInserted');
+			$.event.trigger( 'GPT:unitsInserted' );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Is Insertion Enabled?
 		 *
 		 * @return bool
 		 */
-		function _is_enabled() {
+		function isEnabled() {
 
-			var page_config = app.manager.get_config();
+			var pageConfig = app.manager.getConfig();
 
-			if (typeof page_config.insertion_enabled === 'undefined') return false;
-
-			return page_config.insertion_enabled;
-
-		}
-
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-		function _insert_ad_units() {
-
-			if (_in_content) {
-				_denote_valid_insertions();
-				_insert_primary_unit();
-				_insert_secondary_units();
+			if ( typeof pageConfig.insertionEnabled === 'undefined' ) {
+				return false;
 			}
 
-			_broadcast();
+			return pageConfig.insertionEnabled;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		function _denote_valid_insertions() {
+		function insertAdUnits() {
 
-			var $nodes = $local_context.children(),
-				excluded = app.config.insert_exclusion || _defaults.insert_exclusion
+			if ( inContent ) {
+				denoteValidInsertions();
+				insertPrimaryUnit();
+				insertSecondaryUnits();
+			}
+
+			broadcast();
+
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////
+
+		function denoteValidInsertions() {
+
+			var $nodes = $localContext.children(),
+				excluded = app.config.insertExclusion || defaults.insertExclusion
 			;
 
-			$nodes.each(function (i) {
+			$nodes.each( function ( i ) {
 
-				var $element = $(this),
-					$prev = i > 0 ? $nodes.eq(i - 1) : false,
+				var $element = $( this ),
+					$prev = i > 0 ? $nodes.eq( i - 1 ) : false,
 					valid = true
 				;
 
-				$.each(excluded, function (index, item) {
-					if ($element.is(item) || $element.find(item).length > 0) {
+				$.each( excluded, function ( index, item ) {
+					if ( $element.is( item ) || $element.find( item ).length ) {
 						valid = false; // not valid
 						return false; // break loop
 					}
 				} );
 
-				if ($prev && $prev.is('p') && $prev.find('img').length === 1) valid = false;
+				if ( $prev && $prev.is( 'p' ) && $prev.find( 'img' ).length === 1 ) {
+					valid = false;
+				}
 
-				$element.attr('data-valid-location', valid);
+				$element.attr( 'data-valid-location', valid );
 
 			} );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Check against of list of elements to skip
@@ -190,305 +192,303 @@ var admanager = (function (app, $) {
 		 * @param  object $element
 		 * @return bool
 		 */
-		function _is_valid_insertion_location($element) {
+		function isValidInsertionLocation( $element ) {
 
-			return $element.data('valid-location');
+			return $element.data( 'valid-location' );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
-		 * _ad_unit_markup
+		 * adUnitMarkup
 		 *
-		 * @param string unit_id
-		 * @param bool disable_float
+		 * @param string unitId
+		 * @param bool disableFloat
 		 * @return string
 		 */
-		function _ad_unit_markup(unit_id, disable_float) {
+		function adUnitMarkup( unitId, disableFloat ) {
 
-			var float_disable = disable_float || false,
-				type = app.util.get_unit_type(unit_id),
-				alignment = _odd ? 'odd' : 'even',
-				$html= $('<div/>');
+			var floatDisable = disableFloat || false,
+				type = app.util.getUnitType( unitId ),
+				alignment = odd ? 'odd' : 'even',
+				$html = $( '<div />' );
 
 			$html
-				.addClass(_defaults.ad_class)
-				.attr('data-id', unit_id)
-				.attr('data-client-type', type);
+				.addClass( defaults.adClass )
+				.attr( 'data-id', unitId )
+				.attr( 'data-client-type', type );
 
-			if (float_disable) {
+			if ( floatDisable ) {
 				$html
-					.addClass('disable_float');
+					.addClass( 'disableFloat' );
 			} else {
 				$html
-					.addClass('in_content')
-					.addClass(alignment);
+					.addClass( 'inContent' )
+					.addClass( alignment );
 			}
 
-			if (!float_disable) _odd = !_odd;
+			if ( ! floatDisable ) {
+				odd = ! odd;
+			}
 
 			return $html;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Insert Primary Unit: Unit most display above the fold
-		 *
 		 */
-		function _insert_primary_unit() {
+		function insertPrimaryUnit() {
 
-			var unit = _get_primary_unit(),
-				tallest = admanager.util.tallest_available(unit),
-				shortest = admanager.util.shortest_available(unit),
-				location = _find_insertion_location({
+			var unit = getPrimaryUnit(),
+				tallest = admanager.util.tallestAvailable( unit ),
+				shortest = admanager.util.shortestAvailable( unit ),
+				location = findInsertionLocation( {
 					height: tallest,
-					limit: _defaults.ad_height_limit
-				}),
+					limit: defaults.adHeightLimit
+				} ),
 				markup = null
 			;
 
-			if (!location) {
-				location = _find_insertion_location({
+			if ( ! location ) {
+				location = findInsertionLocation( {
 					height: shortest,
-					limit: _defaults.ad_height_limit,
+					limit: defaults.adHeightLimit,
 					force: true
-				});
+				} );
 
-				if (!location.disable_float) {
+				if ( ! location.disableFloat ) {
 					// unset large sizes
-					unit = admanager.util.limit_unit_height(unit, shortest);
+					unit = admanager.util.limitUnitHeight( unit, shortest );
 				}
 			}
 
-			markup = _ad_unit_markup(unit.id, location.disable_float);
+			markup = adUnitMarkup( unit.id, location.disableFloat );
 
-			location.$insert_before.before(markup);
+			location.$insertBefore.before( markup );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
-		 * Insert Secondary Unit: Ad units that commonly appear below the fold 
-		 *
-		 *
+		 * Insert Secondary Unit: Ad units that commonly appear below the fold
 		 */
-		function _insert_secondary_units() {
+		function insertSecondaryUnits() {
 
-			$.each(_inventory, function (index, unit) {
+			$.each( inventory, function ( index, unit ) {
 
-				var tallest = admanager.util.tallest_available(unit),
-					location = _find_insertion_location({
+				var tallest = admanager.util.tallestAvailable( unit ),
+					location = findInsertionLocation( {
 						height: tallest
-					}),
+					} ),
 					markup = null
 				;
 
-				if (!location) {
+				if ( ! location ) {
 					return false;
 				}
 
-				markup = _ad_unit_markup(unit.id, location.disable_float);
-				location.$insert_before.before(markup);
+				markup = adUnitMarkup( unit.id, location.disableFloat );
+				location.$insertBefore.before( markup );
 
 			} );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		function _get_primary_unit() {
+		function getPrimaryUnit() {
 
-			var primary_unit = false;
+			var primaryUnit = false;
 
-			$.each(_inventory, function (index, unit) {
+			$.each( inventory, function ( index, unit ) {
 
-				if (unit.primary === true) {
-					primary_unit = unit;
-					_inventory.remove(index);
+				if ( unit.primary ) {
+					primaryUnit = unit;
+					inventory.remove( index );
 					return false;
 				}
 
 			} );
 
-			if (!primary_unit) {
-				primary_unit = _inventory[0];
-				_inventory.remove(0);
+			if ( ! primaryUnit ) {
+				primaryUnit = inventory[0];
+				inventory.remove( 0 );
 			}
 
-			return primary_unit;
+			return primaryUnit;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
-		 * _find_insertion_location
+		 * findInsertionLocation
 		 *
 		 * @param object options
 		 * @return object or boolean:false
 		 */
-		function _find_insertion_location(options) {
+		function findInsertionLocation( options ) {
 
 			options = options || {};
 
-			var $nodes = _get_nodes(),
-				node_search = new NodeSearch({
+			var $nodes = getNodes(),
+				nodeSearch = new NodeSearch( {
 					$nodes: $nodes,
 					force: options.force ? options.force : false,
 					limit: options.limit ? options.limit : false,
 					height: options.height
-				})
+				} )
 			;
 
-			if ($nodes.length < 1) return false;
-
-			// Loop through each node as necessary
-			$.each($nodes, function (i, node) {
-
-				var exit_loop = node_search.verify_node(i, $(node));
-
-				if (exit_loop === true) {
-					return false;
-				} else if (exit_loop === false) {
-					return true;
-				}
-
-			});
-
-			if (!node_search.location_found) {
+			if ( ! $nodes.length ) {
 				return false;
 			}
 
-			node_search.mark_valid_nodes();
-			node_search.set_last_position();
+			// Loop through each node as necessary
+			$.each( $nodes, function ( i, node ) {
+
+				var exitLoop = nodeSearch.verifyNode( i, $( node ) );
+
+				if ( exitLoop ) {
+					return false;
+				} else if ( ! exitLoop ) {
+					return true;
+				}
+
+			} );
+
+			if ( ! nodeSearch.locationFound ) {
+				return false;
+			}
+
+			nodeSearch.markValidNodes();
+			nodeSearch.setLastPosition();
 
 			return {
-				'$insert_before' : node_search.$insert_before,
-				'disable_float' : node_search.disable_float
+				'$insertBefore': nodeSearch.$insertBefore,
+				'disableFloat': nodeSearch.disableFloat
 			};
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Search object used for determining insertion points
-		 *
 		 */
-		function NodeSearch(options) {
+		function NodeSearch( options ) {
 
-			this.total_height = 0;
-			this.margin_difference = 40;
+			this.totalHeight = 0;
+			this.marginDifference = 40;
 			this.inserted = [];
-			this.$insert_before = null;
-			this.disable_float = false;
-			this.location_found = false;
-			this.valid_height = 0;
-			this.exit_loop = false;
+			this.$insertBefore = null;
+			this.disableFloat = false;
+			this.locationFound = false;
+			this.validHeight = 0;
+			this.exitLoop = false;
 			this.height = options.height;
 			this.force = options.force;
 			this.limit = options.limit;
 			this.$nodes = options.$nodes;
-			this.last_position = 0;
-			this.needed_height = options.height - this.margin_difference;
+			this.lastPosition = 0;
+			this.neededheight = options.height - this.marginDifference;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Store the position of the last ad
-		 *
 		 */
-		NodeSearch.prototype.set_last_position = function () {
+		NodeSearch.prototype.setLastPosition = function () {
 
-			this.last_position = this.$insert_before.offset().top + this.needed_height;
+			this.lastPosition = this.$insertBefore.offset().top + this.neededheight;
 
 		};
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Mark nodes where insertion is valid
-		 *
 		 */
-		NodeSearch.prototype.mark_valid_nodes = function () {
+		NodeSearch.prototype.markValidNodes = function () {
 
-			if (this.inserted.length > 0) {
-				$.each(this.inserted, function (index, item) {
-					$(item).data('valid-location', false);
-				});
+			if ( this.inserted.length ) {
+				$.each( this.inserted, function ( index, item ) {
+					$( item ).data( 'valid-location', false );
+				} );
 			}
 
 		};
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Verify each node to find a suitable insertion point
 		 *
 		 * @return boolean
 		 */
-		NodeSearch.prototype.verify_node = function (index, $node) {
+		NodeSearch.prototype.verifyNode = function ( index, $node ) {
 
-			var since = $node.offset().top - this.last_position,
+			var since = $node.offset().top - this.lastPosition,
 				height = $node.outerHeight(),
-				is_last = (this.$nodes.length - 1) === index;
+				isLast = ( this.$nodes.length - 1 ) === index;
 
-			this.total_height += height;
+			this.totalHeight += height;
 
-			if (this.force && (this.total_height >= this.limit || is_last)) {
+			if ( this.force && ( this.totalHeight >= this.limit || isLast ) ) {
 
-				this.$insert_before = $node;
-				this.disable_float = true;
-				this.location_found = true;
-				this.exit_loop = true;
+				this.$insertBefore = $node;
+				this.disableFloat = true;
+				this.locationFound = true;
+				this.exitLoop = true;
 
-			} else if (this.limit && (this.total_height >= this.limit || is_last)) {
+			} else if ( this.limit && ( this.totalHeight >= this.limit || isLast ) ) {
 
-				this.location_found = false;
-				this.exit_loop = true;
+				this.locationFound = false;
+				this.exitLoop = true;
 
-			} else if (_is_valid_insertion_location($node)) {
+			} else if ( isValidInsertionLocation( $node ) ) {
 
-				this.valid_height += height;
-				this.inserted.push($node);
+				this.validHeight += height;
+				this.inserted.push( $node );
 
-				if (this.$insert_before === null) {
-					this.$insert_before = $node;
+				if ( this.$insertBefore === null ) {
+					this.$insertBefore = $node;
 				}
 
-				if (this.valid_height >= this.needed_height) {
+				if ( this.validHeight >= this.neededheight ) {
 
-					if (this.limit === false && (since < _defaults.px_between_units)) {
+					if ( ! this.limit && ( since < defaults.pxBetweenUnits ) ) {
 
-						this.valid_height = 0;
-						this.$insert_before = null;
+						this.validHeight = 0;
+						this.$insertBefore = null;
 
 					}
 
-					this.location_found = true;
-					this.exit_loop = true;
+					this.locationFound = true;
+					this.exitLoop = true;
 
 				}
 
 			} else {
 
-				this.valid_height = 0;
-				this.$insert_before = null;
-				this.exit_loop = null;
+				this.validHeight = 0;
+				this.$insertBefore = null;
+				this.exitLoop = null;
 
 			}
 
-			return this.exit_loop;
+			return this.exitLoop;
 
 		};
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Is Element an Ad Unit
@@ -496,45 +496,47 @@ var admanager = (function (app, $) {
 		 * @param mixed $el
 		 * @return bool
 		 */
-		function _is_this_an_ad($el) {
+		function isThisAnAd( $el ) {
 
-			if (!$el) return false;
+			if ( ! $el ) {
+				return false;
+			}
 
-			return $el.is(_defaults.ad_selector);
+			return $el.is( defaults.adSelector );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Get Nodes to Loop Through
 		 *
 		 * @return array $nodes
 		 */
-		function _get_nodes() {
+		function getNodes() {
 
-			var $prev_unit = $local_context.find(_defaults.ad_selector).last(),
+			var $prevUnit = $localContext.find( defaults.adSelector ).last(),
 				$nodes = null;
 
 			// nodes after previous unit or all nodes
-			if ($prev_unit.length > 0) {
-				$nodes = $prev_unit.nextAll($local_context);
+			if ( $prevUnit.length ) {
+				$nodes = $prevUnit.nextAll( $localContext );
 			} else {
-				$nodes = $local_context.children();
+				$nodes = $localContext.children();
 			}
 
 			return $nodes;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		return {
-			init : _init
+			init: init
 		};
 
-	} ($));
+	}( $ ) );
 
 	return app;
 
-} (admanager || {}, jQuery));
+}( admanager || {}, jQuery ) );

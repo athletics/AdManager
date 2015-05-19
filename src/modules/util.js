@@ -1,40 +1,40 @@
 /**
- *		Name: Util
- *
- *		Requires: app, jQuery
+ * Name: Util
+ * Requires: app, jQuery
  */
+var admanager = ( function ( app, $ ) {
 
-var admanager = (function (app, $) {
+	app.util = ( function ( $ ) {
 
-	app.util = (function ($) {
-
-		var _name = 'Util',
-			_debug_enable = false
+		var name = 'Util',
+			debugEnabled = false
 		;
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		function _init() {
+		function init() {
 
-			debug(_name + ': initialized');
-			_init_array_remove();
+			debug( name + ': initialized' );
+			initArrayRemove();
 			return app;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		function debug(obj) {
+		function debug( obj ) {
 
-			if (!_debug_enable) return;
+			if ( ! debugEnabled ) {
+				return;
+			}
 
-			if ((typeof console == "object") && (console.log)) {
-				console.log(obj);
+			if ( ( typeof console === 'object' ) && ( console.log ) ) {
+				console.log( obj );
 			}
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Return difference between arrays
@@ -43,65 +43,67 @@ var admanager = (function (app, $) {
 		 * @param  array values
 		 * @return array diff
 		 */
-		function _difference(array, values) {
+		function difference( array, values ) {
 
 			var diff = [];
 
-			$.grep(array, function (element) {
-				if ($.inArray(element, values) === -1) diff.push(element);
-			});
+			$.grep( array, function ( element ) {
+				if ( $.inArray( element, values ) === -1 ) {
+					diff.push( element );
+				}
+			} );
 
 			return diff;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		function _init_array_remove() {
+		function initArrayRemove() {
 
 			// Array Remove - By John Resig (MIT Licensed)
-			Array.prototype.remove = function (from, to) {
-				var rest = this.slice((to || from) + 1 || this.length);
+			Array.prototype.remove = function ( from, to ) {
+				var rest = this.slice( ( to || from ) + 1 || this.length );
 				this.length = from < 0 ? this.length + from : from;
-				return this.push.apply(this, rest);
+				return this.push.apply( this, rest );
 			};
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Import JSON page config data from DOM
 		 *
-		 * This imports inline JSON via data attribute 
+		 * This imports inline JSON via data attribute
 		 * and extends an existing config with it.
 		 *
 		 * @param object options.$context
-		 * @param string options.attr_name
+		 * @param string options.attrName
 		 * @return object
 		 */
-		function _import_config(options) {
+		function importConfig( options ) {
 
 			var $context = options.$context,
-				attr_name = options.attr_name,
-				exist_config = options.exist_config,
+				attrName = options.attrName,
+				existConfig = options.existConfig,
 				selector,
-				new_config,
+				newConfig,
 				data = {};
 
-			selector = '*[data-' + attr_name + ']';
-			new_config = $.extend({}, exist_config);
-			data = $context.find(selector).data(attr_name);
+			selector = '*[data-' + attrName + ']';
+			newConfig = $.extend( {}, existConfig );
+			data = $context.find( selector ).data( attrName );
 
-			if (typeof new_config === 'object') {
-				new_config = $.extend(new_config, data);
+			if ( typeof newConfig === 'object' ) {
+				newConfig = $.extend( newConfig, data );
 			}
 
-			return new_config;
+			return newConfig;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Returns the DOM wrapper context for the ads
@@ -110,22 +112,20 @@ var admanager = (function (app, $) {
 		 * but in infinite scroll applications, this needs to be dynamic.
 		 * If the config does not provide one, the default value is 'body'.
 		 *
-		 * @return array $(selector)
+		 * @return array $( selector )
 		 *
-		 * TODO: 
+		 * TODO:
 		 * Add optional dynamically-determined context,
 		 * for use in multi-segment infinite scroll
-		 *
 		 */
-
-		function _get_context() {
+		function getContext() {
 
 			var selector = app.config.context || 'body';
-			return $(selector);
+			return $( selector );
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Get Shortest Possible Size for Unit
@@ -133,20 +133,23 @@ var admanager = (function (app, $) {
 		 * @param object unit
 		 * @return integer
 		 */
-		function _shortest_available(unit) {
+		function shortestAvailable( unit ) {
 
 			var shortest = 0;
 
-			$.each(unit.sizes, function (index, sizes) {
-				if (shortest === 0) shortest = sizes[1];
-				else if (sizes[1] < shortest) shortest = sizes[1];
-			});
+			$.each( unit.sizes, function ( index, sizes ) {
+				if ( shortest === 0 ) {
+					shortest = sizes[1];
+				} else if ( sizes[1] < shortest ) {
+					shortest = sizes[1];
+				}
+			} );
 
 			return shortest;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Get Tallest Possible Size for Unit
@@ -154,19 +157,21 @@ var admanager = (function (app, $) {
 		 * @param object unit
 		 * @return integer
 		 */
-		function _tallest_available(unit) {
+		function tallestAvailable( unit ) {
 
 			var tallest = 0;
 
-			$.each(unit.sizes, function (index, sizes) {
-				if (sizes[1] > tallest) tallest = sizes[1];
-			});
+			$.each( unit.sizes, function ( index, sizes ) {
+				if ( sizes[1] > tallest ) {
+					tallest = sizes[1];
+				}
+			} );
 
 			return tallest;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Limit Ad Unit Height: Removes Larger Sizes from Inventory
@@ -175,18 +180,20 @@ var admanager = (function (app, $) {
 		 * @param  int limit
 		 * @return object unit
 		 */
-		function _limit_unit_height(unit, limit) {
+		function limitUnitHeight( unit, limit ) {
 
-			$.each(unit.sizes, function (index, sizes) {
-				if (sizes[1] <= limit) return true;
-				unit.sizes.remove(index);
-			});
+			$.each( unit.sizes, function ( index, sizes ) {
+				if ( sizes[1] <= limit ) {
+					return true;
+				}
+				unit.sizes.remove( index );
+			} );
 
 			return unit;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Get Unit Type
@@ -194,36 +201,38 @@ var admanager = (function (app, $) {
 		 * @param string id
 		 * @return string type
 		 */
-		function _get_unit_type(id) {
+		function getUnitType( id ) {
 
 			var type = 'default';
 
-			$.each(app.config.inventory, function (index, unit) {
-				if (unit.id !== id) return true;
+			$.each( app.config.inventory, function ( index, unit ) {
+				if ( unit.id !== id ) {
+					return true;
+				}
 				type = unit.type;
 				return false;
-			});
+			} );
 
 			return type;
 
 		}
 
-		/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+		//////////////////////////////////////////////////////////////////////////////////////
 
 		return {
-			init               : _init,
-			debug              : debug,
-			difference         : _difference,
-			import_config      : _import_config,
-			shortest_available : _shortest_available,
-			tallest_available  : _tallest_available,
-			limit_unit_height  : _limit_unit_height,
-			get_unit_type      : _get_unit_type,
-			get_context        : _get_context
+			init:              init,
+			debug:             debug,
+			difference:        difference,
+			importConfig:      importConfig,
+			shortestAvailable: shortestAvailable,
+			tallestAvailable:  tallestAvailable,
+			limitUnitHeight:   limitUnitHeight,
+			getUnitType:       getUnitType,
+			getContext:        getContext
 		};
 
-	} ($));
+	} ( $ ) );
 
 	return app;
 
-} (admanager || {}, jQuery));
+} ( admanager || {}, jQuery ) );
