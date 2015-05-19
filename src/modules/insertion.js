@@ -1,9 +1,7 @@
 /**
- *		Name: Ad Insertion
- *
- *		Requires: app, app.util, jQuery
+ * Name: Ad Insertion
+ * Requires: app, app.util, jQuery
  */
-
 var admanager = ( function ( app, $ ) {
 
 	app.insertion = ( function ( $ ) {
@@ -242,7 +240,6 @@ var admanager = ( function ( app, $ ) {
 
 		/**
 		 * Insert Primary Unit: Unit most display above the fold
-		 *
 		 */
 		function insertPrimaryUnit() {
 
@@ -383,7 +380,6 @@ var admanager = ( function ( app, $ ) {
 
 		/**
 		 * Search object used for determining insertion points
-		 *
 		 */
 		function NodeSearch( options ) {
 

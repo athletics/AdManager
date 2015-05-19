@@ -1,9 +1,7 @@
 /**
- *		Name: Bootstrap
- *
- *		Requires: jQuery
+ * Name: Bootstrap
+ * Requires: jQuery
  */
-
 var admanager = ( function ( app, $ ) {
 
 	if ( typeof app.initialized === 'undefined' ) {

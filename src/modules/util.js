@@ -1,9 +1,7 @@
 /**
- *		Name: Util
- *
- *		Requires: app, jQuery
+ * Name: Util
+ * Requires: app, jQuery
  */
-
 var admanager = ( function ( app, $ ) {
 
 	app.util = ( function ( $ ) {
@@ -119,9 +117,7 @@ var admanager = ( function ( app, $ ) {
 		 * TODO:
 		 * Add optional dynamically-determined context,
 		 * for use in multi-segment infinite scroll
-		 *
 		 */
-
 		function getContext() {
 
 			var selector = app.config.context || 'body';

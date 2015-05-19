@@ -1,9 +1,7 @@
 /**
- *		Name: Ad Manager
- *
- *		Requires: app, app.util, app.insertion, jQuery
+ * Name: Ad Manager
+ * Requires: app, app.util, app.insertion, jQuery
  */
-
 var admanager = ( function ( app, $ ) {
 
 	app.manager = ( function ( $ ) {
