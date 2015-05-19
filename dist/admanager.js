@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.2.1 ( 2015-05-19 )
+ * @version 0.3.0 ( 2015-05-19 )
  */
 var admanager = function(app, $) {
     if (typeof app.initialized === "undefined") {
