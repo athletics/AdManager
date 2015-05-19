@@ -7,7 +7,8 @@ var admanager = ( function ( app, $ ) {
 	app.util = ( function ( $ ) {
 
 		var name = 'Util',
-			debugEnabled = false
+			debugEnabled = false,
+			debug
 		;
 
 		//////////////////////////////////////////////////////////////////////////////////////
@@ -22,17 +23,23 @@ var admanager = ( function ( app, $ ) {
 
 		//////////////////////////////////////////////////////////////////////////////////////
 
-		function debug( obj ) {
+		/**
+		 * Debug - console.log wrapper
+		 *
+		 * @param mixed obj
+		 */
+		debug = function () {
+
 
 			if ( ! debugEnabled ) {
 				return;
+			} else if ( typeof console !== 'object' || ! console.log ) {
+				return;
 			}
 
-			if ( ( typeof console === 'object' ) && ( console.log ) ) {
-				console.log( obj );
-			}
+			return Function.prototype.bind.call( console.log, console );
 
-		}
+		}();
 
 		//////////////////////////////////////////////////////////////////////////////////////
 
