@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.3.0 ( 2015-05-19 )
+ * @version 0.3.1 ( 2015-05-19 )
  */
 var admanager = function(app, $) {
     if (typeof app.initialized === "undefined") {
@@ -581,20 +581,20 @@ var admanager = function(app, $) {
 
 var admanager = function(app, $) {
     app.util = function($) {
-        var name = "Util", debugEnabled = false;
+        var name = "Util", debugEnabled = false, debug;
         function init() {
             debug(name + ": initialized");
             initArrayRemove();
             return app;
         }
-        function debug(obj) {
+        debug = function() {
             if (!debugEnabled) {
                 return;
+            } else if (typeof console !== "object" || !console.log) {
+                return;
             }
-            if (typeof console === "object" && console.log) {
-                console.log(obj);
-            }
-        }
+            return Function.prototype.bind.call(console.log, console);
+        }();
         function difference(array, values) {
             var diff = [];
             $.grep(array, function(element) {
