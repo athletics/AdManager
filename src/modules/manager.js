@@ -616,16 +616,16 @@ var admanager = ( function ( app, $ ) {
 		//////////////////////////////////////////////////////////////////////////////////////
 
 		return {
-			init                : init,
-			isEnabled           : isEnabled,
-			getConfig           : getConfig,
-			getDefaults         : getDefaults,
-			getAdInfo           : getAdInfo,
-			displaySlot         : displaySlot,
-			removeDefinedSlot   : removeDefinedSlot,
-			getDynamicInventory : getDynamicInventory,
-			initSequence        : initSequence,
-			emptyAds            : emptyAds
+			init:                init,
+			isEnabled:           isEnabled,
+			getConfig:           getConfig,
+			getDefaults:         getDefaults,
+			getAdInfo:           getAdInfo,
+			displaySlot:         displaySlot,
+			removeDefinedSlot:   removeDefinedSlot,
+			getDynamicInventory: getDynamicInventory,
+			initSequence:        initSequence,
+			emptyAds:            emptyAds
 		};
 
 	}( $ ) );

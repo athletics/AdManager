@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.2.1 ( 2015-05-18 )
+ * @version 0.2.1 ( 2015-05-19 )
  */
 var admanager = function(app, $) {
     if (typeof app.initialized === "undefined") {
@@ -64,14 +64,14 @@ var admanager = function(app, $) {
         function qualifyContext() {
             var inventoryData = app.manager.getDynamicInventory();
             setContext();
-            inventory = inventory.length > 0 ? inventory : inventoryData.dynamicItems;
+            inventory = inventory.length ? inventory : inventoryData.dynamicItems;
             localContext = localContext ? localContext : inventoryData.localContext;
-            if (inventory.length < 1) {
+            if (!inventory.length) {
                 broadcast();
                 return app;
             }
             $localContext = $context.find(localContext).first();
-            if ($localContext.length > 0) {
+            if ($localContext.length) {
                 inContent = true;
             }
             if (!inContent) {
@@ -104,7 +104,7 @@ var admanager = function(app, $) {
             $nodes.each(function(i) {
                 var $element = $(this), $prev = i > 0 ? $nodes.eq(i - 1) : false, valid = true;
                 $.each(excluded, function(index, item) {
-                    if ($element.is(item) || $element.find(item).length > 0) {
+                    if ($element.is(item) || $element.find(item).length) {
                         valid = false;
                         return false;
                     }
@@ -164,7 +164,7 @@ var admanager = function(app, $) {
         function getPrimaryUnit() {
             var primaryUnit = false;
             $.each(inventory, function(index, unit) {
-                if (unit.primary === true) {
+                if (unit.primary) {
                     primaryUnit = unit;
                     inventory.remove(index);
                     return false;
@@ -184,14 +184,14 @@ var admanager = function(app, $) {
                 limit: options.limit ? options.limit : false,
                 height: options.height
             });
-            if ($nodes.length < 1) {
+            if (!$nodes.length) {
                 return false;
             }
             $.each($nodes, function(i, node) {
                 var exitLoop = nodeSearch.verifyNode(i, $(node));
-                if (exitLoop === true) {
+                if (exitLoop) {
                     return false;
-                } else if (exitLoop === false) {
+                } else if (!exitLoop) {
                     return true;
                 }
             });
@@ -225,7 +225,7 @@ var admanager = function(app, $) {
             this.lastPosition = this.$insertBefore.offset().top + this.neededheight;
         };
         NodeSearch.prototype.markValidNodes = function() {
-            if (this.inserted.length > 0) {
+            if (this.inserted.length) {
                 $.each(this.inserted, function(index, item) {
                     $(item).data("valid-location", false);
                 });
@@ -249,7 +249,7 @@ var admanager = function(app, $) {
                     this.$insertBefore = $node;
                 }
                 if (this.validHeight >= this.neededheight) {
-                    if (this.limit === false && since < defaults.pxBetweenUnits) {
+                    if (!this.limit && since < defaults.pxBetweenUnits) {
                         this.validHeight = 0;
                         this.$insertBefore = null;
                     }
@@ -271,7 +271,7 @@ var admanager = function(app, $) {
         }
         function getNodes() {
             var $prevUnit = $localContext.find(defaults.adSelector).last(), $nodes = null;
-            if ($prevUnit.length > 0) {
+            if ($prevUnit.length) {
                 $nodes = $prevUnit.nextAll($localContext);
             } else {
                 $nodes = $localContext.children();
@@ -447,7 +447,7 @@ var admanager = function(app, $) {
                 googletag.pubads().refresh(definedSlots);
                 for (var n = 0; n < pagePositions.length; n++) {
                     currentPosition = getAdInfo(pagePositions[n]);
-                    if ($("#" + currentPosition.idName).length > 0) {
+                    if ($("#" + currentPosition.idName).length) {
                         googletag.display(currentPosition.idName);
                     }
                 }
@@ -470,7 +470,9 @@ var admanager = function(app, $) {
                 if (inventory[i].id !== unit && inventory[i].slot !== unit) {
                     continue;
                 }
-                if (typeof inventory[i].iteration == "undefined") inventory[i].iteration = 0;
+                if (typeof inventory[i].iteration == "undefined") {
+                    inventory[i].iteration = 0;
+                }
                 inventory[i].iteration = inventory[i].iteration + 1;
                 return;
             }
@@ -589,7 +591,7 @@ var admanager = function(app, $) {
             if (!debugEnabled) {
                 return;
             }
-            if (typeof console == "object" && console.log) {
+            if (typeof console === "object" && console.log) {
                 console.log(obj);
             }
         }
