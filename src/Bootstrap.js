@@ -7,14 +7,18 @@
 
 		define( [
 			'./Config',
-			'./Util'
+			'./Util',
+			'./Manager',
+			'./Insertion'
 		], factory );
 
 	} else if ( typeof exports == 'object' ) {
 
 		module.exports = factory(
 			require( './Config' ),
-			require( './Util' )
+			require( './Util' ),
+			require( './Manager' ),
+			require( './Insertion' )
 		);
 
 	} else {
@@ -23,14 +27,16 @@
 
 		root.AdManager = factory(
 			_AdManager.Config,
-			_AdManager.Util
+			_AdManager.Util,
+			_AdManager.Manager,
+			_AdManager.Insertion
 		);
 
 	}
 
-} ) ( this, function ( Config, Util ) {
+} ) ( this, function ( Config, Util, Manager, Insertion ) {
 
-	function init( newConfig ) {
+	function AdManager( newConfig ) {
 
 		newConfig = newConfig || false;
 
@@ -44,8 +50,16 @@
 
 		Util.init();
 
+		Manager.init();
+		Insertion.init();
+
 	}
 
-	return init;
+	AdManager.prototype.Util = Util;
+	AdManager.prototype.Config = Config;
+	AdManager.prototype.Manager = Manager;
+	AdManager.prototype.Insertion = Insertion;
+
+	return AdManager;
 
 } );
