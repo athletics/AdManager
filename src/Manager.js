@@ -154,7 +154,7 @@
 						sizesToRemove.push( inventory[ i ].sizes[ j ] );
 					}
 				}
-				inventory[ i ].sizes = app.util.difference( inventory[ i ].sizes, sizesToRemove );
+				inventory[ i ].sizes = Util.difference( inventory[ i ].sizes, sizesToRemove );
 			}
 		}
 
@@ -274,7 +274,7 @@
 	function setPagePositions() {
 
 		var clientType = typeof app.config.clientType !== 'undefined' ? app.config.clientType : false,
-			$context = app.util.getContext(),
+			$context = Util.getContext(),
 			$units = null,
 			selector = defaults.adSelector
 		;
@@ -300,7 +300,7 @@
 		googletag.cmd.push( function () {
 
 			var currentPosition = null,
-				$context = app.util.getContext(),
+				$context = Util.getContext(),
 				$unit,
 				$unitTarget;
 
@@ -544,7 +544,7 @@
 	 */
 	function isEnabled() {
 
-		var $context = app.util.getContext(),
+		var $context = Util.getContext(),
 			attrName = 'page-ad-config'
 		;
 
@@ -552,7 +552,7 @@
 			attrName = app.config.pageConfigAttr;
 		}
 
-		app.config = app.util.importConfig( {
+		app.config = Util.importConfig( {
 			$context: $context,
 			attrName: attrName,
 			existConfig: app.config
