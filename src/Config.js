@@ -44,7 +44,16 @@
 		debug( name + ': initialized' );
 		debug( newConfig );
 
-		config = newConfig;
+		config = $.extend( {
+			account: 0,
+			clientType: false,
+			context: 'body',
+			enabled: true,
+			insertExclusion: [],
+			inventory: [],
+			pageConfigAttr: false,
+			targeting: []
+		}, newConfig );
 
 	}
 
