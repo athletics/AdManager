@@ -272,7 +272,7 @@
 	 */
 	function setPagePositions() {
 
-		var clientType = typeof app.config.clientType !== 'undefined' ? app.config.clientType : false,
+		var clientType = Config.get( 'clientType' ),
 			$context = Util.getContext(),
 			$units = null,
 			selector = defaults.adSelector
@@ -513,7 +513,7 @@
 	function getDynamicInventory() {
 
 		var dynamicItems = [],
-			type = typeof app.config.clientType !== 'undefined' ? app.config.clientType : false,
+			type = Config.get( 'clientType' ),
 			localContext;
 
 		$.each( inventory, function ( index, position ) {
