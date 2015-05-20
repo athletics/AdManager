@@ -53,6 +53,7 @@
 			context: 'body',
 			enabled: true,
 			insertExclusion: [],
+			insertionEnabled: false,
 			inventory: [],
 			pageConfigAttr: false,
 			targeting: []

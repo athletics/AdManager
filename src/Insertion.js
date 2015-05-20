@@ -141,13 +141,7 @@
 	 */
 	function isEnabled() {
 
-		var pageConfig = app.manager.getConfig();
-
-		if ( typeof pageConfig.insertionEnabled === 'undefined' ) {
-			return false;
-		}
-
-		return pageConfig.insertionEnabled;
+		return Config.get( 'insertionEnabled' );
 
 	}
 
