@@ -14,11 +14,12 @@
 	} else {
 
 		root.AdManager = root.AdManager || {};
+
 		root.AdManager.Util = factory( root.jQuery );
 
 	}
 
-}( this, function ( $ ) {
+} ( this, function ( $ ) {
 
 	var name = 'Util',
 		debugEnabled = true,
@@ -47,7 +48,7 @@
 
 		return Function.prototype.bind.call( console.log, console );
 
-	}();
+	} ();
 
 	/**
 	 * Return difference between arrays
