@@ -539,25 +539,7 @@
 	 */
 	function isEnabled() {
 
-		var $context = Util.getContext(),
-			attrName = 'page-ad-config'
-		;
-
-		if ( typeof app.config.pageConfigAttr !== 'undefined' ) {
-			attrName = app.config.pageConfigAttr;
-		}
-
-		app.config = Util.importConfig( {
-			$context: $context,
-			attrName: attrName,
-			existConfig: app.config
-		} );
-
-		if ( typeof app.config.enabled === 'undefined' ) {
-			return true;
-		}
-
-		return app.config.enabled;
+		return Config.get( 'enabled' );
 
 	}
 
