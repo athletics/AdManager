@@ -25,7 +25,7 @@
 
 	}
 
-}( this, function ( Util ) {
+} ( this, function ( Util ) {
 
 	var name = 'Config',
 		debugEnabled = true,
