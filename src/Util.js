@@ -5,21 +5,30 @@
 
 	if ( typeof define === 'function' && define.amd ) {
 
-		define( [ 'jquery' ], factory );
+		define( [
+			'jquery',
+			'./Config'
+		], factory );
 
 	} else if ( typeof exports === 'object' ) {
 
-		module.exports = factory( 'jquery' );
+		module.exports = factory(
+			require( 'jquery' ),
+			require( './Config' )
+		);
 
 	} else {
 
 		root.AdManager = root.AdManager || {};
 
-		root.AdManager.Util = factory( root.jQuery );
+		root.AdManager.Util = factory(
+			root.jQuery,
+			root.AdManager.Config
+		);
 
 	}
 
-} ( this, function ( $ ) {
+} ( this, function ( $, Config ) {
 
 	var name = 'Util',
 		debugEnabled = true,
@@ -128,8 +137,8 @@
 	 */
 	function getContext() {
 
-		// @todo update app.config usage
-		var selector = app.config.context || 'body';
+		var selector = Config.context || 'body';
+
 		return $( selector );
 
 	}
@@ -206,13 +215,16 @@
 
 		var type = 'default';
 
-		// @todo update app.config usage
-		$.each( app.config.inventory, function ( index, unit ) {
+		$.each( Config.inventory, function ( index, unit ) {
+
 			if ( unit.id !== id ) {
 				return true;
 			}
+
 			type = unit.type;
+
 			return false;
+
 		} );
 
 		return type;
