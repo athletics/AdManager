@@ -6,12 +6,14 @@
 	if ( typeof define === 'function' && define.amd ) {
 
 		define( [
+			'jquery',
 			'./Util'
 		], factory );
 
 	} else if ( typeof exports === 'object' ) {
 
 		module.exports = factory(
+			require( 'jquery' ),
 			require( './Util' )
 		);
 
@@ -20,12 +22,13 @@
 		root.AdManager = root.AdManager || {};
 
 		root.AdManager.Config = factory(
+			root.jQuery,
 			root.AdManager.Util
 		);
 
 	}
 
-} ( this, function ( Util ) {
+} ( this, function ( $, Util ) {
 
 	var name = 'Config',
 		debugEnabled = true,
