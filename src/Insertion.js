@@ -240,8 +240,8 @@
 	function insertPrimaryUnit() {
 
 		var unit = getPrimaryUnit(),
-			tallest = admanager.util.tallestAvailable( unit ),
-			shortest = admanager.util.shortestAvailable( unit ),
+			tallest = Util.tallestAvailable( unit ),
+			shortest = Util.shortestAvailable( unit ),
 			location = findInsertionLocation( {
 				height: tallest,
 				limit: defaults.adHeightLimit
@@ -258,7 +258,7 @@
 
 			if ( ! location.disableFloat ) {
 				// unset large sizes
-				unit = admanager.util.limitUnitHeight( unit, shortest );
+				unit = Util.limitUnitHeight( unit, shortest );
 			}
 		}
 
@@ -275,7 +275,7 @@
 
 		$.each( inventory, function ( index, unit ) {
 
-			var tallest = admanager.util.tallestAvailable( unit ),
+			var tallest = Util.tallestAvailable( unit ),
 				location = findInsertionLocation( {
 					height: tallest
 				} ),
