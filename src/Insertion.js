@@ -57,7 +57,6 @@
 
 	function init() {
 
-		debug = admanager.util.debug ? admanager.util.debug : function () {};
 		debug( name + ': initialized' );
 
 		defaults = $.extend( defaults, app.manager.getDefaults() );
