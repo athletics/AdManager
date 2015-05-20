@@ -83,7 +83,7 @@
 
 	function setContext() {
 
-		$context = app.util.getContext();
+		$context = Util.getContext();
 
 	}
 
@@ -209,7 +209,7 @@
 	function adUnitMarkup( unitId, disableFloat ) {
 
 		var floatDisable = disableFloat || false,
-			type = app.util.getUnitType( unitId ),
+			type = Util.getUnitType( unitId ),
 			alignment = odd ? 'odd' : 'even',
 			$html = $( '<div />' );
 
