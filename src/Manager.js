@@ -253,16 +253,15 @@
 
 		googletag.cmd.push( function () {
 
-			var pageConfig = getConfig(),
-				targeting = pageConfig.targeting
-			;
+			var targeting = Config.get( 'targeting' );
 
-			// Set targeting
-			if ( typeof targeting !== 'undefined' ) {
-				$.each( targeting, function ( key, value ) {
-					googletag.pubads().setTargeting( key, value );
-				} );
+			if ( ! targeting.length ) {
+				return;
 			}
+
+			$.each( targeting, function ( key, value ) {
+				googletag.pubads().setTargeting( key, value );
+			} );
 
 		} );
 
@@ -533,10 +532,6 @@
 
 	}
 
-	function getConfig() {
-		return app.config;
-	}
-
 	/**
 	 * Check if the Ad Manager is enabled for page
 	 *
@@ -594,7 +589,6 @@
 	return {
 		init:                init,
 		isEnabled:           isEnabled,
-		getConfig:           getConfig,
 		getDefaults:         getDefaults,
 		getAdInfo:           getAdInfo,
 		displaySlot:         displaySlot,
