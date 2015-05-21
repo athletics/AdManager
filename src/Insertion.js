@@ -8,6 +8,7 @@
 		define( [
 			'jquery',
 			'./Util',
+			'./Config',
 			'./Manager',
 			'./Inventory'
 		], factory );
@@ -17,6 +18,7 @@
 		module.exports = factory(
 			require( 'jquery' ),
 			require( './Util' ),
+			require( './Config' ),
 			require( './Manager' ),
 			require( './Inventory' )
 		);
@@ -28,13 +30,14 @@
 		root.AdManager.Insertion = factory(
 			root.jQuery,
 			root.AdManager.Util,
+			root.AdManager.Config,
 			root.AdManager.Manager,
 			root.AdManager.Inventory
 		);
 
 	}
 
-} ( this, function ( $, Util, Manager, Inventory ) {
+} ( this, function ( $, Util, Config, Manager, Inventory ) {
 
 	var name = 'Insertion',
 		debugEnabled = true,
