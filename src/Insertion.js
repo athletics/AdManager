@@ -112,7 +112,7 @@
 		// Return if empty
 		if ( ! inventory.length ) {
 			broadcast();
-			return app;
+			return;
 		}
 
 		$localContext = $context.find( localContext ).first();
@@ -125,11 +125,11 @@
 		// Return if there is no insertion selector
 		if ( ! inContent ) {
 			broadcast();
-			return app;
+			return;
 		}
 
 		insertAdUnits();
-		return app;
+		return;
 
 	}
 
