@@ -6,8 +6,9 @@
 	if ( typeof define === 'function' && define.amd ) {
 
 		define( [
-			'./Config',
 			'./Util',
+			'./Config',
+			'./Inventory',
 			'./Manager',
 			'./Insertion'
 		], factory );
@@ -15,8 +16,9 @@
 	} else if ( typeof exports == 'object' ) {
 
 		module.exports = factory(
-			require( './Config' ),
 			require( './Util' ),
+			require( './Config' ),
+			require( './Inventory' ),
 			require( './Manager' ),
 			require( './Insertion' )
 		);
@@ -26,15 +28,16 @@
 		var _AdManager = root.AdManager;
 
 		root.AdManager = factory(
-			_AdManager.Config,
 			_AdManager.Util,
+			_AdManager.Config,
+			_AdManager.Inventory,
 			_AdManager.Manager,
 			_AdManager.Insertion
 		);
 
 	}
 
-} ( this, function ( Config, Util, Manager, Insertion ) {
+} ( this, function ( Util, Config, Inventory, Manager, Insertion ) {
 
 	function AdManager( newConfig ) {
 
@@ -49,14 +52,14 @@
 		Config.init( newConfig );
 
 		Util.init();
-
-		Manager.init();
 		Insertion.init();
+		Manager.init();
 
 	}
 
 	AdManager.prototype.Util = Util;
 	AdManager.prototype.Config = Config;
+	AdManager.prototype.Inventory = Inventory;
 	AdManager.prototype.Manager = Manager;
 	AdManager.prototype.Insertion = Insertion;
 
