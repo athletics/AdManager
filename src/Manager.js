@@ -58,7 +58,7 @@
 
 		defaults.adSelector = '.' + defaults.adClass;
 		inventory = getInventory();
-		account = Config.account;
+		account = Config.get( 'account' );
 		bindHandlers();
 		loadLibrary();
 
@@ -103,7 +103,7 @@
 	 */
 	function getInventory() {
 
-		return getAvailableSizes( inventoryCleanTypes( Config.inventory ) );
+		return getAvailableSizes( inventoryCleanTypes( Config.get( 'inventory' ) ) );
 
 	}
 

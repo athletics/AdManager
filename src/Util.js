@@ -137,7 +137,7 @@
 	 */
 	function getContext() {
 
-		var selector = Config.context || 'body';
+		var selector = Config.get( 'context' ) || 'body';
 
 		return $( selector );
 
@@ -215,7 +215,7 @@
 
 		var type = 'default';
 
-		$.each( Config.inventory, function ( index, unit ) {
+		$.each( Config.get( 'inventory' ), function ( index, unit ) {
 
 			if ( unit.id !== id ) {
 				return true;
