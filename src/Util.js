@@ -92,37 +92,6 @@
 	}
 
 	/**
-	 * Import JSON page config data from DOM
-	 *
-	 * This imports inline JSON via data attribute
-	 * and extends an existing config with it.
-	 *
-	 * @param object options.$context
-	 * @param string options.attrName
-	 * @return object
-	 */
-	function importConfig( options ) {
-
-		var $context = options.$context,
-			attrName = options.attrName,
-			existConfig = options.existConfig,
-			selector,
-			newConfig,
-			data = {};
-
-		selector = '*[data-' + attrName + ']';
-		newConfig = $.extend( {}, existConfig );
-		data = $context.find( selector ).data( attrName );
-
-		if ( typeof newConfig === 'object' ) {
-			newConfig = $.extend( newConfig, data );
-		}
-
-		return newConfig;
-
-	}
-
-	/**
 	 * Get Shortest Possible Size for Unit
 	 *
 	 * @param object unit
@@ -216,7 +185,6 @@
 		init:              init,
 		debug:             debug,
 		difference:        difference,
-		importConfig:      importConfig,
 		shortestAvailable: shortestAvailable,
 		tallestAvailable:  tallestAvailable,
 		limitUnitHeight:   limitUnitHeight,
