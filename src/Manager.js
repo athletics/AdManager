@@ -273,7 +273,7 @@
 	function setPagePositions() {
 
 		var clientType = Config.get( 'clientType' ),
-			$context = Util.getContext(),
+			$context = $( Config.get( 'context' ) ),
 			$units = null,
 			selector = defaults.adSelector
 		;
@@ -299,7 +299,7 @@
 		googletag.cmd.push( function () {
 
 			var currentPosition = null,
-				$context = Util.getContext(),
+				$context = $( Config.get( 'context' ) ),
 				$unit,
 				$unitTarget;
 
