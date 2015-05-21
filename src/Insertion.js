@@ -65,7 +65,7 @@
 
 		debug( name + ': initialized' );
 
-		defaults = $.extend( defaults, app.manager.getDefaults() );
+		defaults = $.extend( defaults, Manager.getDefaults() );
 
 		bindHandlers();
 
@@ -100,7 +100,7 @@
 	 */
 	function qualifyContext() {
 
-		var inventoryData = app.manager.getDynamicInventory();
+		var inventoryData = Manager.getDynamicInventory();
 
 		setContext();
 		inventory = inventory.length ? inventory : inventoryData.dynamicItems;
@@ -165,7 +165,7 @@
 	function denoteValidInsertions() {
 
 		var $nodes = $localContext.children(),
-			excluded = app.config.insertExclusion || defaults.insertExclusion
+			excluded = Config.get( 'insertExclusion' ) || defaults.insertExclusion
 		;
 
 		$nodes.each( function ( i ) {
