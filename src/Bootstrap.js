@@ -34,7 +34,7 @@
 
 	}
 
-} ) ( this, function ( Config, Util, Manager, Insertion ) {
+} ( this, function ( Config, Util, Manager, Insertion ) {
 
 	function AdManager( newConfig ) {
 
@@ -62,4 +62,4 @@
 
 	return AdManager;
 
-} );
+} ) );
