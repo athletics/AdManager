@@ -7,14 +7,18 @@
 
 		define( [
 			'jquery',
-			'./Util'
+			'./Util',
+			'./Manager',
+			'./Inventory'
 		], factory );
 
 	} else if ( typeof exports === 'object' ) {
 
 		module.exports = factory(
 			require( 'jquery' ),
-			require( './Util' )
+			require( './Util' ),
+			require( './Manager' ),
+			require( './Inventory' )
 		);
 
 	} else {
@@ -23,12 +27,14 @@
 
 		root.AdManager.Insertion = factory(
 			root.jQuery,
-			root.AdManager.Util
+			root.AdManager.Util,
+			root.AdManager.Manager,
+			root.AdManager.Inventory
 		);
 
 	}
 
-} ( this, function ( $, Util ) {
+} ( this, function ( $, Util, Manager, Inventory ) {
 
 	var name = 'Insertion',
 		debugEnabled = true,
@@ -208,7 +214,7 @@
 	function adUnitMarkup( unitId, disableFloat ) {
 
 		var floatDisable = disableFloat || false,
-			type = Util.getUnitType( unitId ),
+			type = Inventory.getUnitType( unitId ),
 			alignment = odd ? 'odd' : 'even',
 			$html = $( '<div />' );
 
@@ -240,8 +246,8 @@
 	function insertPrimaryUnit() {
 
 		var unit = getPrimaryUnit(),
-			tallest = Util.tallestAvailable( unit ),
-			shortest = Util.shortestAvailable( unit ),
+			tallest = Inventory.tallestAvailable( unit ),
+			shortest = Inventory.shortestAvailable( unit ),
 			location = findInsertionLocation( {
 				height: tallest,
 				limit: defaults.adHeightLimit
@@ -258,7 +264,7 @@
 
 			if ( ! location.disableFloat ) {
 				// unset large sizes
-				unit = Util.limitUnitHeight( unit, shortest );
+				unit = Inventory.limitUnitHeight( unit, shortest );
 			}
 		}
 
@@ -275,7 +281,7 @@
 
 		$.each( inventory, function ( index, unit ) {
 
-			var tallest = Util.tallestAvailable( unit ),
+			var tallest = Inventory.tallestAvailable( unit ),
 				location = findInsertionLocation( {
 					height: tallest
 				} ),
