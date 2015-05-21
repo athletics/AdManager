@@ -123,27 +123,6 @@
 	}
 
 	/**
-	 * Returns the DOM wrapper context for the ads
-	 *
-	 * In standard applications this remains constant,
-	 * but in infinite scroll applications, this needs to be dynamic.
-	 * If the config does not provide one, the default value is 'body'.
-	 *
-	 * @return array $( selector )
-	 *
-	 * TODO:
-	 * Add optional dynamically-determined context,
-	 * for use in multi-segment infinite scroll
-	 */
-	function getContext() {
-
-		var selector = Config.get( 'context' ) || 'body';
-
-		return $( selector );
-
-	}
-
-	/**
 	 * Get Shortest Possible Size for Unit
 	 *
 	 * @param object unit
@@ -242,7 +221,6 @@
 		tallestAvailable:  tallestAvailable,
 		limitUnitHeight:   limitUnitHeight,
 		getUnitType:       getUnitType,
-		getContext:        getContext
 	};
 
 } ) );

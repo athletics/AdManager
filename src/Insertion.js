@@ -82,7 +82,7 @@
 
 	function setContext() {
 
-		$context = Util.getContext();
+		$context = $( Config.get( 'context' ) );
 
 	}
 
