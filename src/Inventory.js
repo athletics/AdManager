@@ -91,7 +91,7 @@
 			if ( sizes[1] <= limit ) {
 				return true;
 			}
-			unit.sizes.remove( index );
+			unit.sizes = Util.removeByKey( unit.sizes, index );
 		} );
 
 		return unit;

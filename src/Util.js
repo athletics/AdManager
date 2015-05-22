@@ -27,28 +27,12 @@
 
 } ( this, function ( $ ) {
 
-	var name = 'Util',
-		debugEnabled = true,
-		debug;
-
-	//////////////////////////////////////////////////////////////////////////////////////
-
-	function init() {
-
-		debug( name + ': initialized' );
-
-		initArrayRemove();
-
-	}
-
 	/**
 	 * Debug - console.log wrapper
 	 */
-	debug = function () {
+	var debug = function () {
 
-		if ( ! debugEnabled ) {
-			return;
-		} else if ( typeof console !== 'object' || ! console.log ) {
+		if ( typeof console !== 'object' || ! console.log ) {
 			return;
 		}
 
@@ -77,23 +61,29 @@
 
 	}
 
-	function initArrayRemove() {
+	/**
+	 * Remove by key.
+	 *
+	 * @param  {Array}   array
+	 * @param  {Integer} key
+	 * @return {Array}   array
+	 */
+	function removeByKey( array, key ) {
 
-		// Array Remove - By John Resig (MIT Licensed)
-		Array.prototype.remove = function ( from, to ) {
-			var rest = this.slice( ( to || from ) + 1 || this.length );
-			this.length = from < 0 ? this.length + from : from;
-			return this.push.apply( this, rest );
-		};
+		array = $.grep( array, function ( element, index ) {
+			return index !== key;
+		} );
+
+		return array;
 
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	return {
-		init:       init,
-		debug:      debug,
-		difference: difference
+		debug:       debug,
+		difference:  difference,
+		removeByKey: removeByKey
 	};
 
 } ) );

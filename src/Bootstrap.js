@@ -50,8 +50,6 @@
 		debug = Util.debug;
 
 		Config.init( newConfig );
-
-		Util.init();
 		Insertion.init();
 		Manager.init();
 
