@@ -2,6 +2,7 @@
   "name": "AdManager",
   "version": "0.3.1",
   "description": "Generic code for GPT ad management",
+  "main": "src/Index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/athletics/ad-manager.git"
