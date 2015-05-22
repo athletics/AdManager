@@ -3,87 +3,87 @@
  */
 ( function ( root, factory ) {
 
-	if ( typeof define === 'function' && define.amd ) {
+    if ( typeof define === 'function' && define.amd ) {
 
-		define( [
-			'jquery'
-		], factory );
+        define( [
+            'jquery'
+        ], factory );
 
-	} else if ( typeof exports === 'object' ) {
+    } else if ( typeof exports === 'object' ) {
 
-		module.exports = factory(
-			require( 'jquery' )
-		);
+        module.exports = factory(
+            require( 'jquery' )
+        );
 
-	} else {
+    } else {
 
-		root.AdManager = root.AdManager || {};
+        root.AdManager = root.AdManager || {};
 
-		root.AdManager.Util = factory(
-			root.jQuery
-		);
+        root.AdManager.Util = factory(
+            root.jQuery
+        );
 
-	}
+    }
 
 } ( this, function ( $ ) {
 
-	/**
-	 * Debug - console.log wrapper
-	 */
-	var debug = function () {
+    /**
+     * Debug - console.log wrapper
+     */
+    var debug = function () {
 
-		if ( typeof console !== 'object' || ! console.log ) {
-			return;
-		}
+        if ( typeof console !== 'object' || ! console.log ) {
+            return;
+        }
 
-		return Function.prototype.bind.call( console.log, console );
+        return Function.prototype.bind.call( console.log, console );
 
-	} ();
+    } ();
 
-	/**
-	 * Return difference between arrays
-	 *
-	 * @param  array array
-	 * @param  array values
-	 * @return array diff
-	 */
-	function difference( array, values ) {
+    /**
+     * Return difference between arrays
+     *
+     * @param  array array
+     * @param  array values
+     * @return array diff
+     */
+    function difference( array, values ) {
 
-		var diff = [];
+        var diff = [];
 
-		$.grep( array, function ( element ) {
-			if ( $.inArray( element, values ) === -1 ) {
-				diff.push( element );
-			}
-		} );
+        $.grep( array, function ( element ) {
+            if ( $.inArray( element, values ) === -1 ) {
+                diff.push( element );
+            }
+        } );
 
-		return diff;
+        return diff;
 
-	}
+    }
 
-	/**
-	 * Remove by key.
-	 *
-	 * @param  {Array}   array
-	 * @param  {Integer} key
-	 * @return {Array}   array
-	 */
-	function removeByKey( array, key ) {
+    /**
+     * Remove by key.
+     *
+     * @param  {Array}   array
+     * @param  {Integer} key
+     * @return {Array}   array
+     */
+    function removeByKey( array, key ) {
 
-		array = $.grep( array, function ( element, index ) {
-			return index !== key;
-		} );
+        array = $.grep( array, function ( element, index ) {
+            return index !== key;
+        } );
 
-		return array;
+        return array;
 
-	}
+    }
 
-	//////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	return {
-		debug:       debug,
-		difference:  difference,
-		removeByKey: removeByKey
-	};
+    return {
+        debug:       debug,
+        difference:  difference,
+        removeByKey: removeByKey
+    };
 
 } ) );
