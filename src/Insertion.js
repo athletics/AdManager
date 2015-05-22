@@ -3,523 +3,523 @@
  */
 ( function ( root, factory ) {
 
-	if ( typeof define === 'function' && define.amd ) {
+    if ( typeof define === 'function' && define.amd ) {
 
-		define( [
-			'jquery',
-			'./Util',
-			'./Config',
-			'./Manager',
-			'./Inventory'
-		], factory );
+        define( [
+            'jquery',
+            './Util',
+            './Config',
+            './Manager',
+            './Inventory'
+        ], factory );
 
-	} else if ( typeof exports === 'object' ) {
+    } else if ( typeof exports === 'object' ) {
 
-		module.exports = factory(
-			require( 'jquery' ),
-			require( './Util' ),
-			require( './Config' ),
-			require( './Manager' ),
-			require( './Inventory' )
-		);
+        module.exports = factory(
+            require( 'jquery' ),
+            require( './Util' ),
+            require( './Config' ),
+            require( './Manager' ),
+            require( './Inventory' )
+        );
 
-	} else {
+    } else {
 
-		root.AdManager = root.AdManager || {};
+        root.AdManager = root.AdManager || {};
 
-		root.AdManager.Insertion = factory(
-			root.jQuery,
-			root.AdManager.Util,
-			root.AdManager.Config,
-			root.AdManager.Manager,
-			root.AdManager.Inventory
-		);
+        root.AdManager.Insertion = factory(
+            root.jQuery,
+            root.AdManager.Util,
+            root.AdManager.Config,
+            root.AdManager.Manager,
+            root.AdManager.Inventory
+        );
 
-	}
+    }
 
 } ( this, function ( $, Util, Config, Manager, Inventory ) {
 
-	var name = 'Insertion',
-		debugEnabled = true,
-		debug = debugEnabled ? Util.debug : function () {},
-		$context = null,
-		$localContext = null,
-		inContent = false,
-		inventory = [],
-		odd = true,
-		localContext = null,
-		defaults = {
-			pxBetweenUnits: 800,
-			adHeightLimit: 1000,
-			insertExclusion: [
-				'img',
-				'iframe',
-				'video',
-				'audio',
-				'.video',
-				'.audio',
-				'.app_ad_unit'
-			]
-		};
+    var name = 'Insertion',
+        debugEnabled = true,
+        debug = debugEnabled ? Util.debug : function () {},
+        $context = null,
+        $localContext = null,
+        inContent = false,
+        inventory = [],
+        odd = true,
+        localContext = null,
+        defaults = {
+            pxBetweenUnits: 800,
+            adHeightLimit: 1000,
+            insertExclusion: [
+                'img',
+                'iframe',
+                'video',
+                'audio',
+                '.video',
+                '.audio',
+                '.app_ad_unit'
+            ]
+        };
 
-	//////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	function init() {
+    function init() {
 
-		debug( name + ': initialized' );
+        debug( name + ': initialized' );
 
-		defaults = $.extend( defaults, Manager.getDefaults() );
+        defaults = $.extend( defaults, Manager.getDefaults() );
 
-		bindHandlers();
+        bindHandlers();
 
-	}
+    }
 
-	function bindHandlers() {
+    function bindHandlers() {
 
-		$( document )
-			.on( 'GPT:initSequence', function () {
+        $( document )
+            .on( 'GPT:initSequence', function () {
 
-				debug( name + ': GPT:initSequence' );
-				/**
-				 * Begin qualification procedure when the DOM is ready
-				 */
-				qualifyContext();
+                debug( name + ': GPT:initSequence' );
+                /**
+                 * Begin qualification procedure when the DOM is ready
+                 */
+                qualifyContext();
 
-			} );
+            } );
 
-	}
+    }
 
-	function setContext() {
+    function setContext() {
 
-		$context = $( Config.get( 'context' ) );
+        $context = $( Config.get( 'context' ) );
 
-	}
+    }
 
-	/*
-	 * First qualify the DOM context where ads are to be inserted
-	 * to determine if insertion should proceed.
-	 *
-	 * @return object
-	 */
-	function qualifyContext() {
+    /*
+     * First qualify the DOM context where ads are to be inserted
+     * to determine if insertion should proceed.
+     *
+     * @return object
+     */
+    function qualifyContext() {
 
-		var inventoryData = Manager.getDynamicInventory();
+        var inventoryData = Manager.getDynamicInventory();
 
-		setContext();
-		inventory = inventory.length ? inventory : inventoryData.dynamicItems;
-		localContext = localContext ? localContext : inventoryData.localContext;
+        setContext();
+        inventory = inventory.length ? inventory : inventoryData.dynamicItems;
+        localContext = localContext ? localContext : inventoryData.localContext;
 
-		// Return if empty
-		if ( ! inventory.length ) {
-			broadcast();
-			return;
-		}
+        // Return if empty
+        if ( ! inventory.length ) {
+            broadcast();
+            return;
+        }
 
-		$localContext = $context.find( localContext ).first();
+        $localContext = $context.find( localContext ).first();
 
-		// Detect a local context
-		if ( $localContext.length ) {
-			inContent = true;
-		}
+        // Detect a local context
+        if ( $localContext.length ) {
+            inContent = true;
+        }
 
-		// Return if there is no insertion selector
-		if ( ! inContent ) {
-			broadcast();
-			return;
-		}
+        // Return if there is no insertion selector
+        if ( ! inContent ) {
+            broadcast();
+            return;
+        }
 
-		insertAdUnits();
-		return;
+        insertAdUnits();
+        return;
 
-	}
+    }
 
-	/**
-	 * Ad units have been inserted / proceed
-	 */
-	function broadcast() {
+    /**
+     * Ad units have been inserted / proceed
+     */
+    function broadcast() {
 
-		$.event.trigger( 'GPT:unitsInserted' );
+        $.event.trigger( 'GPT:unitsInserted' );
 
-	}
+    }
 
-	/**
-	 * Is Insertion Enabled?
-	 *
-	 * @return bool
-	 */
-	function isEnabled() {
+    /**
+     * Is Insertion Enabled?
+     *
+     * @return bool
+     */
+    function isEnabled() {
 
-		return Config.get( 'insertionEnabled' );
+        return Config.get( 'insertionEnabled' );
 
-	}
+    }
 
-	function insertAdUnits() {
+    function insertAdUnits() {
 
-		if ( inContent ) {
-			denoteValidInsertions();
-			insertPrimaryUnit();
-			insertSecondaryUnits();
-		}
-
-		broadcast();
-
-	}
-
-	function denoteValidInsertions() {
-
-		var $nodes = $localContext.children(),
-			excluded = Config.get( 'insertExclusion' ) || defaults.insertExclusion
-		;
-
-		$nodes.each( function ( i ) {
-
-			var $element = $( this ),
-				$prev = i > 0 ? $nodes.eq( i - 1 ) : false,
-				valid = true
-			;
+        if ( inContent ) {
+            denoteValidInsertions();
+            insertPrimaryUnit();
+            insertSecondaryUnits();
+        }
+
+        broadcast();
+
+    }
+
+    function denoteValidInsertions() {
+
+        var $nodes = $localContext.children(),
+            excluded = Config.get( 'insertExclusion' ) || defaults.insertExclusion
+        ;
+
+        $nodes.each( function ( i ) {
+
+            var $element = $( this ),
+                $prev = i > 0 ? $nodes.eq( i - 1 ) : false,
+                valid = true
+            ;
 
-			$.each( excluded, function ( index, item ) {
-				if ( $element.is( item ) || $element.find( item ).length ) {
-					valid = false; // not valid
-					return false; // break loop
-				}
-			} );
+            $.each( excluded, function ( index, item ) {
+                if ( $element.is( item ) || $element.find( item ).length ) {
+                    valid = false; // not valid
+                    return false; // break loop
+                }
+            } );
 
-			if ( $prev && $prev.is( 'p' ) && $prev.find( 'img' ).length === 1 ) {
-				valid = false;
-			}
-
-			$element.attr( 'data-valid-location', valid );
-
-		} );
-
-	}
-
-	/**
-	 * Check against of list of elements to skip
-	 *
-	 * @param  object $element
-	 * @return bool
-	 */
-	function isValidInsertionLocation( $element ) {
+            if ( $prev && $prev.is( 'p' ) && $prev.find( 'img' ).length === 1 ) {
+                valid = false;
+            }
+
+            $element.attr( 'data-valid-location', valid );
+
+        } );
+
+    }
+
+    /**
+     * Check against of list of elements to skip
+     *
+     * @param  object $element
+     * @return bool
+     */
+    function isValidInsertionLocation( $element ) {
 
-		return $element.data( 'valid-location' );
+        return $element.data( 'valid-location' );
 
-	}
+    }
 
-	/**
-	 * adUnitMarkup
-	 *
-	 * @param string unitId
-	 * @param bool disableFloat
-	 * @return string
-	 */
-	function adUnitMarkup( unitId, disableFloat ) {
+    /**
+     * adUnitMarkup
+     *
+     * @param string unitId
+     * @param bool disableFloat
+     * @return string
+     */
+    function adUnitMarkup( unitId, disableFloat ) {
 
-		var floatDisable = disableFloat || false,
-			type = Inventory.getUnitType( unitId ),
-			alignment = odd ? 'odd' : 'even',
-			$html = $( '<div />' );
+        var floatDisable = disableFloat || false,
+            type = Inventory.getUnitType( unitId ),
+            alignment = odd ? 'odd' : 'even',
+            $html = $( '<div />' );
 
-		$html
-			.addClass( defaults.adClass )
-			.attr( 'data-id', unitId )
-			.attr( 'data-client-type', type );
+        $html
+            .addClass( defaults.adClass )
+            .attr( 'data-id', unitId )
+            .attr( 'data-client-type', type );
 
-		if ( floatDisable ) {
-			$html
-				.addClass( 'disableFloat' );
-		} else {
-			$html
-				.addClass( 'inContent' )
-				.addClass( alignment );
-		}
+        if ( floatDisable ) {
+            $html
+                .addClass( 'disableFloat' );
+        } else {
+            $html
+                .addClass( 'inContent' )
+                .addClass( alignment );
+        }
 
-		if ( ! floatDisable ) {
-			odd = ! odd;
-		}
+        if ( ! floatDisable ) {
+            odd = ! odd;
+        }
 
-		return $html;
+        return $html;
 
-	}
+    }
 
-	/**
-	 * Insert Primary Unit: Unit most display above the fold
-	 */
-	function insertPrimaryUnit() {
+    /**
+     * Insert Primary Unit: Unit most display above the fold
+     */
+    function insertPrimaryUnit() {
 
-		var unit = getPrimaryUnit(),
-			tallest = Inventory.tallestAvailable( unit ),
-			shortest = Inventory.shortestAvailable( unit ),
-			location = findInsertionLocation( {
-				height: tallest,
-				limit: defaults.adHeightLimit
-			} ),
-			markup = null
-		;
+        var unit = getPrimaryUnit(),
+            tallest = Inventory.tallestAvailable( unit ),
+            shortest = Inventory.shortestAvailable( unit ),
+            location = findInsertionLocation( {
+                height: tallest,
+                limit: defaults.adHeightLimit
+            } ),
+            markup = null
+        ;
 
-		if ( ! location ) {
-			location = findInsertionLocation( {
-				height: shortest,
-				limit: defaults.adHeightLimit,
-				force: true
-			} );
+        if ( ! location ) {
+            location = findInsertionLocation( {
+                height: shortest,
+                limit: defaults.adHeightLimit,
+                force: true
+            } );
 
-			if ( ! location.disableFloat ) {
-				// unset large sizes
-				unit = Inventory.limitUnitHeight( unit, shortest );
-			}
-		}
+            if ( ! location.disableFloat ) {
+                // unset large sizes
+                unit = Inventory.limitUnitHeight( unit, shortest );
+            }
+        }
 
-		markup = adUnitMarkup( unit.id, location.disableFloat );
+        markup = adUnitMarkup( unit.id, location.disableFloat );
 
-		location.$insertBefore.before( markup );
+        location.$insertBefore.before( markup );
 
-	}
+    }
 
-	/**
-	 * Insert Secondary Unit: Ad units that commonly appear below the fold
-	 */
-	function insertSecondaryUnits() {
+    /**
+     * Insert Secondary Unit: Ad units that commonly appear below the fold
+     */
+    function insertSecondaryUnits() {
 
-		$.each( inventory, function ( index, unit ) {
+        $.each( inventory, function ( index, unit ) {
 
-			var tallest = Inventory.tallestAvailable( unit ),
-				location = findInsertionLocation( {
-					height: tallest
-				} ),
-				markup = null
-			;
+            var tallest = Inventory.tallestAvailable( unit ),
+                location = findInsertionLocation( {
+                    height: tallest
+                } ),
+                markup = null
+            ;
 
-			if ( ! location ) {
-				return false;
-			}
-
-			markup = adUnitMarkup( unit.id, location.disableFloat );
-			location.$insertBefore.before( markup );
+            if ( ! location ) {
+                return false;
+            }
+
+            markup = adUnitMarkup( unit.id, location.disableFloat );
+            location.$insertBefore.before( markup );
 
-		} );
+        } );
 
-	}
-
-	function getPrimaryUnit() {
+    }
+
+    function getPrimaryUnit() {
 
-		var primaryUnit = false;
+        var primaryUnit = false;
 
-		$.each( inventory, function ( index, unit ) {
+        $.each( inventory, function ( index, unit ) {
 
-			if ( unit.primary ) {
-				primaryUnit = unit;
-				inventory = Util.removeByKey( inventory, index );
-				return false;
-			}
+            if ( unit.primary ) {
+                primaryUnit = unit;
+                inventory = Util.removeByKey( inventory, index );
+                return false;
+            }
 
-		} );
+        } );
 
-		if ( ! primaryUnit ) {
-			primaryUnit = inventory[0];
-			inventory = Util.removeByKey( inventory, 0 );
-		}
+        if ( ! primaryUnit ) {
+            primaryUnit = inventory[0];
+            inventory = Util.removeByKey( inventory, 0 );
+        }
 
-		return primaryUnit;
+        return primaryUnit;
 
-	}
-
-	/**
-	 * findInsertionLocation
-	 *
-	 * @param object options
-	 * @return object or boolean:false
-	 */
-	function findInsertionLocation( options ) {
+    }
+
+    /**
+     * findInsertionLocation
+     *
+     * @param object options
+     * @return object or boolean:false
+     */
+    function findInsertionLocation( options ) {
 
-		options = options || {};
+        options = options || {};
 
-		var $nodes = getNodes(),
-			nodeSearch = new NodeSearch( {
-				$nodes: $nodes,
-				force: options.force ? options.force : false,
-				limit: options.limit ? options.limit : false,
-				height: options.height
-			} )
-		;
+        var $nodes = getNodes(),
+            nodeSearch = new NodeSearch( {
+                $nodes: $nodes,
+                force: options.force ? options.force : false,
+                limit: options.limit ? options.limit : false,
+                height: options.height
+            } )
+        ;
 
-		if ( ! $nodes.length ) {
-			return false;
-		}
+        if ( ! $nodes.length ) {
+            return false;
+        }
 
-		// Loop through each node as necessary
-		$.each( $nodes, function ( i, node ) {
+        // Loop through each node as necessary
+        $.each( $nodes, function ( i, node ) {
 
-			var exitLoop = nodeSearch.verifyNode( i, $( node ) );
+            var exitLoop = nodeSearch.verifyNode( i, $( node ) );
 
-			if ( exitLoop ) {
-				return false;
-			} else if ( ! exitLoop ) {
-				return true;
-			}
+            if ( exitLoop ) {
+                return false;
+            } else if ( ! exitLoop ) {
+                return true;
+            }
 
-		} );
+        } );
 
-		if ( ! nodeSearch.locationFound ) {
-			return false;
-		}
+        if ( ! nodeSearch.locationFound ) {
+            return false;
+        }
 
-		nodeSearch.markValidNodes();
-		nodeSearch.setLastPosition();
+        nodeSearch.markValidNodes();
+        nodeSearch.setLastPosition();
 
-		return {
-			'$insertBefore': nodeSearch.$insertBefore,
-			'disableFloat': nodeSearch.disableFloat
-		};
+        return {
+            '$insertBefore': nodeSearch.$insertBefore,
+            'disableFloat': nodeSearch.disableFloat
+        };
 
-	}
+    }
 
-	/**
-	 * Search object used for determining insertion points
-	 */
-	function NodeSearch( options ) {
+    /**
+     * Search object used for determining insertion points
+     */
+    function NodeSearch( options ) {
 
-		this.totalHeight = 0;
-		this.marginDifference = 40;
-		this.inserted = [];
-		this.$insertBefore = null;
-		this.disableFloat = false;
-		this.locationFound = false;
-		this.validHeight = 0;
-		this.exitLoop = false;
-		this.height = options.height;
-		this.force = options.force;
-		this.limit = options.limit;
-		this.$nodes = options.$nodes;
-		this.lastPosition = 0;
-		this.neededheight = options.height - this.marginDifference;
+        this.totalHeight = 0;
+        this.marginDifference = 40;
+        this.inserted = [];
+        this.$insertBefore = null;
+        this.disableFloat = false;
+        this.locationFound = false;
+        this.validHeight = 0;
+        this.exitLoop = false;
+        this.height = options.height;
+        this.force = options.force;
+        this.limit = options.limit;
+        this.$nodes = options.$nodes;
+        this.lastPosition = 0;
+        this.neededheight = options.height - this.marginDifference;
 
-	}
+    }
 
-	/**
-	 * Store the position of the last ad
-	 */
-	NodeSearch.prototype.setLastPosition = function () {
+    /**
+     * Store the position of the last ad
+     */
+    NodeSearch.prototype.setLastPosition = function () {
 
-		this.lastPosition = this.$insertBefore.offset().top + this.neededheight;
+        this.lastPosition = this.$insertBefore.offset().top + this.neededheight;
 
-	};
+    };
 
-	/**
-	 * Mark nodes where insertion is valid
-	 */
-	NodeSearch.prototype.markValidNodes = function () {
+    /**
+     * Mark nodes where insertion is valid
+     */
+    NodeSearch.prototype.markValidNodes = function () {
 
-		if ( this.inserted.length ) {
-			$.each( this.inserted, function ( index, item ) {
-				$( item ).data( 'valid-location', false );
-			} );
-		}
+        if ( this.inserted.length ) {
+            $.each( this.inserted, function ( index, item ) {
+                $( item ).data( 'valid-location', false );
+            } );
+        }
 
-	};
+    };
 
-	/**
-	 * Verify each node to find a suitable insertion point
-	 *
-	 * @return boolean
-	 */
-	NodeSearch.prototype.verifyNode = function ( index, $node ) {
+    /**
+     * Verify each node to find a suitable insertion point
+     *
+     * @return boolean
+     */
+    NodeSearch.prototype.verifyNode = function ( index, $node ) {
 
-		var since = $node.offset().top - this.lastPosition,
-			height = $node.outerHeight(),
-			isLast = ( this.$nodes.length - 1 ) === index;
+        var since = $node.offset().top - this.lastPosition,
+            height = $node.outerHeight(),
+            isLast = ( this.$nodes.length - 1 ) === index;
 
-		this.totalHeight += height;
+        this.totalHeight += height;
 
-		if ( this.force && ( this.totalHeight >= this.limit || isLast ) ) {
+        if ( this.force && ( this.totalHeight >= this.limit || isLast ) ) {
 
-			this.$insertBefore = $node;
-			this.disableFloat = true;
-			this.locationFound = true;
-			this.exitLoop = true;
+            this.$insertBefore = $node;
+            this.disableFloat = true;
+            this.locationFound = true;
+            this.exitLoop = true;
 
-		} else if ( this.limit && ( this.totalHeight >= this.limit || isLast ) ) {
+        } else if ( this.limit && ( this.totalHeight >= this.limit || isLast ) ) {
 
-			this.locationFound = false;
-			this.exitLoop = true;
+            this.locationFound = false;
+            this.exitLoop = true;
 
-		} else if ( isValidInsertionLocation( $node ) ) {
+        } else if ( isValidInsertionLocation( $node ) ) {
 
-			this.validHeight += height;
-			this.inserted.push( $node );
+            this.validHeight += height;
+            this.inserted.push( $node );
 
-			if ( this.$insertBefore === null ) {
-				this.$insertBefore = $node;
-			}
+            if ( this.$insertBefore === null ) {
+                this.$insertBefore = $node;
+            }
 
-			if ( this.validHeight >= this.neededheight ) {
+            if ( this.validHeight >= this.neededheight ) {
 
-				if ( ! this.limit && ( since < defaults.pxBetweenUnits ) ) {
+                if ( ! this.limit && ( since < defaults.pxBetweenUnits ) ) {
 
-					this.validHeight = 0;
-					this.$insertBefore = null;
+                    this.validHeight = 0;
+                    this.$insertBefore = null;
 
-				}
+                }
 
-				this.locationFound = true;
-				this.exitLoop = true;
+                this.locationFound = true;
+                this.exitLoop = true;
 
-			}
+            }
 
-		} else {
+        } else {
 
-			this.validHeight = 0;
-			this.$insertBefore = null;
-			this.exitLoop = null;
+            this.validHeight = 0;
+            this.$insertBefore = null;
+            this.exitLoop = null;
 
-		}
+        }
 
-		return this.exitLoop;
+        return this.exitLoop;
 
-	};
+    };
 
-	/**
-	 * Is Element an Ad Unit
-	 *
-	 * @param mixed $el
-	 * @return bool
-	 */
-	function isThisAnAd( $el ) {
+    /**
+     * Is Element an Ad Unit
+     *
+     * @param mixed $el
+     * @return bool
+     */
+    function isThisAnAd( $el ) {
 
-		if ( ! $el ) {
-			return false;
-		}
+        if ( ! $el ) {
+            return false;
+        }
 
-		return $el.is( defaults.adSelector );
+        return $el.is( defaults.adSelector );
 
-	}
+    }
 
-	/**
-	 * Get Nodes to Loop Through
-	 *
-	 * @return array $nodes
-	 */
-	function getNodes() {
+    /**
+     * Get Nodes to Loop Through
+     *
+     * @return array $nodes
+     */
+    function getNodes() {
 
-		var $prevUnit = $localContext.find( defaults.adSelector ).last(),
-			$nodes = null;
+        var $prevUnit = $localContext.find( defaults.adSelector ).last(),
+            $nodes = null;
 
-		// nodes after previous unit or all nodes
-		if ( $prevUnit.length ) {
-			$nodes = $prevUnit.nextAll( $localContext );
-		} else {
-			$nodes = $localContext.children();
-		}
+        // nodes after previous unit or all nodes
+        if ( $prevUnit.length ) {
+            $nodes = $prevUnit.nextAll( $localContext );
+        } else {
+            $nodes = $localContext.children();
+        }
 
-		return $nodes;
+        return $nodes;
 
-	}
+    }
 
-	//////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	return {
-		init: init
-	};
+    return {
+        init: init
+    };
 
 } ) );
