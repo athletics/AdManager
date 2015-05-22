@@ -310,7 +310,7 @@
 
 			if ( unit.primary ) {
 				primaryUnit = unit;
-				inventory.remove( index );
+				inventory = Util.removeByKey( inventory, index );
 				return false;
 			}
 
@@ -318,7 +318,7 @@
 
 		if ( ! primaryUnit ) {
 			primaryUnit = inventory[0];
-			inventory.remove( 0 );
+			inventory = Util.removeByKey( inventory, 0 );
 		}
 
 		return primaryUnit;
