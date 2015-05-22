@@ -7,13 +7,13 @@ var pkg = require( './package.json' );
 var rjs = function ( name, out, optimize ) {
 
 	var ext = optimize ? '.min.js' : '.js',
-		banner = '/**\n' +
+		banner = '/*!\n' +
 			' * ' + pkg.name + ' - ' + pkg.description + '\n' +
 			' *\n' +
 			' * @author ' + pkg.author.name + ' - ' + pkg.author.url + '\n' +
 			' * @see ' + pkg.homepage + '\n' +
 			' * @version ' + pkg.version + '\n' +
-			' */\n';
+			' */';
 
 	requirejs.optimize( {
 		name: name,

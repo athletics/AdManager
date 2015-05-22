@@ -1,5 +1,5 @@
 {
-  "name": "ad-manager",
+  "name": "AdManager",
   "version": "0.3.1",
   "description": "Generic code for GPT ad management",
   "repository": {
@@ -10,7 +10,7 @@
     "name": "Athletics",
     "url": "http://athleticsnyc.com"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "homepage": "https://github.com/athletics/ad-manager",
   "devDependencies": {
     "gulp": "^3.8.11",
