@@ -29,8 +29,8 @@ var rjs = function ( name, out, optimize ) {
 };
 
 gulp.task( 'js', function () {
-    rjs( './src/Bootstrap', './dist/AdManager', false );
-    rjs( './src/Bootstrap', './dist/AdManager', true );
+    rjs( './src/Index', './dist/AdManager', false );
+    rjs( './src/Index', './dist/AdManager', true );
 } );
 
 gulp.task( 'watch', function () {
