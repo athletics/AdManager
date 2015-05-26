@@ -106,19 +106,30 @@
     }
 
     /**
-     * removeDefinedSlot
+     * Remove slot by name.
      *
-     * @param string name
-     * @return object definedSlot
+     * @param  {Object} definedSlots
+     * @param  {String} name
+     * @return {Object} definedSlots
      */
-    function removeDefinedSlot( name ) {
+    function removeDefinedSlot( definedSlots, name ) {
 
-        $.each( definedSlots, function ( index, slot ) {
-            var unitName = slot.getAdUnitPath().replace( '/' + account + '/', '' );
-            if ( unitName === name ) {
-                definedSlots = Util.removeByKey( definedSlots, index );
+        for ( var i = 0; i < definedSlots.length; i++ ) {
+
+            var unitName = definedSlots[ i ].getAdUnitPath()
+                .replace( '/' + Config.get( 'account' ) + '/', '' );
+
+            if ( unitName !== name ) {
+                continue;
             }
-        } );
+
+            definedSlots = Util.removeByKey( definedSlots, i );
+
+            break;
+
+        }
+
+        return definedSlots;
 
     }
 

@@ -386,7 +386,7 @@
             ;
             googletag.pubads().refresh( [ slot ] );
             googletag.display( position.idName );
-            Inventory.removeDefinedSlot( position.slot );
+            definedSlots = Inventory.removeDefinedSlot( definedSlots, position.slot );
         } );
 
     }
