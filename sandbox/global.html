@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>AdManager</title>
+    <title>AdManager</title>
 </head>
 <body>
-	<h1>AdManager</h1>
-	<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
-	<script type="text/javascript" src="/src/Util.js"></script>
-	<script type="text/javascript" src="/src/Config.js"></script>
-	<script type="text/javascript" src="/src/Manager.js"></script>
-	<script type="text/javascript" src="/src/Insertion.js"></script>
-	<script type="text/javascript" src="/src/Bootstrap.js"></script>
-	<script type="text/javascript">
-		AdManager( {} );
-	</script>
+    <h1>AdManager</h1>
+    <script type="text/javascript" src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/dist/AdManager.js"></script>
+    <script type="text/javascript">
+        ( function () {
+            var config = {};
+            AdManager( config );
+        } () );
+    </script>
 </body>
 </html>
