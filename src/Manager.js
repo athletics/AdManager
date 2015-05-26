@@ -237,7 +237,7 @@
 
             for ( var i = 0; i < pagePositions.length; i++ ) {
 
-                incrementAdSlot( pagePositions[ i ] );
+                Inventory.incrementAdSlot( pagePositions[ i ] );
                 currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
 
                 if ( typeof currentPosition.id == 'undefined' ) {
@@ -324,30 +324,6 @@
             lineItemId: unit.lineItemId,
             serviceName: unit.serviceName
         } );
-
-    }
-
-    /**
-     * Increment Ad Slot
-     *
-     * @param string unit
-     */
-    function incrementAdSlot( unit ) {
-
-        for ( var i = 0; i < inventory.length; i++ ) {
-            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
-                continue;
-            }
-
-            if ( typeof inventory[ i ].iteration == 'undefined' ) {
-                inventory[ i ].iteration = 0;
-            }
-
-            // increment
-            inventory[ i ].iteration = inventory[ i ].iteration + 1;
-
-            return;
-        }
 
     }
 
