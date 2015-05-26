@@ -40,11 +40,7 @@
         pagePositions = [],
         inventory = [],
         account = null,
-        defaults = {
-            adClass:           'app_ad_unit',      // Outer ad wrap
-            adUnitTargetClass: 'app_unit_target',  // Inner ad wrap
-            adSelector:        ''                  // Leave blank
-        };
+        adSelector = '';
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -54,9 +50,10 @@
             return;
         }
 
-        defaults.adSelector = '.' + defaults.adClass;
-        inventory = getInventory();
+        inventory = Config.get( 'inventory' );
         account = Config.get( 'account' );
+        adSelector = Config.get( 'adSelector' );
+
         bindHandlers();
         loadLibrary();
 
@@ -273,7 +270,7 @@
         var clientType = Config.get( 'clientType' ),
             $context = $( Config.get( 'context' ) ),
             $units = null,
-            selector = defaults.adSelector
+            selector = adSelector
         ;
 
         if ( clientType !== false ) {
@@ -312,7 +309,7 @@
 
                 // find the empty container div on the page. we
                 // will dynamically instantiate the unique ad unit.
-                $unit = $context.find( defaults.adSelector + '[data-id="' + currentPosition.id + '"]' );
+                $unit = $context.find( adSelector + '[data-id="' + currentPosition.id + '"]' );
                 $unitTarget = $( '<div />' );
 
                 if ( $unit.length < 1 ) {
@@ -320,7 +317,7 @@
                 }
 
                 // generate new div
-                $unitTarget.addClass( defaults.adUnitTargetClass );
+                $unitTarget.addClass( Config.get( 'adUnitTargetClass' ) );
                 $unitTarget.attr( 'id', currentPosition.idName );
                 $unit.append( $unitTarget );
 
@@ -552,16 +549,12 @@
         var $context = options.$context,
             removeContainer = options.removeContainer || false;
 
-        $context.find( defaults.adSelector ).empty();
+        $context.find( adSelector ).empty();
 
         if ( removeContainer ) {
-            $context.find( defaults.adSelector ).remove();
+            $context.find( adSelector ).remove();
         }
 
-    }
-
-    function getDefaults() {
-        return defaults;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -569,7 +562,6 @@
     return {
         init:                init,
         isEnabled:           isEnabled,
-        getDefaults:         getDefaults,
         getAdInfo:           getAdInfo,
         displaySlot:         displaySlot,
         removeDefinedSlot:   removeDefinedSlot,
