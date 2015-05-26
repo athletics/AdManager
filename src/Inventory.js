@@ -170,7 +170,8 @@
      */
     function getAdInfo( unit ) {
 
-        var adInfo = {};
+        var adInfo = {},
+            inventory = getInventory();
 
         for ( var i = 0; i < inventory.length; i++ ) {
             if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
