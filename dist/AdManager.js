@@ -1,682 +1,1606 @@
-/**
- * ad-manager - Generic code for GPT ad management
+/*!
+ * AdManager - Generic code for GPT ad management
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.3.1 ( 2015-05-19 )
+ * @version 0.3.1
+ *//**
+ * Util
  */
-var admanager = function(app, $) {
-    if (typeof app.initialized === "undefined") {
-        app.initialized = false;
-    }
-    app.bootstrap = function($) {
-        var name = "Bootstrap", debug = null, initCallbacks = [];
-        function init(config) {
-            if (app.initialized) {
-                return false;
-            }
-            admanager.config = config || false;
-            if (!admanager.config) {
-                throw new Error("Please provide config");
-            }
-            debug = admanager.util.debug ? admanager.util.debug : function() {};
-            app.util.init().manager.init().insertion.init();
-            for (var i = 0; i < initCallbacks.length; i++) {
-                initCallbacks[i]();
-            }
-            debug(name + ": initialized");
-            app.initialized = true;
-            return app;
-        }
-        function register(callback) {
-            initCallbacks.push(callback);
-        }
-        return {
-            init: init,
-            register: register
-        };
-    }();
-    return app;
-}(admanager || {}, jQuery);
+( function ( root, factory ) {
 
-var admanager = function(app, $) {
-    app.insertion = function($) {
-        var name = "Insertion", debug = null, $context = null, $localContext = null, inContent = false, inventory = [], odd = true, localContext = null, defaults = {
-            pxBetweenUnits: 800,
-            adHeightLimit: 1e3,
-            insertExclusion: [ "img", "iframe", "video", "audio", ".video", ".audio", ".app_ad_unit" ]
+    if ( typeof define === 'function' && define.amd ) {
+
+        define( 'src/Util',[
+            'jquery'
+        ], factory );
+
+    } else if ( typeof exports === 'object' ) {
+
+        module.exports = factory(
+            require( 'jquery' )
+        );
+
+    } else {
+
+        root.AdManager = root.AdManager || {};
+
+        root.AdManager.Util = factory(
+            root.jQuery
+        );
+
+    }
+
+} ( this, function ( $ ) {
+
+    /**
+     * Debug: a console.log wrapper.
+     *
+     * @return {String}
+     */
+    var debug = function () {
+
+        if ( typeof console !== 'object' || ! console.log ) {
+            return;
+        }
+
+        return Function.prototype.bind.call( console.log, console );
+
+    } ();
+
+    /**
+     * Return difference between arrays.
+     *
+     * @param  {Array} array
+     * @param  {Array} values
+     * @return {Array} diff
+     */
+    function difference( array, values ) {
+
+        var diff = [];
+
+        $.grep( array, function ( element ) {
+            if ( $.inArray( element, values ) === -1 ) {
+                diff.push( element );
+            }
+        } );
+
+        return diff;
+
+    }
+
+    /**
+     * Remove by key.
+     *
+     * @param  {Array}   array
+     * @param  {Integer} key
+     * @return {Array}   array
+     */
+    function removeByKey( array, key ) {
+
+        array = $.grep( array, function ( element, index ) {
+            return index !== key;
+        } );
+
+        return array;
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    return {
+        debug:       debug,
+        difference:  difference,
+        removeByKey: removeByKey
+    };
+
+} ) );
+/**
+ * Config
+ */
+( function ( root, factory ) {
+
+    if ( typeof define === 'function' && define.amd ) {
+
+        define( 'src/Config',[
+            'jquery',
+            './Util'
+        ], factory );
+
+    } else if ( typeof exports === 'object' ) {
+
+        module.exports = factory(
+            require( 'jquery' ),
+            require( './Util' )
+        );
+
+    } else {
+
+        root.AdManager = root.AdManager || {};
+
+        root.AdManager.Config = factory(
+            root.jQuery,
+            root.AdManager.Util
+        );
+
+    }
+
+} ( this, function ( $, Util ) {
+
+    var name = 'Config',
+        debugEnabled = true,
+        debug = debugEnabled ? Util.debug : function () {},
+        config = {
+            account:             null,               // DFP account ID
+            adClass:             'app_ad_unit',      // Outer ad wrap
+            adUnitTargetClass:   'app_unit_target',  // Inner ad wrap
+            clientType:          false,              // Used to filter inventory
+            context:             'body',             // Selector for ad filling container
+            enabled:             true,               // Turn off ads
+            insertExclusion:     [],                 // Inventory to exclude from dynamic insertion
+            insertionEnabled:    false,              // Enable dynamic insertion
+            insertion:           {
+                pxBetweenUnits:  800,                // Minimum space b/w dynamically inserted units
+                adHeightLimit:   1000,               // Max-height for dynamic units
+                insertExclusion: [                   // Skip these elements when inserting units
+                    'img',
+                    'iframe',
+                    'video',
+                    'audio',
+                    '.video',
+                    '.audio',
+                    '.app_ad_unit'
+                ]
+            },
+            inventory:           [],                 // Inventory of ad units
+            pageConfigAttr:      false,              // Selector for dynamic config import
+            targeting:           []                  // Key value pairs to send with DFP request
         };
-        function init() {
-            debug = admanager.util.debug ? admanager.util.debug : function() {};
-            debug(name + ": initialized");
-            defaults = $.extend(defaults, app.manager.getDefaults());
-            bindHandlers();
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Initialize the config module.
+     *
+     * @param  {Object} newConfig The AdManager config object.
+     */
+    function init( newConfig ) {
+
+        config = $.extend( config, newConfig );
+
+    }
+
+    /**
+     * Set
+     *
+     * @param  {String} key
+     * @param  {Mixed}  value
+     * @return {Object} config
+     */
+    function set( key, value ) {
+
+        return setConfigValue( config, key, value );
+
+    }
+
+    /**
+     * Get
+     *
+     * @param  {String|Null} key Optional.
+     * @return {Mixed}
+     */
+    function get( key ) {
+
+        key = key || false;
+
+        if ( ! key ) {
+            return config;
         }
-        function bindHandlers() {
-            $(document).on("GPT:initSequence", function() {
-                debug(name + ": GPT:initSequence");
-                qualifyContext();
-            });
+
+        // get selector from className
+        // use with `adClass`, `adUnitTargetClass`, etc.
+        var index = key.indexOf( 'Selector', this.length - 'Selector'.length );
+
+        if ( index !== -1 ) {
+            key = key.slice( 0, index ) + 'Class';
+            return '.' + getConfigValue( config, key ).replace( /^\./, '' );
         }
-        function setContext() {
-            $context = app.util.getContext();
+
+        return getConfigValue( config, key );
+
+    }
+
+    /**
+     * Set config value. Uses recursion to set nested values.
+     *
+     * @param  {Object} config
+     * @param  {String} key
+     * @param  {Mixed}  value
+     * @return {Object} config
+     */
+    function setConfigValue( config, key, value ) {
+
+        if ( typeof key === 'string' ) {
+            key = key.split( '.' );
         }
-        function qualifyContext() {
-            var inventoryData = app.manager.getDynamicInventory();
-            setContext();
-            inventory = inventory.length ? inventory : inventoryData.dynamicItems;
-            localContext = localContext ? localContext : inventoryData.localContext;
-            if (!inventory.length) {
-                broadcast();
-                return app;
+
+        if ( key.length > 1 ) {
+            setConfigValue( config[ key.shift() ], key, value );
+        } else {
+            config[ key[0] ] = value;
+        }
+
+        return config;
+
+    }
+
+    /**
+     * Get config value. Uses recursion to get nested values.
+     *
+     * @param  {Object} config
+     * @param  {String} key
+     * @return {Mixed}
+     */
+    function getConfigValue( config, key ) {
+
+        if ( typeof key === 'string' ) {
+            key = key.split( '.' );
+        }
+
+        if ( key.length > 1 ) {
+            return getConfigValue( config[ key.shift() ], key );
+        } else {
+            return key[0] in config ? config[ key[0] ] : null;
+        }
+
+    }
+
+    /**
+     * Import JSON page config data from DOM
+     *
+     * This imports inline JSON via data attribute
+     * and extends an existing config with it.
+     *
+     * @param object options.$context
+     * @param string options.attrName
+     * @return object
+     */
+    function importConfig( options ) {
+
+        var $context = options.$context,
+            attrName = options.attrName,
+            existConfig = options.existConfig,
+            selector,
+            newConfig,
+            data = {};
+
+        selector = '*[data-' + attrName + ']';
+        newConfig = $.extend( {}, existConfig );
+        data = $context.find( selector ).data( attrName );
+
+        if ( typeof newConfig === 'object' ) {
+            newConfig = $.extend( newConfig, data );
+        }
+
+        return newConfig;
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    return {
+        init: init,
+        set:  set,
+        get:  get
+    };
+
+} ) );
+/**
+ * Inventory
+ */
+( function ( root, factory ) {
+
+    if ( typeof define === 'function' && define.amd ) {
+
+        define( 'src/Inventory',[
+            'jquery',
+            './Util',
+            './Config'
+        ], factory );
+
+    } else if ( typeof exports === 'object' ) {
+
+        module.exports = factory(
+            require( 'jquery' ),
+            require( './Util' ),
+            require( './Config' )
+        );
+
+    } else {
+
+        root.AdManager = root.AdManager || {};
+
+        root.AdManager.Inventory = factory(
+            root.jQuery,
+            root.AdManager.Util,
+            root.AdManager.Config
+        );
+
+    }
+
+} ( this, function ( $, Util, Config ) {
+
+    var name = 'Inventory',
+        debugEnabled = true,
+        debug = debugEnabled ? Util.debug : function () {};
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Get sanitized inventory.
+     *
+     * @return {Object}
+     */
+    function getInventory() {
+
+        return getAvailableSizes( inventoryCleanTypes( Config.get( 'inventory' ) ) );
+
+    }
+
+    /**
+     * Add default unit type if not set.
+     *
+     * @param  {Array} inventory
+     * @return {Array} inventory
+     */
+    function inventoryCleanTypes( inventory ) {
+
+        for ( var i = 0; i < inventory.length; i++ ) {
+
+            if ( typeof inventory[ i ].type !== 'undefined' ) {
+                continue;
             }
-            $localContext = $context.find(localContext).first();
-            if ($localContext.length) {
-                inContent = true;
-            }
-            if (!inContent) {
-                broadcast();
-                return app;
-            }
-            insertAdUnits();
-            return app;
+
+            inventory[ i ].type = 'default';
+
         }
-        function broadcast() {
-            $.event.trigger("GPT:unitsInserted");
+
+        return inventory;
+
+    }
+
+    /**
+     * Remove sizes from inventory that will not display properly.
+     *
+     * @todo   Simplify and remove limits.
+     *
+     * @param  {Array} inventory
+     * @return {Array} inventory
+     */
+    function getAvailableSizes( inventory ) {
+
+        var width = ( window.innerWidth > 0 ) ? window.innerWidth : screen.width;
+
+        if ( width > 1024 ) {
+            return inventory;
         }
-        function isEnabled() {
-            var pageConfig = app.manager.getConfig();
-            if (typeof pageConfig.insertionEnabled === "undefined") {
+
+        if ( width >= 768 && width <= 1024 ) {
+
+            var max = 980;
+
+            for ( var i = 0; i < inventory.length; i++ ) {
+                var sizesToRemove = [];
+                for ( var j = 0; j < inventory[ i ].sizes.length; j++ ) {
+                    if ( inventory[ i ].sizes[ j ][0] > max ) {
+                        sizesToRemove.push( inventory[ i ].sizes[ j ] );
+                    }
+                }
+                inventory[ i ].sizes = Util.difference( inventory[ i ].sizes, sizesToRemove );
+            }
+        }
+
+        return inventory;
+
+    }
+
+    /**
+     * Remove slot by name.
+     *
+     * @param  {Object} definedSlots
+     * @param  {String} name
+     * @return {Object} definedSlots
+     */
+    function removeDefinedSlot( definedSlots, name ) {
+
+        for ( var i = 0; i < definedSlots.length; i++ ) {
+
+            var unitName = definedSlots[ i ].getAdUnitPath()
+                .replace( '/' + Config.get( 'account' ) + '/', '' );
+
+            if ( unitName !== name ) {
+                continue;
+            }
+
+            definedSlots = Util.removeByKey( definedSlots, i );
+
+            break;
+
+        }
+
+        return definedSlots;
+
+    }
+
+    /**
+     * Get ad units for dynamic insertion.
+     *
+     * @return {Object}
+     */
+    function getDynamicInventory() {
+
+        var dynamicItems = [],
+            type = Config.get( 'clientType' ),
+            inventory = getInventory(),
+            localContext;
+
+        $.each( inventory, function ( index, position ) {
+            if ( ( typeof position.dynamic !== 'undefined' ) && ( position.dynamic === true ) ) {
+                if ( ! type || type === position.type ) {
+                    dynamicItems.push( position );
+                    localContext = position.localContext;
+                }
+            }
+        } );
+
+        return {
+            dynamicItems: dynamicItems,
+            localContext: localContext
+        };
+
+    }
+
+    /**
+     * Get Ad Unit Info
+     *
+     * @param  {String} unit
+     * @return {Object} adInfo
+     */
+    function getAdInfo( unit ) {
+
+        var adInfo = {},
+            inventory = getInventory();
+
+        for ( var i = 0; i < inventory.length; i++ ) {
+            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
+                continue;
+            }
+
+            // build return object
+            adInfo = inventory[ i ];
+
+            // determine the object's idName
+            if ( typeof adInfo.useIterator !== 'undefined' && ! adInfo.useIterator ) {
+                // don't use the iterator
+                adInfo.idName = adInfo.id;
+            } else {
+                // use the iterator
+                adInfo.idName = adInfo.id + '_' + adInfo.iteration;
+            }
+
+            return adInfo;
+        }
+
+        return adInfo;
+
+    }
+
+    /**
+     * Get Shortest Possible Size for Unit
+     *
+     * @param  {Object}  unit
+     * @return {Integer} shortest
+     */
+    function shortestAvailable( unit ) {
+
+        var shortest = 0;
+
+        $.each( unit.sizes, function ( index, sizes ) {
+            if ( shortest === 0 ) {
+                shortest = sizes[1];
+            } else if ( sizes[1] < shortest ) {
+                shortest = sizes[1];
+            }
+        } );
+
+        return shortest;
+
+    }
+
+    /**
+     * Get Tallest Possible Size for Unit
+     *
+     * @param  {Object}  unit
+     * @return {Integer} tallest
+     */
+    function tallestAvailable( unit ) {
+
+        var tallest = 0;
+
+        $.each( unit.sizes, function ( index, sizes ) {
+            if ( sizes[1] > tallest ) {
+                tallest = sizes[1];
+            }
+        } );
+
+        return tallest;
+
+    }
+
+    /**
+     * Limit Ad Unit Height: Removes Larger Sizes from Inventory
+     *
+     * @param  {Object}  unit
+     * @param  {Integer} limit
+     * @return {Object}  unit
+     */
+    function limitUnitHeight( unit, limit ) {
+
+        $.each( unit.sizes, function ( index, sizes ) {
+            if ( sizes[1] <= limit ) {
+                return true;
+            }
+            unit.sizes = Util.removeByKey( unit.sizes, index );
+        } );
+
+        return unit;
+
+    }
+
+    /**
+     * Get Unit Type
+     *
+     * @param  {String} id
+     * @return {String} type
+     */
+    function getUnitType( id ) {
+
+        var type = 'default';
+
+        $.each( getInventory(), function ( index, unit ) {
+
+            if ( unit.id !== id ) {
+                return true;
+            }
+
+            type = unit.type;
+
+            return false;
+
+        } );
+
+        return type;
+
+    }
+
+    /**
+     * Increment ad slot.
+     *
+     * @param {String} unit
+     */
+    function incrementAdSlot( unit ) {
+
+        var inventory = Config.get( 'inventory' );
+
+        for ( var i = 0; i < inventory.length; i++ ) {
+
+            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
+                continue;
+            }
+
+            inventory[ i ].iteration = typeof inventory[ i ].iteration === 'undefined' ? 0 : inventory[ i ].iteration + 1;
+
+            Config.set( 'inventory', inventory );
+
+            break;
+
+        }
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    return {
+        getInventory:        getInventory,
+        getAdInfo:           getAdInfo,
+        getDynamicInventory: getDynamicInventory,
+        shortestAvailable:   shortestAvailable,
+        tallestAvailable:    tallestAvailable,
+        limitUnitHeight:     limitUnitHeight,
+        getUnitType:         getUnitType,
+        incrementAdSlot:     incrementAdSlot
+    };
+
+} ) );
+/**
+ * Manager
+ */
+( function ( root, factory ) {
+
+    if ( typeof define === 'function' && define.amd ) {
+
+        define( 'src/Manager',[
+            'jquery',
+            './Util',
+            './Config',
+            './Inventory'
+        ], factory );
+
+    } else if ( typeof exports === 'object' ) {
+
+        module.exports = factory(
+            require( 'jquery' ),
+            require( './Util' ),
+            require( './Config' ),
+            require( './Inventory' )
+        );
+
+    } else {
+
+        root.AdManager = root.AdManager || {};
+
+        root.AdManager.Manager = factory(
+            root.jQuery,
+            root.AdManager.Util,
+            root.AdManager.Config,
+            root.AdManager.Inventory
+        );
+
+    }
+
+} ( this, function ( $, Util, Config, Inventory ) {
+
+    var name = 'Manager',
+        debugEnabled = true,
+        debug = debugEnabled ? Util.debug : function () {},
+        definedSlots = [],
+        pagePositions = [],
+        inventory = [],
+        account = null,
+        adSelector = '';
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    function init() {
+
+        if ( ! isEnabled() ) {
+            return;
+        }
+
+        inventory = Inventory.getInventory();
+        account = Config.get( 'account' );
+        adSelector = Config.get( 'adSelector' );
+
+        bindHandlers();
+        loadLibrary();
+
+    }
+
+    /**
+     * Bind to custom jQuery events
+     */
+    function bindHandlers() {
+
+        $( document )
+            .on( 'GPT:unitsInserted', function ( event ) {
+                debug( name + ': ' + event.type );
+            } )
+            .on( 'GPT:libraryLoaded', function ( event ) {
+                debug( name + ': ' + event.type );
+                initSequence();
+            } )
+            .on( 'GPT:slotsDefined', function ( event ) {
+                debug( name + ': ' + event.type );
+                displayPageAds();
+            } );
+
+    }
+
+    function initSequence() {
+
+        $.event.trigger( 'GPT:initSequence' );
+
+        listenForDfpEvents();
+        enableSingleRequest();
+        setTargeting();
+        setPagePositions();
+        defineSlotsForPagePositions();
+
+    }
+
+    /**
+     * Request GPT library
+     */
+    function loadLibrary() {
+
+        var googletag,
+            gads,
+            useSSL,
+            node,
+            readyStateLoaded = false
+        ;
+
+        window.googletag = window.googletag || {};
+        googletag = window.googletag;
+        googletag.cmd = googletag.cmd || [];
+        gads = document.createElement( 'script' );
+        gads.async = true;
+        gads.type = 'text/javascript';
+        useSSL = 'https:' == document.location.protocol;
+        gads.src = ( useSSL ? 'https:' : 'http:' ) + '//www.googletagservices.com/tag/js/gpt.js';
+        if ( gads.addEventListener ) {
+            gads.addEventListener( 'load', onLibraryLoaded, false );
+        } else if ( gads.readyState ) {
+            gads.onreadystatechange = function () { // Legacy IE
+                if ( ! readyStateLoaded ) {
+                    readyStateLoaded = true;
+                    onLibraryLoaded();
+                }
+            };
+        }
+        node = document.getElementsByTagName( 'script' )[0];
+        node.parentNode.insertBefore( gads, node );
+
+    }
+
+    /**
+     * Callback when GPT library is loaded
+     */
+    function onLibraryLoaded() {
+
+        googletag.cmd.push( function () {
+            $.event.trigger( 'GPT:libraryLoaded' );
+        } );
+
+    }
+
+    /**
+     * Bind to GPT events
+     */
+    function listenForDfpEvents() {
+
+        googletag.cmd.push( function () {
+            googletag.pubads()
+                .addEventListener( 'slotRenderEnded', function ( event ) {
+                    slotRenderEnded( event );
+                } )
+            ;
+        } );
+
+    }
+
+    /**
+     * Enable Batched SRA
+     *
+     * @uses collapseEmptyDivs()
+     * @uses enableSingleRequest()
+     * @uses disableInitialLoad()
+     */
+    function enableSingleRequest() {
+
+        googletag.cmd.push( function () {
+            // https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_collapseEmptyDivs
+            googletag.pubads().collapseEmptyDivs();
+
+            // https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_enableSingleRequest
+            googletag.pubads().enableSingleRequest();
+
+            // https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_disableInitialLoad
+            googletag.pubads().disableInitialLoad();
+        } );
+
+    }
+
+    /**
+     * Send Targeting
+     * Defined in Page Config
+     */
+    function setTargeting() {
+
+        googletag.cmd.push( function () {
+
+            var targeting = Config.get( 'targeting' );
+
+            if ( ! targeting.length ) {
+                return;
+            }
+
+            $.each( targeting, function ( key, value ) {
+                googletag.pubads().setTargeting( key, value );
+            } );
+
+        } );
+
+    }
+
+    /**
+     * Set Page Positions
+     */
+    function setPagePositions() {
+
+        var clientType = Config.get( 'clientType' ),
+            $context = $( Config.get( 'context' ) ),
+            $units = null,
+            selector = adSelector
+        ;
+
+        if ( clientType !== false ) {
+            selector += '[data-client-type="' + clientType + '"]';
+        }
+
+        $units = $context.find( selector );
+
+        $units.each( function () {
+            var id = $( this ).data( 'id' );
+            pagePositions.push( id );
+        } );
+
+    }
+
+    /**
+     * Define Slots for Page Positions
+     */
+    function defineSlotsForPagePositions() {
+
+        googletag.cmd.push( function () {
+
+            var currentPosition = null,
+                $context = $( Config.get( 'context' ) ),
+                $unit,
+                $unitTarget;
+
+            for ( var i = 0; i < pagePositions.length; i++ ) {
+
+                Inventory.incrementAdSlot( pagePositions[ i ] );
+                currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
+
+                if ( typeof currentPosition.id == 'undefined' ) {
+                    continue;
+                }
+
+                // find the empty container div on the page. we
+                // will dynamically instantiate the unique ad unit.
+                $unit = $context.find( adSelector + '[data-id="' + currentPosition.id + '"]' );
+                $unitTarget = $( '<div />' );
+
+                if ( $unit.length < 1 ) {
+                    continue;
+                }
+
+                // generate new div
+                $unitTarget.addClass( Config.get( 'adUnitTargetClass' ) );
+                $unitTarget.attr( 'id', currentPosition.idName );
+                $unit.append( $unitTarget );
+
+                // activate
+                $unit.addClass( 'active' );
+
+                definedSlots[ i ] = googletag
+                    .defineSlot(
+                        '/' + account + '/' + currentPosition.slot,
+                        currentPosition.sizes,
+                        currentPosition.idName
+                     )
+                    .addService( googletag.pubads() )
+                ;
+
+            }
+
+            // Enables GPT services for defined slots
+            googletag.enableServices();
+
+            $.event.trigger( 'GPT:slotsDefined' );
+
+        } );
+
+    }
+
+    function displayPageAds() {
+
+        googletag.cmd.push( function () {
+
+            // Fetch and display ads for definedSlots
+            googletag.pubads().refresh( definedSlots );
+
+            // lastly, run display code
+            for ( var n = 0; n < pagePositions.length; n++ ) {
+
+                currentPosition = Inventory.getAdInfo( pagePositions[n] );
+
+                if ( $( '#' + currentPosition.idName ).length ) {
+                    googletag.display( currentPosition.idName );
+                }
+
+            }
+
+        } );
+
+    }
+
+    /**
+     * slotRenderEnded - callback after unit is rendered
+     *
+     * @see https://developers.google.com/doubleclick-gpt/reference
+     * @param object unit
+     */
+    function slotRenderEnded( unit ) {
+
+        var unitName = unit.slot.getAdUnitPath().replace( '/' + account + '/', '' ),
+            adInfo = Inventory.getAdInfo( unitName )
+        ;
+
+        $.event.trigger( 'GPT:adUnitRendered', {
+            name: unitName,
+            id: adInfo.id,
+            size: unit.size,
+            isEmpty: unit.isEmpty,
+            creativeId: unit.creativeId,
+            lineItemId: unit.lineItemId,
+            serviceName: unit.serviceName
+        } );
+
+    }
+
+    /**
+     * getDefinedSlot
+     *
+     * @param string name
+     * @return object definedSlot
+     */
+    function getDefinedSlot( name ) {
+
+        var definedSlot = null;
+
+        $.each( definedSlots, function ( i, slot ) {
+            var unitName = slot.getAdUnitPath().replace( '/' + account + '/', '' );
+            if ( unitName === name ) {
+                definedSlot = slot;
                 return false;
             }
-            return pageConfig.insertionEnabled;
+        } );
+
+        return definedSlot;
+
+    }
+
+    /**
+     * displaySlot
+     *
+     * @param string unit [type or slot]
+     */
+    function displaySlot( unit ) {
+
+        googletag.cmd.push( function () {
+            var position = Inventory.getAdInfo( unit ),
+                slot = getDefinedSlot( position.slot )
+            ;
+            googletag.pubads().refresh( [ slot ] );
+            googletag.display( position.idName );
+            definedSlots = Inventory.removeDefinedSlot( definedSlots, position.slot );
+        } );
+
+    }
+
+    /**
+     * Check if the Ad Manager is enabled for page
+     *
+     * @return bool
+     */
+    function isEnabled() {
+
+        return Config.get( 'enabled' );
+
+    }
+
+    /**
+     * Empties all ads in a given context
+     *
+     * @param object options.$context
+     * @param bool   options.removeContainer
+     */
+    function emptyAds( options ) {
+
+        var $context = options.$context,
+            removeContainer = options.removeContainer || false;
+
+        $context.find( adSelector ).empty();
+
+        if ( removeContainer ) {
+            $context.find( adSelector ).remove();
         }
-        function insertAdUnits() {
-            if (inContent) {
-                denoteValidInsertions();
-                insertPrimaryUnit();
-                insertSecondaryUnits();
-            }
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    return {
+        init:         init,
+        isEnabled:    isEnabled,
+        displaySlot:  displaySlot,
+        initSequence: initSequence,
+        emptyAds:     emptyAds
+    };
+
+} ) );
+/**
+ * Insertion
+ */
+( function ( root, factory ) {
+
+    if ( typeof define === 'function' && define.amd ) {
+
+        define( 'src/Insertion',[
+            'jquery',
+            './Util',
+            './Config',
+            './Inventory'
+        ], factory );
+
+    } else if ( typeof exports === 'object' ) {
+
+        module.exports = factory(
+            require( 'jquery' ),
+            require( './Util' ),
+            require( './Config' ),
+            require( './Inventory' )
+        );
+
+    } else {
+
+        root.AdManager = root.AdManager || {};
+
+        root.AdManager.Insertion = factory(
+            root.jQuery,
+            root.AdManager.Util,
+            root.AdManager.Config,
+            root.AdManager.Inventory
+        );
+
+    }
+
+} ( this, function ( $, Util, Config, Inventory ) {
+
+    var name = 'Insertion',
+        debugEnabled = true,
+        debug = debugEnabled ? Util.debug : function () {},
+        $context = null,
+        $localContext = null,
+        inContent = false,
+        inventory = [],
+        odd = true,
+        localContext = null;
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    function init() {
+
+        bindHandlers();
+
+    }
+
+    function bindHandlers() {
+
+        $( document )
+            .on( 'GPT:initSequence', function ( event ) {
+
+                debug( name + ': ' + event.type );
+                /**
+                 * Begin qualification procedure when the DOM is ready
+                 */
+                qualifyContext();
+
+            } );
+
+    }
+
+    function setContext() {
+
+        $context = $( Config.get( 'context' ) );
+
+    }
+
+    /*
+     * First qualify the DOM context where ads are to be inserted
+     * to determine if insertion should proceed.
+     *
+     * @return object
+     */
+    function qualifyContext() {
+
+        var inventoryData = Inventory.getDynamicInventory();
+
+        setContext();
+        inventory = inventory.length ? inventory : inventoryData.dynamicItems;
+        localContext = localContext ? localContext : inventoryData.localContext;
+
+        // Return if empty
+        if ( ! inventory.length ) {
             broadcast();
+            return;
         }
-        function denoteValidInsertions() {
-            var $nodes = $localContext.children(), excluded = app.config.insertExclusion || defaults.insertExclusion;
-            $nodes.each(function(i) {
-                var $element = $(this), $prev = i > 0 ? $nodes.eq(i - 1) : false, valid = true;
-                $.each(excluded, function(index, item) {
-                    if ($element.is(item) || $element.find(item).length) {
-                        valid = false;
-                        return false;
-                    }
-                });
-                if ($prev && $prev.is("p") && $prev.find("img").length === 1) {
-                    valid = false;
+
+        $localContext = $context.find( localContext ).first();
+
+        // Detect a local context
+        if ( $localContext.length ) {
+            inContent = true;
+        }
+
+        // Return if there is no insertion selector
+        if ( ! inContent ) {
+            broadcast();
+            return;
+        }
+
+        insertAdUnits();
+
+    }
+
+    /**
+     * Ad units have been inserted / proceed
+     */
+    function broadcast() {
+
+        $.event.trigger( 'GPT:unitsInserted' );
+
+    }
+
+    /**
+     * Is Insertion Enabled?
+     *
+     * @return bool
+     */
+    function isEnabled() {
+
+        return Config.get( 'insertionEnabled' );
+
+    }
+
+    function insertAdUnits() {
+
+        if ( inContent ) {
+            denoteValidInsertions();
+            insertPrimaryUnit();
+            insertSecondaryUnits();
+        }
+
+        broadcast();
+
+    }
+
+    function denoteValidInsertions() {
+
+        var $nodes = $localContext.children(),
+            excluded = Config.get( 'insertExclusion' )
+        ;
+
+        $nodes.each( function ( i ) {
+
+            var $element = $( this ),
+                $prev = i > 0 ? $nodes.eq( i - 1 ) : false,
+                valid = true
+            ;
+
+            $.each( excluded, function ( index, item ) {
+                if ( $element.is( item ) || $element.find( item ).length ) {
+                    valid = false; // not valid
+                    return false; // break loop
                 }
-                $element.attr("data-valid-location", valid);
-            });
-        }
-        function isValidInsertionLocation($element) {
-            return $element.data("valid-location");
-        }
-        function adUnitMarkup(unitId, disableFloat) {
-            var floatDisable = disableFloat || false, type = app.util.getUnitType(unitId), alignment = odd ? "odd" : "even", $html = $("<div />");
-            $html.addClass(defaults.adClass).attr("data-id", unitId).attr("data-client-type", type);
-            if (floatDisable) {
-                $html.addClass("disableFloat");
-            } else {
-                $html.addClass("inContent").addClass(alignment);
+            } );
+
+            if ( $prev && $prev.is( 'p' ) && $prev.find( 'img' ).length === 1 ) {
+                valid = false;
             }
-            if (!floatDisable) {
-                odd = !odd;
-            }
-            return $html;
+
+            $element.attr( 'data-valid-location', valid );
+
+        } );
+
+    }
+
+    /**
+     * Check against of list of elements to skip
+     *
+     * @param  object $element
+     * @return bool
+     */
+    function isValidInsertionLocation( $element ) {
+
+        return $element.data( 'valid-location' );
+
+    }
+
+    /**
+     * adUnitMarkup
+     *
+     * @param string unitId
+     * @param bool disableFloat
+     * @return string
+     */
+    function adUnitMarkup( unitId, disableFloat ) {
+
+        var floatDisable = disableFloat || false,
+            type = Inventory.getUnitType( unitId ),
+            alignment = odd ? 'odd' : 'even',
+            $html = $( '<div />' );
+
+        $html
+            .addClass( Config.get( 'adClass' ) )
+            .attr( 'data-id', unitId )
+            .attr( 'data-client-type', type );
+
+        if ( floatDisable ) {
+            $html
+                .addClass( 'disableFloat' );
+        } else {
+            $html
+                .addClass( 'inContent' )
+                .addClass( alignment );
         }
-        function insertPrimaryUnit() {
-            var unit = getPrimaryUnit(), tallest = admanager.util.tallestAvailable(unit), shortest = admanager.util.shortestAvailable(unit), location = findInsertionLocation({
+
+        if ( ! floatDisable ) {
+            odd = ! odd;
+        }
+
+        return $html;
+
+    }
+
+    /**
+     * Insert Primary Unit: Unit most display above the fold
+     */
+    function insertPrimaryUnit() {
+
+        var unit = getPrimaryUnit(),
+            tallest = Inventory.tallestAvailable( unit ),
+            shortest = Inventory.shortestAvailable( unit ),
+            location = findInsertionLocation( {
                 height: tallest,
-                limit: defaults.adHeightLimit
-            }), markup = null;
-            if (!location) {
-                location = findInsertionLocation({
-                    height: shortest,
-                    limit: defaults.adHeightLimit,
-                    force: true
-                });
-                if (!location.disableFloat) {
-                    unit = admanager.util.limitUnitHeight(unit, shortest);
-                }
+                limit: Config.get( 'insertion.adHeightLimit' )
+            } ),
+            markup = null
+        ;
+
+        if ( ! location ) {
+            location = findInsertionLocation( {
+                height: shortest,
+                limit: Config.get( 'insertion.adHeightLimit' ),
+                force: true
+            } );
+
+            if ( ! location.disableFloat ) {
+                // unset large sizes
+                unit = Inventory.limitUnitHeight( unit, shortest );
             }
-            markup = adUnitMarkup(unit.id, location.disableFloat);
-            location.$insertBefore.before(markup);
         }
-        function insertSecondaryUnits() {
-            $.each(inventory, function(index, unit) {
-                var tallest = admanager.util.tallestAvailable(unit), location = findInsertionLocation({
+
+        markup = adUnitMarkup( unit.id, location.disableFloat );
+
+        location.$insertBefore.before( markup );
+
+    }
+
+    /**
+     * Insert Secondary Unit: Ad units that commonly appear below the fold
+     */
+    function insertSecondaryUnits() {
+
+        $.each( inventory, function ( index, unit ) {
+
+            var tallest = Inventory.tallestAvailable( unit ),
+                location = findInsertionLocation( {
                     height: tallest
-                }), markup = null;
-                if (!location) {
-                    return false;
-                }
-                markup = adUnitMarkup(unit.id, location.disableFloat);
-                location.$insertBefore.before(markup);
-            });
-        }
-        function getPrimaryUnit() {
-            var primaryUnit = false;
-            $.each(inventory, function(index, unit) {
-                if (unit.primary) {
-                    primaryUnit = unit;
-                    inventory.remove(index);
-                    return false;
-                }
-            });
-            if (!primaryUnit) {
-                primaryUnit = inventory[0];
-                inventory.remove(0);
+                } ),
+                markup = null
+            ;
+
+            if ( ! location ) {
+                return false;
             }
-            return primaryUnit;
+
+            markup = adUnitMarkup( unit.id, location.disableFloat );
+            location.$insertBefore.before( markup );
+
+        } );
+
+    }
+
+    function getPrimaryUnit() {
+
+        var primaryUnit = false;
+
+        $.each( inventory, function ( index, unit ) {
+
+            if ( unit.primary ) {
+                primaryUnit = unit;
+                inventory = Util.removeByKey( inventory, index );
+                return false;
+            }
+
+        } );
+
+        if ( ! primaryUnit ) {
+            primaryUnit = inventory[0];
+            inventory = Util.removeByKey( inventory, 0 );
         }
-        function findInsertionLocation(options) {
-            options = options || {};
-            var $nodes = getNodes(), nodeSearch = new NodeSearch({
+
+        return primaryUnit;
+
+    }
+
+    /**
+     * findInsertionLocation
+     *
+     * @param object options
+     * @return object or boolean:false
+     */
+    function findInsertionLocation( options ) {
+
+        options = options || {};
+
+        var $nodes = getNodes(),
+            nodeSearch = new NodeSearch( {
                 $nodes: $nodes,
                 force: options.force ? options.force : false,
                 limit: options.limit ? options.limit : false,
                 height: options.height
-            });
-            if (!$nodes.length) {
-                return false;
-            }
-            $.each($nodes, function(i, node) {
-                var exitLoop = nodeSearch.verifyNode(i, $(node));
-                if (exitLoop) {
-                    return false;
-                } else if (!exitLoop) {
-                    return true;
-                }
-            });
-            if (!nodeSearch.locationFound) {
-                return false;
-            }
-            nodeSearch.markValidNodes();
-            nodeSearch.setLastPosition();
-            return {
-                $insertBefore: nodeSearch.$insertBefore,
-                disableFloat: nodeSearch.disableFloat
-            };
-        }
-        function NodeSearch(options) {
-            this.totalHeight = 0;
-            this.marginDifference = 40;
-            this.inserted = [];
-            this.$insertBefore = null;
-            this.disableFloat = false;
-            this.locationFound = false;
-            this.validHeight = 0;
-            this.exitLoop = false;
-            this.height = options.height;
-            this.force = options.force;
-            this.limit = options.limit;
-            this.$nodes = options.$nodes;
-            this.lastPosition = 0;
-            this.neededheight = options.height - this.marginDifference;
-        }
-        NodeSearch.prototype.setLastPosition = function() {
-            this.lastPosition = this.$insertBefore.offset().top + this.neededheight;
-        };
-        NodeSearch.prototype.markValidNodes = function() {
-            if (this.inserted.length) {
-                $.each(this.inserted, function(index, item) {
-                    $(item).data("valid-location", false);
-                });
-            }
-        };
-        NodeSearch.prototype.verifyNode = function(index, $node) {
-            var since = $node.offset().top - this.lastPosition, height = $node.outerHeight(), isLast = this.$nodes.length - 1 === index;
-            this.totalHeight += height;
-            if (this.force && (this.totalHeight >= this.limit || isLast)) {
-                this.$insertBefore = $node;
-                this.disableFloat = true;
-                this.locationFound = true;
-                this.exitLoop = true;
-            } else if (this.limit && (this.totalHeight >= this.limit || isLast)) {
-                this.locationFound = false;
-                this.exitLoop = true;
-            } else if (isValidInsertionLocation($node)) {
-                this.validHeight += height;
-                this.inserted.push($node);
-                if (this.$insertBefore === null) {
-                    this.$insertBefore = $node;
-                }
-                if (this.validHeight >= this.neededheight) {
-                    if (!this.limit && since < defaults.pxBetweenUnits) {
-                        this.validHeight = 0;
-                        this.$insertBefore = null;
-                    }
-                    this.locationFound = true;
-                    this.exitLoop = true;
-                }
-            } else {
-                this.validHeight = 0;
-                this.$insertBefore = null;
-                this.exitLoop = null;
-            }
-            return this.exitLoop;
-        };
-        function isThisAnAd($el) {
-            if (!$el) {
-                return false;
-            }
-            return $el.is(defaults.adSelector);
-        }
-        function getNodes() {
-            var $prevUnit = $localContext.find(defaults.adSelector).last(), $nodes = null;
-            if ($prevUnit.length) {
-                $nodes = $prevUnit.nextAll($localContext);
-            } else {
-                $nodes = $localContext.children();
-            }
-            return $nodes;
-        }
-        return {
-            init: init
-        };
-    }($);
-    return app;
-}(admanager || {}, jQuery);
+            } )
+        ;
 
-var admanager = function(app, $) {
-    app.manager = function($) {
-        var name = "Manager", debug = null, definedSlots = [], pagePositions = [], inventory = [], account = null, defaults = {
-            adClass: "app_ad_unit",
-            adUnitTargetClass: "app_unit_target",
-            adSelector: ""
-        };
-        function init() {
-            debug = admanager.util.debug ? admanager.util.debug : function() {};
-            debug(name + ": initialized");
-            if (!isEnabled()) {
-                return app;
-            }
-            defaults.adSelector = "." + defaults.adClass;
-            inventory = getInventory();
-            account = app.config.account;
-            bindHandlers();
-            loadLibrary();
-            return app;
+        if ( ! $nodes.length ) {
+            return false;
         }
-        function bindHandlers() {
-            $(document).on("GPT:unitsInserted", function() {
-                debug(name + ": GPT:unitsInserted");
-            }).on("GPT:libraryLoaded", function() {
-                debug(name + ": GPT:libraryLoaded");
-                initSequence();
-            }).on("GPT:slotsDefined", function() {
-                debug(name + ": GPT:slotsDefined");
-                displayPageAds();
-            });
-        }
-        function initSequence() {
-            $.event.trigger("GPT:initSequence");
-            listenForDfpEvents();
-            enableSingleRequest();
-            setTargeting();
-            setPagePositions();
-            defineSlotsForPagePositions();
-        }
-        function getInventory() {
-            return getAvailableSizes(inventoryCleanTypes(app.config.inventory));
-        }
-        function inventoryCleanTypes(inventory) {
-            for (var i = 0; i < inventory.length; i++) {
-                if (typeof inventory[i].type !== "undefined") {
-                    continue;
-                }
-                inventory[i].type = "default";
-            }
-            return inventory;
-        }
-        function getAvailableSizes(inventory) {
-            var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
-            if (width > 1024) {
-                return inventory;
-            }
-            if (width >= 768 && width <= 1024) {
-                var max = 980;
-                for (var i = 0; i < inventory.length; i++) {
-                    var sizesToRemove = [];
-                    for (var j = 0; j < inventory[i].sizes.length; j++) {
-                        if (inventory[i].sizes[j][0] > max) {
-                            sizesToRemove.push(inventory[i].sizes[j]);
-                        }
-                    }
-                    inventory[i].sizes = app.util.difference(inventory[i].sizes, sizesToRemove);
-                }
-            }
-            return inventory;
-        }
-        function loadLibrary() {
-            var googletag, gads, useSSL, node, readyStateLoaded = false;
-            window.googletag = window.googletag || {};
-            googletag = window.googletag;
-            googletag.cmd = googletag.cmd || [];
-            gads = document.createElement("script");
-            gads.async = true;
-            gads.type = "text/javascript";
-            useSSL = "https:" == document.location.protocol;
-            gads.src = (useSSL ? "https:" : "http:") + "//www.googletagservices.com/tag/js/gpt.js";
-            if (gads.addEventListener) {
-                gads.addEventListener("load", onLibraryLoaded, false);
-            } else if (gads.readyState) {
-                gads.onreadystatechange = function() {
-                    if (!readyStateLoaded) {
-                        readyStateLoaded = true;
-                        onLibraryLoaded();
-                    }
-                };
-            }
-            node = document.getElementsByTagName("script")[0];
-            node.parentNode.insertBefore(gads, node);
-        }
-        function onLibraryLoaded() {
-            googletag.cmd.push(function() {
-                $.event.trigger("GPT:libraryLoaded");
-            });
-        }
-        function listenForDfpEvents() {
-            googletag.cmd.push(function() {
-                googletag.pubads().addEventListener("slotRenderEnded", function(event) {
-                    slotRenderEnded(event);
-                });
-            });
-        }
-        function enableSingleRequest() {
-            googletag.cmd.push(function() {
-                googletag.pubads().collapseEmptyDivs();
-                googletag.pubads().enableSingleRequest();
-                googletag.pubads().disableInitialLoad();
-            });
-        }
-        function setTargeting() {
-            googletag.cmd.push(function() {
-                var pageConfig = getConfig(), targeting = pageConfig.targeting;
-                if (typeof targeting !== "undefined") {
-                    $.each(targeting, function(key, value) {
-                        googletag.pubads().setTargeting(key, value);
-                    });
-                }
-            });
-        }
-        function setPagePositions() {
-            var clientType = typeof app.config.clientType !== "undefined" ? app.config.clientType : false, $context = app.util.getContext(), $units = null, selector = defaults.adSelector;
-            if (clientType !== false) {
-                selector += '[data-client-type="' + clientType + '"]';
-            }
-            $units = $context.find(selector);
-            $units.each(function() {
-                var id = $(this).data("id");
-                pagePositions.push(id);
-            });
-        }
-        function defineSlotsForPagePositions() {
-            googletag.cmd.push(function() {
-                var currentPosition = null, $context = app.util.getContext(), $unit, $unitTarget;
-                for (var i = 0; i < pagePositions.length; i++) {
-                    incrementAdSlot(pagePositions[i]);
-                    currentPosition = getAdInfo(pagePositions[i]);
-                    if (typeof currentPosition.id == "undefined") {
-                        continue;
-                    }
-                    $unit = $context.find(defaults.adSelector + '[data-id="' + currentPosition.id + '"]');
-                    $unitTarget = $("<div />");
-                    if ($unit.length < 1) {
-                        continue;
-                    }
-                    $unitTarget.addClass(defaults.adUnitTargetClass);
-                    $unitTarget.attr("id", currentPosition.idName);
-                    $unit.append($unitTarget);
-                    $unit.addClass("active");
-                    definedSlots[i] = googletag.defineSlot("/" + account + "/" + currentPosition.slot, currentPosition.sizes, currentPosition.idName).addService(googletag.pubads());
-                }
-                googletag.enableServices();
-                $.event.trigger("GPT:slotsDefined");
-            });
-        }
-        function displayPageAds() {
-            googletag.cmd.push(function() {
-                googletag.pubads().refresh(definedSlots);
-                for (var n = 0; n < pagePositions.length; n++) {
-                    currentPosition = getAdInfo(pagePositions[n]);
-                    if ($("#" + currentPosition.idName).length) {
-                        googletag.display(currentPosition.idName);
-                    }
-                }
-            });
-        }
-        function slotRenderEnded(unit) {
-            var unitName = unit.slot.getAdUnitPath().replace("/" + account + "/", ""), adInfo = getAdInfo(unitName);
-            $.event.trigger("GPT:adUnitRendered", {
-                name: unitName,
-                id: adInfo.id,
-                size: unit.size,
-                isEmpty: unit.isEmpty,
-                creativeId: unit.creativeId,
-                lineItemId: unit.lineItemId,
-                serviceName: unit.serviceName
-            });
-        }
-        function incrementAdSlot(unit) {
-            for (var i = 0; i < inventory.length; i++) {
-                if (inventory[i].id !== unit && inventory[i].slot !== unit) {
-                    continue;
-                }
-                if (typeof inventory[i].iteration == "undefined") {
-                    inventory[i].iteration = 0;
-                }
-                inventory[i].iteration = inventory[i].iteration + 1;
-                return;
-            }
-        }
-        function getAdInfo(unit) {
-            var returnObject = {};
-            for (var i = 0; i < inventory.length; i++) {
-                if (inventory[i].id !== unit && inventory[i].slot !== unit) {
-                    continue;
-                }
-                returnObject = inventory[i];
-                if (typeof returnObject.useIterator !== "undefined" && !returnObject.useIterator) {
-                    returnObject.idName = returnObject.id;
-                } else {
-                    returnObject.idName = returnObject.id + "_" + returnObject.iteration;
-                }
-                return returnObject;
-            }
-            return returnObject;
-        }
-        function getDefinedSlot(name) {
-            var definedSlot = null;
-            $.each(definedSlots, function(i, slot) {
-                var unitName = slot.getAdUnitPath().replace("/" + account + "/", "");
-                if (unitName === name) {
-                    definedSlot = slot;
-                    return false;
-                }
-            });
-            return definedSlot;
-        }
-        function displaySlot(unit) {
-            googletag.cmd.push(function() {
-                var position = getAdInfo(unit), slot = getDefinedSlot(position.slot);
-                googletag.pubads().refresh([ slot ]);
-                googletag.display(position.idName);
-                removeDefinedSlot(position.slot);
-            });
-        }
-        function removeDefinedSlot(name) {
-            $.each(definedSlots, function(index, slot) {
-                var unitName = slot.getAdUnitPath().replace("/" + account + "/", "");
-                if (unitName === name) {
-                    definedSlots.remove(index);
-                }
-            });
-        }
-        function getDynamicInventory() {
-            var dynamicItems = [], type = typeof app.config.clientType !== "undefined" ? app.config.clientType : false, localContext;
-            $.each(inventory, function(index, position) {
-                if (typeof position.dynamic !== "undefined" && position.dynamic === true) {
-                    if (!type || type === position.type) {
-                        dynamicItems.push(position);
-                        localContext = position.localContext;
-                    }
-                }
-            });
-            return {
-                dynamicItems: dynamicItems,
-                localContext: localContext
-            };
-        }
-        function getConfig() {
-            return app.config;
-        }
-        function isEnabled() {
-            var $context = app.util.getContext(), attrName = "page-ad-config";
-            if (typeof app.config.pageConfigAttr !== "undefined") {
-                attrName = app.config.pageConfigAttr;
-            }
-            app.config = app.util.importConfig({
-                $context: $context,
-                attrName: attrName,
-                existConfig: app.config
-            });
-            if (typeof app.config.enabled === "undefined") {
+
+        // Loop through each node as necessary
+        $.each( $nodes, function ( i, node ) {
+
+            var exitLoop = nodeSearch.verifyNode( i, $( node ) );
+
+            if ( exitLoop ) {
+                return false;
+            } else if ( ! exitLoop ) {
                 return true;
             }
-            return app.config.enabled;
-        }
-        function emptyAds(options) {
-            var $context = options.$context, removeContainer = options.removeContainer || false;
-            $context.find(defaults.adSelector).empty();
-            if (removeContainer) {
-                $context.find(defaults.adSelector).remove();
-            }
-        }
-        function getDefaults() {
-            return defaults;
-        }
-        return {
-            init: init,
-            isEnabled: isEnabled,
-            getConfig: getConfig,
-            getDefaults: getDefaults,
-            getAdInfo: getAdInfo,
-            displaySlot: displaySlot,
-            removeDefinedSlot: removeDefinedSlot,
-            getDynamicInventory: getDynamicInventory,
-            initSequence: initSequence,
-            emptyAds: emptyAds
-        };
-    }($);
-    return app;
-}(admanager || {}, jQuery);
 
-var admanager = function(app, $) {
-    app.util = function($) {
-        var name = "Util", debugEnabled = false, debug;
-        function init() {
-            debug(name + ": initialized");
-            initArrayRemove();
-            return app;
+        } );
+
+        if ( ! nodeSearch.locationFound ) {
+            return false;
         }
-        debug = function() {
-            if (!debugEnabled) {
-                return;
-            } else if (typeof console !== "object" || !console.log) {
-                return;
-            }
-            return Function.prototype.bind.call(console.log, console);
-        }();
-        function difference(array, values) {
-            var diff = [];
-            $.grep(array, function(element) {
-                if ($.inArray(element, values) === -1) {
-                    diff.push(element);
-                }
-            });
-            return diff;
-        }
-        function initArrayRemove() {
-            Array.prototype.remove = function(from, to) {
-                var rest = this.slice((to || from) + 1 || this.length);
-                this.length = from < 0 ? this.length + from : from;
-                return this.push.apply(this, rest);
-            };
-        }
-        function importConfig(options) {
-            var $context = options.$context, attrName = options.attrName, existConfig = options.existConfig, selector, newConfig, data = {};
-            selector = "*[data-" + attrName + "]";
-            newConfig = $.extend({}, existConfig);
-            data = $context.find(selector).data(attrName);
-            if (typeof newConfig === "object") {
-                newConfig = $.extend(newConfig, data);
-            }
-            return newConfig;
-        }
-        function getContext() {
-            var selector = app.config.context || "body";
-            return $(selector);
-        }
-        function shortestAvailable(unit) {
-            var shortest = 0;
-            $.each(unit.sizes, function(index, sizes) {
-                if (shortest === 0) {
-                    shortest = sizes[1];
-                } else if (sizes[1] < shortest) {
-                    shortest = sizes[1];
-                }
-            });
-            return shortest;
-        }
-        function tallestAvailable(unit) {
-            var tallest = 0;
-            $.each(unit.sizes, function(index, sizes) {
-                if (sizes[1] > tallest) {
-                    tallest = sizes[1];
-                }
-            });
-            return tallest;
-        }
-        function limitUnitHeight(unit, limit) {
-            $.each(unit.sizes, function(index, sizes) {
-                if (sizes[1] <= limit) {
-                    return true;
-                }
-                unit.sizes.remove(index);
-            });
-            return unit;
-        }
-        function getUnitType(id) {
-            var type = "default";
-            $.each(app.config.inventory, function(index, unit) {
-                if (unit.id !== id) {
-                    return true;
-                }
-                type = unit.type;
-                return false;
-            });
-            return type;
-        }
+
+        nodeSearch.markValidNodes();
+        nodeSearch.setLastPosition();
+
         return {
-            init: init,
-            debug: debug,
-            difference: difference,
-            importConfig: importConfig,
-            shortestAvailable: shortestAvailable,
-            tallestAvailable: tallestAvailable,
-            limitUnitHeight: limitUnitHeight,
-            getUnitType: getUnitType,
-            getContext: getContext
+            '$insertBefore': nodeSearch.$insertBefore,
+            'disableFloat': nodeSearch.disableFloat
         };
-    }($);
-    return app;
-}(admanager || {}, jQuery);
-window.AdManager = admanager.bootstrap.init;
+
+    }
+
+    /**
+     * Search object used for determining insertion points
+     */
+    function NodeSearch( options ) {
+
+        this.totalHeight = 0;
+        this.marginDifference = 40;
+        this.inserted = [];
+        this.$insertBefore = null;
+        this.disableFloat = false;
+        this.locationFound = false;
+        this.validHeight = 0;
+        this.exitLoop = false;
+        this.height = options.height;
+        this.force = options.force;
+        this.limit = options.limit;
+        this.$nodes = options.$nodes;
+        this.lastPosition = 0;
+        this.neededheight = options.height - this.marginDifference;
+
+    }
+
+    /**
+     * Store the position of the last ad
+     */
+    NodeSearch.prototype.setLastPosition = function () {
+
+        this.lastPosition = this.$insertBefore.offset().top + this.neededheight;
+
+    };
+
+    /**
+     * Mark nodes where insertion is valid
+     */
+    NodeSearch.prototype.markValidNodes = function () {
+
+        if ( this.inserted.length ) {
+            $.each( this.inserted, function ( index, item ) {
+                $( item ).data( 'valid-location', false );
+            } );
+        }
+
+    };
+
+    /**
+     * Verify each node to find a suitable insertion point
+     *
+     * @return boolean
+     */
+    NodeSearch.prototype.verifyNode = function ( index, $node ) {
+
+        var since = $node.offset().top - this.lastPosition,
+            height = $node.outerHeight(),
+            isLast = ( this.$nodes.length - 1 ) === index;
+
+        this.totalHeight += height;
+
+        if ( this.force && ( this.totalHeight >= this.limit || isLast ) ) {
+
+            this.$insertBefore = $node;
+            this.disableFloat = true;
+            this.locationFound = true;
+            this.exitLoop = true;
+
+        } else if ( this.limit && ( this.totalHeight >= this.limit || isLast ) ) {
+
+            this.locationFound = false;
+            this.exitLoop = true;
+
+        } else if ( isValidInsertionLocation( $node ) ) {
+
+            this.validHeight += height;
+            this.inserted.push( $node );
+
+            if ( this.$insertBefore === null ) {
+                this.$insertBefore = $node;
+            }
+
+            if ( this.validHeight >= this.neededheight ) {
+
+                if ( ! this.limit && ( since < Config.get( 'insertion.pxBetweenUnits' ) ) ) {
+
+                    this.validHeight = 0;
+                    this.$insertBefore = null;
+
+                }
+
+                this.locationFound = true;
+                this.exitLoop = true;
+
+            }
+
+        } else {
+
+            this.validHeight = 0;
+            this.$insertBefore = null;
+            this.exitLoop = null;
+
+        }
+
+        return this.exitLoop;
+
+    };
+
+    /**
+     * Is Element an Ad Unit
+     *
+     * @param mixed $el
+     * @return bool
+     */
+    function isThisAnAd( $el ) {
+
+        if ( ! $el ) {
+            return false;
+        }
+
+        return $el.is( Config.get( 'adSelector' ) );
+
+    }
+
+    /**
+     * Get Nodes to Loop Through
+     *
+     * @return array $nodes
+     */
+    function getNodes() {
+
+        var $prevUnit = $localContext.find( Config.get( 'adSelector' ) ).last(),
+            $nodes = null;
+
+        // nodes after previous unit or all nodes
+        if ( $prevUnit.length ) {
+            $nodes = $prevUnit.nextAll( $localContext );
+        } else {
+            $nodes = $localContext.children();
+        }
+
+        return $nodes;
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    return {
+        init: init
+    };
+
+} ) );
+/**
+ * Bootstrap
+ */
+( function ( root, factory ) {
+
+    if ( typeof define === 'function' && define.amd ) {
+
+        define( 'src/Index',[
+            './Util',
+            './Config',
+            './Inventory',
+            './Manager',
+            './Insertion'
+        ], factory );
+
+    } else if ( typeof exports == 'object' ) {
+
+        module.exports = factory(
+            require( './Util' ),
+            require( './Config' ),
+            require( './Inventory' ),
+            require( './Manager' ),
+            require( './Insertion' )
+        );
+
+    } else {
+
+        var _AdManager = root.AdManager;
+
+        root.AdManager = factory(
+            _AdManager.Util,
+            _AdManager.Config,
+            _AdManager.Inventory,
+            _AdManager.Manager,
+            _AdManager.Insertion
+        );
+
+    }
+
+} ( this, function ( Util, Config, Inventory, Manager, Insertion ) {
+
+    function AdManager( newConfig ) {
+
+        newConfig = newConfig || false;
+
+        if ( ! newConfig ) {
+            throw new Error( 'Please provide a config.' );
+        }
+
+        debug = Util.debug;
+
+        Config.init( newConfig );
+        Insertion.init();
+        Manager.init();
+
+    }
+
+    var module = AdManager.prototype;
+
+    module.Util = Util;
+    module.Config = Config;
+    module.Inventory = Inventory;
+    module.Manager = Manager;
+    module.Insertion = Insertion;
+
+    return AdManager;
+
+} ) );
