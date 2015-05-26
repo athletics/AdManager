@@ -51,10 +51,10 @@
     }
 
     /**
-     * Add default unit type if not set
+     * Add default unit type if not set.
      *
-     * @param array inventory
-     * @return array inventory
+     * @param  {Array} inventory
+     * @return {Array} inventory
      */
     function inventoryCleanTypes( inventory ) {
 
@@ -73,10 +73,12 @@
     }
 
     /**
-     * Remove sizes from inventory that will not display properly
+     * Remove sizes from inventory that will not display properly.
      *
-     * @param array inventory
-     * @return array inventory
+     * @todo   Simplify and remove limits.
+     *
+     * @param  {Array} inventory
+     * @return {Array} inventory
      */
     function getAvailableSizes( inventory ) {
 
@@ -133,6 +135,11 @@
 
     }
 
+    /**
+     * Get ad units for dynamic insertion.
+     *
+     * @return {Object}
+     */
     function getDynamicInventory() {
 
         var dynamicItems = [],
@@ -158,12 +165,12 @@
     /**
      * Get Ad Unit Info
      *
-     * @param string unit
-     * @return object
+     * @param  {String} unit
+     * @return {Object} adInfo
      */
     function getAdInfo( unit ) {
 
-        var returnObject = {};
+        var adInfo = {};
 
         for ( var i = 0; i < inventory.length; i++ ) {
             if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
@@ -171,29 +178,29 @@
             }
 
             // build return object
-            returnObject = inventory[ i ];
+            adInfo = inventory[ i ];
 
             // determine the object's idName
-            if ( typeof returnObject.useIterator !== 'undefined' && ! returnObject.useIterator ) {
+            if ( typeof adInfo.useIterator !== 'undefined' && ! adInfo.useIterator ) {
                 // don't use the iterator
-                returnObject.idName = returnObject.id;
+                adInfo.idName = adInfo.id;
             } else {
                 // use the iterator
-                returnObject.idName = returnObject.id + '_' + returnObject.iteration;
+                adInfo.idName = adInfo.id + '_' + adInfo.iteration;
             }
 
-            return returnObject;
+            return adInfo;
         }
 
-        return returnObject;
+        return adInfo;
 
     }
 
     /**
      * Get Shortest Possible Size for Unit
      *
-     * @param object unit
-     * @return integer
+     * @param  {Object}  unit
+     * @return {Integer} shortest
      */
     function shortestAvailable( unit ) {
 
@@ -214,8 +221,8 @@
     /**
      * Get Tallest Possible Size for Unit
      *
-     * @param object unit
-     * @return integer
+     * @param  {Object}  unit
+     * @return {Integer} tallest
      */
     function tallestAvailable( unit ) {
 
@@ -234,9 +241,9 @@
     /**
      * Limit Ad Unit Height: Removes Larger Sizes from Inventory
      *
-     * @param  object unit
-     * @param  int limit
-     * @return object unit
+     * @param  {Object}  unit
+     * @param  {Integer} limit
+     * @return {Object}  unit
      */
     function limitUnitHeight( unit, limit ) {
 
@@ -254,8 +261,8 @@
     /**
      * Get Unit Type
      *
-     * @param string id
-     * @return string type
+     * @param  {String} id
+     * @return {String} type
      */
     function getUnitType( id ) {
 
