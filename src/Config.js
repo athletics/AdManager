@@ -53,6 +53,19 @@
             enabled: true,
             insertExclusion: [],
             insertionEnabled: false,
+            insertion: {
+                pxBetweenUnits: 800,
+                adHeightLimit: 1000,
+                insertExclusion: [
+                    'img',
+                    'iframe',
+                    'video',
+                    'audio',
+                    '.video',
+                    '.audio',
+                    '.app_ad_unit'
+                ]
+            },
             inventory: [],
             pageConfigAttr: false,
             targeting: []
