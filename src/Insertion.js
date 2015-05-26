@@ -57,9 +57,9 @@
     function bindHandlers() {
 
         $( document )
-            .on( 'GPT:initSequence', function () {
+            .on( 'GPT:initSequence', function ( event ) {
 
-                debug( name + ': GPT:initSequence' );
+                debug( name + ': ' + event.type );
                 /**
                  * Begin qualification procedure when the DOM is ready
                  */
