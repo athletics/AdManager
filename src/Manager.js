@@ -8,7 +8,8 @@
         define( [
             'jquery',
             './Util',
-            './Config'
+            './Config',
+            './Inventory'
         ], factory );
 
     } else if ( typeof exports === 'object' ) {
@@ -16,7 +17,8 @@
         module.exports = factory(
             require( 'jquery' ),
             require( './Util' ),
-            require( './Config' )
+            require( './Config' ),
+            require( './Inventory' )
         );
 
     } else {
@@ -26,12 +28,13 @@
         root.AdManager.Manager = factory(
             root.jQuery,
             root.AdManager.Util,
-            root.AdManager.Config
+            root.AdManager.Config,
+            root.AdManager.Inventory
         );
 
     }
 
-} ( this, function ( $, Util, Config ) {
+} ( this, function ( $, Util, Config, Inventory ) {
 
     var name = 'Manager',
         debugEnabled = true,
@@ -50,7 +53,7 @@
             return;
         }
 
-        inventory = Config.get( 'inventory' );
+        inventory = Inventory.getInventory();
         account = Config.get( 'account' );
         adSelector = Config.get( 'adSelector' );
 
@@ -88,72 +91,6 @@
         setTargeting();
         setPagePositions();
         defineSlotsForPagePositions();
-
-    }
-
-    /**
-     * Get Inventory
-     *
-     * @return object
-     */
-    function getInventory() {
-
-        return getAvailableSizes( inventoryCleanTypes( Config.get( 'inventory' ) ) );
-
-    }
-
-    /**
-     * Add default unit type if not set
-     *
-     * @param array inventory
-     * @return array inventory
-     */
-    function inventoryCleanTypes( inventory ) {
-
-        for ( var i = 0; i < inventory.length; i++ ) {
-
-            if ( typeof inventory[ i ].type !== 'undefined' ) {
-                continue;
-            }
-
-            inventory[ i ].type = 'default';
-
-        }
-
-        return inventory;
-
-    }
-
-    /**
-     * Remove sizes from inventory that will not display properly
-     *
-     * @param array inventory
-     * @return array inventory
-     */
-    function getAvailableSizes( inventory ) {
-
-        var width = ( window.innerWidth > 0 ) ? window.innerWidth : screen.width;
-
-        if ( width > 1024 ) {
-            return inventory;
-        }
-
-        if ( width >= 768 && width <= 1024 ) {
-
-            var max = 980;
-
-            for ( var i = 0; i < inventory.length; i++ ) {
-                var sizesToRemove = [];
-                for ( var j = 0; j < inventory[ i ].sizes.length; j++ ) {
-                    if ( inventory[ i ].sizes[ j ][0] > max ) {
-                        sizesToRemove.push( inventory[ i ].sizes[ j ] );
-                    }
-                }
-                inventory[ i ].sizes = Util.difference( inventory[ i ].sizes, sizesToRemove );
-            }
-        }
-
-        return inventory;
 
     }
 
@@ -301,7 +238,7 @@
             for ( var i = 0; i < pagePositions.length; i++ ) {
 
                 incrementAdSlot( pagePositions[ i ] );
-                currentPosition = getAdInfo( pagePositions[ i ] );
+                currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
 
                 if ( typeof currentPosition.id == 'undefined' ) {
                     continue;
@@ -354,7 +291,7 @@
             // lastly, run display code
             for ( var n = 0; n < pagePositions.length; n++ ) {
 
-                currentPosition = getAdInfo( pagePositions[n] );
+                currentPosition = Inventory.getAdInfo( pagePositions[n] );
 
                 if ( $( '#' + currentPosition.idName ).length ) {
                     googletag.display( currentPosition.idName );
@@ -375,7 +312,7 @@
     function slotRenderEnded( unit ) {
 
         var unitName = unit.slot.getAdUnitPath().replace( '/' + account + '/', '' ),
-            adInfo = getAdInfo( unitName )
+            adInfo = Inventory.getAdInfo( unitName )
         ;
 
         $.event.trigger( 'GPT:adUnitRendered', {
@@ -415,40 +352,6 @@
     }
 
     /**
-     * Get Ad Unit Info
-     *
-     * @param string unit
-     * @return object
-     */
-    function getAdInfo( unit ) {
-
-        var returnObject = {};
-
-        for ( var i = 0; i < inventory.length; i++ ) {
-            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
-                continue;
-            }
-
-            // build return object
-            returnObject = inventory[ i ];
-
-            // determine the object's idName
-            if ( typeof returnObject.useIterator !== 'undefined' && ! returnObject.useIterator ) {
-                // don't use the iterator
-                returnObject.idName = returnObject.id;
-            } else {
-                // use the iterator
-                returnObject.idName = returnObject.id + '_' + returnObject.iteration;
-            }
-
-            return returnObject;
-        }
-
-        return returnObject;
-
-    }
-
-    /**
      * getDefinedSlot
      *
      * @param string name
@@ -478,52 +381,13 @@
     function displaySlot( unit ) {
 
         googletag.cmd.push( function () {
-            var position = getAdInfo( unit ),
+            var position = Inventory.getAdInfo( unit ),
                 slot = getDefinedSlot( position.slot )
             ;
             googletag.pubads().refresh( [ slot ] );
             googletag.display( position.idName );
-            removeDefinedSlot( position.slot );
+            Inventory.removeDefinedSlot( position.slot );
         } );
-
-    }
-
-    /**
-     * removeDefinedSlot
-     *
-     * @param string name
-     * @return object definedSlot
-     */
-    function removeDefinedSlot( name ) {
-
-        $.each( definedSlots, function ( index, slot ) {
-            var unitName = slot.getAdUnitPath().replace( '/' + account + '/', '' );
-            if ( unitName === name ) {
-                definedSlots.remove( index );
-            }
-        } );
-
-    }
-
-    function getDynamicInventory() {
-
-        var dynamicItems = [],
-            type = Config.get( 'clientType' ),
-            localContext;
-
-        $.each( inventory, function ( index, position ) {
-            if ( ( typeof position.dynamic !== 'undefined' ) && ( position.dynamic === true ) ) {
-                if ( ! type || type === position.type ) {
-                    dynamicItems.push( position );
-                    localContext = position.localContext;
-                }
-            }
-        } );
-
-        return {
-            dynamicItems: dynamicItems,
-            localContext: localContext
-        };
 
     }
 
@@ -560,14 +424,11 @@
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        init:                init,
-        isEnabled:           isEnabled,
-        getAdInfo:           getAdInfo,
-        displaySlot:         displaySlot,
-        removeDefinedSlot:   removeDefinedSlot,
-        getDynamicInventory: getDynamicInventory,
-        initSequence:        initSequence,
-        emptyAds:            emptyAds
+        init:         init,
+        isEnabled:    isEnabled,
+        displaySlot:  displaySlot,
+        initSequence: initSequence,
+        emptyAds:     emptyAds
     };
 
 } ) );
