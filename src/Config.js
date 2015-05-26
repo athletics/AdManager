@@ -33,7 +33,33 @@
     var name = 'Config',
         debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
-        config = {};
+        config = {
+            account:             null,               // DFP account ID
+            adClass:             'app_ad_unit',      // Outer ad wrap
+            adSelector:          '',                 // Leave blank
+            adUnitTargetClass:   'app_unit_target',  // Inner ad wrap
+            clientType:          false,              // Used to filter inventory
+            context:             'body',             // Selector for ad filling container
+            enabled:             true,               // Turn off ads
+            insertExclusion:     [],                 // Inventory to exclude from dynamic insertion
+            insertionEnabled:    false,              // Enable dynamic insertion
+            insertion:           {
+                pxBetweenUnits:  800,                // Minimum space b/w dynamically inserted units
+                adHeightLimit:   1000,               // Max-height for dynamic units
+                insertExclusion: [                   // Skip these elements when inserting units
+                    'img',
+                    'iframe',
+                    'video',
+                    'audio',
+                    '.video',
+                    '.audio',
+                    '.app_ad_unit'
+                ]
+            },
+            inventory:           [],                 // Inventory of ad units
+            pageConfigAttr:      false,              // Selector for dynamic config import
+            targeting:           []                  // Key value pairs to send with DFP request
+        };
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -46,30 +72,7 @@
 
         debug( name + ': initialized' );
 
-        config = $.extend( {
-            account: 0,
-            clientType: false,
-            context: 'body',
-            enabled: true,
-            insertExclusion: [],
-            insertionEnabled: false,
-            insertion: {
-                pxBetweenUnits: 800,
-                adHeightLimit: 1000,
-                insertExclusion: [
-                    'img',
-                    'iframe',
-                    'video',
-                    'audio',
-                    '.video',
-                    '.audio',
-                    '.app_ad_unit'
-                ]
-            },
-            inventory: [],
-            pageConfigAttr: false,
-            targeting: []
-        }, newConfig );
+        config = $.extend( config, newConfig );
 
     }
 
