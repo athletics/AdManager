@@ -144,6 +144,7 @@
 
         var dynamicItems = [],
             type = Config.get( 'clientType' ),
+            inventory = getInventory(),
             localContext;
 
         $.each( inventory, function ( index, position ) {
@@ -269,7 +270,7 @@
 
         var type = 'default';
 
-        $.each( Config.get( 'inventory' ), function ( index, unit ) {
+        $.each( getInventory(), function ( index, unit ) {
 
             if ( unit.id !== id ) {
                 return true;
