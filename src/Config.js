@@ -74,6 +74,24 @@
     }
 
     /**
+     * Get
+     *
+     * @param  {String|Null} key Optional.
+     * @return {Mixed}
+     */
+    function get( key ) {
+
+        key = key || false;
+
+        if ( ! key ) {
+            return config;
+        }
+
+        return getConfigValue( config, key );
+
+    }
+
+    /**
      * Set config value. Uses recursion to set nested values.
      *
      * @param  {Object} config
@@ -98,20 +116,23 @@
     }
 
     /**
-     * Get
+     * Get config value. Uses recursion to get nested values.
      *
-     * @param  {String|Null} key Optional.
+     * @param  {Object} config
+     * @param  {String} key
      * @return {Mixed}
      */
-    function get( key ) {
+    function getConfigValue( config, key ) {
 
-        key = key || false;
-
-        if ( ! key ) {
-            return config;
+        if ( typeof key === 'string' ) {
+            key = key.split( '.' );
         }
 
-        return key in config ? config[ key ] : null;
+        if ( key.length > 1 ) {
+            return getConfigValue( config[ key.shift() ], key );
+        } else {
+            return key[0] in config ? config[ key[0] ] : null;
+        }
 
     }
 
