@@ -50,8 +50,6 @@
 
     function init() {
 
-        debug( name + ': initialized' );
-
         if ( ! isEnabled() ) {
             return;
         }

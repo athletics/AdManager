@@ -70,8 +70,6 @@
      */
     function init( newConfig ) {
 
-        debug( name + ': initialized' );
-
         config = $.extend( config, newConfig );
 
     }

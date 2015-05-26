@@ -66,8 +66,6 @@
 
     function init() {
 
-        debug( name + ': initialized' );
-
         defaults = $.extend( defaults, Manager.getDefaults() );
 
         bindHandlers();
