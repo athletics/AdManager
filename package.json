@@ -18,5 +18,8 @@
     "gulp-cli": "^0.2.0",
     "gulp-watch": "^4.2.4",
     "requirejs": "^2.1.17"
+  },
+  "dependencies": {
+    "jquery": "^2.1.4"
   }
 }
