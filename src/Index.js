@@ -55,11 +55,13 @@
 
     }
 
-    AdManager.prototype.Util = Util;
-    AdManager.prototype.Config = Config;
-    AdManager.prototype.Inventory = Inventory;
-    AdManager.prototype.Manager = Manager;
-    AdManager.prototype.Insertion = Insertion;
+    var module = AdManager.prototype;
+
+    module.Util = Util;
+    module.Config = Config;
+    module.Inventory = Inventory;
+    module.Manager = Manager;
+    module.Insertion = Insertion;
 
     return AdManager;
 
