@@ -9,7 +9,6 @@
             'jquery',
             './Util',
             './Config',
-            './Manager',
             './Inventory'
         ], factory );
 
@@ -19,7 +18,6 @@
             require( 'jquery' ),
             require( './Util' ),
             require( './Config' ),
-            require( './Manager' ),
             require( './Inventory' )
         );
 
@@ -31,13 +29,12 @@
             root.jQuery,
             root.AdManager.Util,
             root.AdManager.Config,
-            root.AdManager.Manager,
             root.AdManager.Inventory
         );
 
     }
 
-} ( this, function ( $, Util, Config, Manager, Inventory ) {
+} ( this, function ( $, Util, Config, Inventory ) {
 
     var name = 'Insertion',
         debugEnabled = true,
@@ -47,26 +44,11 @@
         inContent = false,
         inventory = [],
         odd = true,
-        localContext = null,
-        defaults = {
-            pxBetweenUnits: 800,
-            adHeightLimit: 1000,
-            insertExclusion: [
-                'img',
-                'iframe',
-                'video',
-                'audio',
-                '.video',
-                '.audio',
-                '.app_ad_unit'
-            ]
-        };
+        localContext = null;
 
     //////////////////////////////////////////////////////////////////////////////////////
 
     function init() {
-
-        defaults = $.extend( defaults, Manager.getDefaults() );
 
         bindHandlers();
 
@@ -101,7 +83,7 @@
      */
     function qualifyContext() {
 
-        var inventoryData = Manager.getDynamicInventory();
+        var inventoryData = Inventory.getDynamicInventory();
 
         setContext();
         inventory = inventory.length ? inventory : inventoryData.dynamicItems;
@@ -127,7 +109,6 @@
         }
 
         insertAdUnits();
-        return;
 
     }
 
@@ -166,7 +147,7 @@
     function denoteValidInsertions() {
 
         var $nodes = $localContext.children(),
-            excluded = Config.get( 'insertExclusion' ) || defaults.insertExclusion
+            excluded = Config.get( 'insertExclusion' )
         ;
 
         $nodes.each( function ( i ) {
@@ -220,7 +201,7 @@
             $html = $( '<div />' );
 
         $html
-            .addClass( defaults.adClass )
+            .addClass( Config.get( 'adClass' ) )
             .attr( 'data-id', unitId )
             .attr( 'data-client-type', type );
 
@@ -251,7 +232,7 @@
             shortest = Inventory.shortestAvailable( unit ),
             location = findInsertionLocation( {
                 height: tallest,
-                limit: defaults.adHeightLimit
+                limit: Config.get( 'insertion.adHeightLimit' )
             } ),
             markup = null
         ;
@@ -259,7 +240,7 @@
         if ( ! location ) {
             location = findInsertionLocation( {
                 height: shortest,
-                limit: defaults.adHeightLimit,
+                limit: Config.get( 'insertion.adHeightLimit' ),
                 force: true
             } );
 
@@ -453,7 +434,7 @@
 
             if ( this.validHeight >= this.neededheight ) {
 
-                if ( ! this.limit && ( since < defaults.pxBetweenUnits ) ) {
+                if ( ! this.limit && ( since < Config.get( 'insertion.pxBetweenUnits' ) ) ) {
 
                     this.validHeight = 0;
                     this.$insertBefore = null;
@@ -489,7 +470,7 @@
             return false;
         }
 
-        return $el.is( defaults.adSelector );
+        return $el.is( Config.get( 'adSelector' ) );
 
     }
 
@@ -500,7 +481,7 @@
      */
     function getNodes() {
 
-        var $prevUnit = $localContext.find( defaults.adSelector ).last(),
+        var $prevUnit = $localContext.find( Config.get( 'adSelector' ) ).last(),
             $nodes = null;
 
         // nodes after previous unit or all nodes
