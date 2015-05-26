@@ -4,7 +4,7 @@
   "homepage": "https://github.com/athletics/ad-manager",
   "description": "Generic code for GPT ad management",
   "license": "MIT",
-  "main": "dist/admanager.min.js",
+  "main": "dist/AdManager.min.js",
   "ignore": [
     "bower.json",
     "package.json",
