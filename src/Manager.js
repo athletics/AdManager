@@ -69,14 +69,14 @@
 
         $( document )
             .on( 'GPT:unitsInserted', function ( event ) {
-                debug( name + ': GPT:unitsInserted' );
+                debug( name + ': ' + event.type );
             } )
             .on( 'GPT:libraryLoaded', function ( event ) {
-                debug( name + ': GPT:libraryLoaded' );
+                debug( name + ': ' + event.type );
                 initSequence();
             } )
             .on( 'GPT:slotsDefined', function ( event ) {
-                debug( name + ': GPT:slotsDefined' );
+                debug( name + ': ' + event.type );
                 displayPageAds();
             } );
 
