@@ -28,7 +28,9 @@
 } ( this, function ( $ ) {
 
     /**
-     * Debug - console.log wrapper
+     * Debug: a console.log wrapper.
+     *
+     * @return {String}
      */
     var debug = function () {
 
@@ -41,11 +43,11 @@
     } ();
 
     /**
-     * Return difference between arrays
+     * Return difference between arrays.
      *
-     * @param  array array
-     * @param  array values
-     * @return array diff
+     * @param  {Array} array
+     * @param  {Array} values
+     * @return {Array} diff
      */
     function difference( array, values ) {
 
