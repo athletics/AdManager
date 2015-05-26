@@ -35,7 +35,7 @@
 
     var name = 'Inventory',
         debugEnabled = true,
-        debug;
+        debug = debugEnabled ? Util.debug : function () {};
 
     //////////////////////////////////////////////////////////////////////////////////////
 
