@@ -63,12 +63,37 @@
     /**
      * Set
      *
-     * @param {String} key
-     * @param {Mixed}  value
+     * @param  {String} key
+     * @param  {Mixed}  value
+     * @return {Object} config
      */
     function set( key, value ) {
 
-        config[ key ] = value;
+        return setConfigValue( config, key, value );
+
+    }
+
+    /**
+     * Set config value. Uses recursion to set nested values.
+     *
+     * @param  {Object} config
+     * @param  {String} key
+     * @param  {Mixed}  value
+     * @return {Object} config
+     */
+    function setConfigValue( config, key, value ) {
+
+        if ( typeof key === 'string' ) {
+            key = key.split( '.' );
+        }
+
+        if ( key.length > 1 ) {
+            setConfigValue( config[ key.shift() ], key, value );
+        } else {
+            config[ key[0] ] = value;
+        }
+
+        return config;
 
     }
 
