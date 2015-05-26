@@ -285,6 +285,31 @@
 
     }
 
+    /**
+     * Increment ad slot.
+     *
+     * @param {String} unit
+     */
+    function incrementAdSlot( unit ) {
+
+        var inventory = Config.get( 'inventory' );
+
+        for ( var i = 0; i < inventory.length; i++ ) {
+
+            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
+                continue;
+            }
+
+            inventory[ i ].iteration = typeof inventory[ i ].iteration === 'undefined' ? 0 : inventory[ i ].iteration + 1;
+
+            Config.set( 'inventory', inventory );
+
+            break;
+
+        }
+
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
@@ -294,7 +319,8 @@
         shortestAvailable:   shortestAvailable,
         tallestAvailable:    tallestAvailable,
         limitUnitHeight:     limitUnitHeight,
-        getUnitType:         getUnitType
+        getUnitType:         getUnitType,
+        incrementAdSlot:     incrementAdSlot
     };
 
 } ) );
