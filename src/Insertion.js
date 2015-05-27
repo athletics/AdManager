@@ -1,5 +1,9 @@
 /**
- * Insertion
+ * Dynamically insert ad units into container.
+ * Avoids ads and other problematic elements.
+ *
+ * @todo  Insert the previously inserted units in an infinite scroll context.
+ * @todo  Update language to `node` and `nodes` everywhere for consistency.
  */
 ( function ( root, factory ) {
 
@@ -60,6 +64,12 @@
 
     }
 
+    /**
+     * Sets the context jQuery object variable.
+     *
+     * @todo  Consider resetting variable to `null` when
+     *        no longer needed in a pushState context.
+     */
     function setContext() {
 
         $context = $( Config.get( 'context' ) );
@@ -100,7 +110,7 @@
     }
 
     /**
-     * Ad units have been inserted / proceed
+     * Triggers ad units inserted event.
      */
     function broadcast() {
 
@@ -111,7 +121,7 @@
     /**
      * Is Insertion Enabled?
      *
-     * @return bool
+     * @return {Boolean} Probably!
      */
     function isEnabled() {
 
@@ -119,6 +129,11 @@
 
     }
 
+    /**
+     * Run in-content insertion.
+     *
+     * @todo  Does this need the extra check?
+     */
     function insertAdUnits() {
 
         if ( inContent ) {
@@ -131,6 +146,14 @@
 
     }
 
+    /**
+     * Walks DOM elements in the local context.
+     * Sets a data attribute if element is a valid insertion location.
+     *
+     * @todo  Potentially use `$.grep` to filter nodes for faster parsing.
+     * @todo  Use `for` loop or `$.grep` to check for excluded elements.
+     * @todo  Clarify `$prev` check.
+     */
     function denoteValidInsertions() {
 
         var $nodes = $localContext.children(),
@@ -162,10 +185,10 @@
     }
 
     /**
-     * Check against of list of elements to skip
+     * Check if node should be skipped.
      *
-     * @param  object $element
-     * @return bool
+     * @param  {Object}  $element
+     * @return {Boolean}
      */
     function isValidInsertionLocation( $element ) {
 
@@ -174,11 +197,13 @@
     }
 
     /**
-     * adUnitMarkup
+     * Generate ad unit markup.
+     * Creates DOM node to attach to the DOM.
      *
-     * @param string unitId
-     * @param bool disableFloat
-     * @return string
+     * @see    https://vip.wordpress.com/2015/03/25/preventing-xss-in-javascript/
+     * @param  {String}  unitId
+     * @param  {Boolean} disableFloat
+     * @return {Array}   $html
      */
     function adUnitMarkup( unitId, disableFloat ) {
 
@@ -211,7 +236,9 @@
     }
 
     /**
-     * Insert Primary Unit: Unit most display above the fold
+     * Inserts the primary unit, which must display above the fold.
+     *
+     * @todo  Clarify usage, make optional.
      */
     function insertPrimaryUnit() {
 
@@ -245,7 +272,7 @@
     }
 
     /**
-     * Insert Secondary Unit: Ad units that commonly appear below the fold
+     * Inserts the secondary units, which can appear below the fold.
      */
     function insertSecondaryUnits() {
 
@@ -269,6 +296,12 @@
 
     }
 
+    /**
+     * Determines the primary unit, which is either denoted or the first listed.
+     *
+     * @todo   Use `$.grep` instead of `$.each` for optimization.
+     * @return {Object|Boolean} primaryUnit False on failure.
+     */
     function getPrimaryUnit() {
 
         var primaryUnit = false;
@@ -293,10 +326,14 @@
     }
 
     /**
-     * findInsertionLocation
+     * Find insertion location.
+     * Considers distance between units and valid locations.
      *
-     * @param object options
-     * @return object or boolean:false
+     * @todo   Convert `$.each` to `for` loop.
+     *         Use `continue` and `break` for clarity.
+     *
+     * @param  {Object}         options
+     * @return {Object|Boolean}         False on failure.
      */
     function findInsertionLocation( options ) {
 
@@ -315,7 +352,9 @@
             return false;
         }
 
-        // Loop through each node as necessary
+        // Loop through each node as necessary.
+        // `verifyNode()` returns true when found.
+        // Break the loop when true.
         $.each( $nodes, function ( i, node ) {
 
             return true !== nodeSearch.verifyNode( i, $( node ) ) ? true : false;
@@ -337,7 +376,9 @@
     }
 
     /**
-     * Search object used for determining insertion points
+     * Search prototype used for determining insertion points.
+     *
+     * @param  {Object} options
      */
     function NodeSearch( options ) {
 
@@ -359,7 +400,7 @@
     }
 
     /**
-     * Store the position of the last ad
+     * Store the position of the last ad.
      */
     NodeSearch.prototype.setLastPosition = function () {
 
@@ -368,7 +409,10 @@
     };
 
     /**
-     * Mark nodes where insertion is valid
+     * Mark nodes where insertion is valid.
+     *
+     * @todo  Consistently use `.attr()` or `.data()` when setting.
+     *        jQuery does not need the DOM to change for data attributes.
      */
     NodeSearch.prototype.markValidNodes = function () {
 
@@ -383,9 +427,12 @@
     };
 
     /**
-     * Verify each node to find a suitable insertion point
+     * Verify each node to find a suitable insertion point.
      *
-     * @return boolean
+     * @todo   Why is `this.exitLoop` set to `null`?
+     * @todo   Document each step. Simplify if possible.
+     *
+     * @return {Boolean}
      */
     NodeSearch.prototype.verifyNode = function ( index, $node ) {
 
@@ -443,10 +490,10 @@
     };
 
     /**
-     * Is Element an Ad Unit
+     * Is Element an Ad Unit?
      *
-     * @param mixed $el
-     * @return bool
+     * @param  {Mixed}   $el
+     * @return {Boolean}
      */
     function isThisAnAd( $el ) {
 
@@ -459,16 +506,16 @@
     }
 
     /**
-     * Get Nodes to Loop Through
+     * Get next group of nodes to loop through.
+     * Grabs the nodes after previous unit or all nodes if no previous.
      *
-     * @return array $nodes
+     * @return {Array} $nodes
      */
     function getNodes() {
 
         var $prevUnit = $localContext.find( Config.get( 'adSelector' ) ).last(),
             $nodes = null;
 
-        // nodes after previous unit or all nodes
         if ( $prevUnit.length ) {
             $nodes = $prevUnit.nextAll( $localContext );
         } else {
