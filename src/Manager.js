@@ -39,6 +39,7 @@
     var name = 'Manager',
         debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
+        libraryLoaded = false,
         definedSlots = [],
         pagePositions = [],
         inventory = [],
@@ -73,6 +74,7 @@
             } )
             .on( 'GPT:libraryLoaded', function ( event ) {
                 debug( name + ': ' + event.type );
+                libraryLoaded = true;
                 initSequence();
             } )
             .on( 'GPT:slotsDefined', function ( event ) {
@@ -98,6 +100,10 @@
      * Request GPT library
      */
     function loadLibrary() {
+
+        if ( libraryLoaded ) {
+            return onLibraryLoaded();
+        }
 
         var googletag,
             gads,
