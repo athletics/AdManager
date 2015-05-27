@@ -111,6 +111,8 @@
 
     /**
      * Triggers ad units inserted event.
+     *
+     * @fires GPT:unitsInserted
      */
     function broadcast() {
 
