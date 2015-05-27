@@ -318,13 +318,7 @@
         // Loop through each node as necessary
         $.each( $nodes, function ( i, node ) {
 
-            var exitLoop = nodeSearch.verifyNode( i, $( node ) );
-
-            if ( exitLoop ) {
-                return false;
-            } else if ( ! exitLoop ) {
-                return true;
-            }
+            return true !== nodeSearch.verifyNode( i, $( node ) ) ? true : false;
 
         } );
 
