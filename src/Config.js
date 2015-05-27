@@ -1,5 +1,7 @@
 /**
  * Import, get, and set configuration values.
+ *
+ * @todo  Initialization should die when no valid account or inventory.
  */
 ( function ( root, factory ) {
 
