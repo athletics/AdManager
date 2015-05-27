@@ -1,9 +1,9 @@
 {
   "name": "ad-manager",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "homepage": "https://github.com/athletics/ad-manager",
   "description": "Generic code for GPT ad management",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "dist/AdManager.min.js",
   "ignore": [
     "bower.json",
