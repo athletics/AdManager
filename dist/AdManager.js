@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.3.1
+ * @version 0.4.0
  *//**
  * Shared utilities for debugging and array manipulation.
  */
@@ -660,6 +660,9 @@
 } ) );
 /**
  * Handles the request and display of ads.
+ *
+ * @todo  Allow for multiple inits, only bind events
+ *        and load library once.
  */
 ( function ( window, factory ) {
 
