@@ -1,7 +1,7 @@
 /**
  * Get, filter, and augment the ad unit inventory.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -10,13 +10,13 @@
             './Util',
             './Config'
         ], function ( $, Util, Config ) {
-            return factory( root, $, Util, Config );
+            return factory( window, $, Util, Config );
         } );
 
     } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
-            root,
+            window,
             require( 'jquery' ),
             require( './Util' ),
             require( './Config' )
@@ -24,18 +24,18 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Inventory = factory(
-            root,
-            root.jQuery,
-            root.AdManager.Util,
-            root.AdManager.Config
+        window.AdManager.Inventory = factory(
+            window,
+            window.jQuery,
+            window.AdManager.Util,
+            window.AdManager.Config
         );
 
     }
 
-} ( this, function ( root, $, Util, Config ) {
+} ( window, function ( window, $, Util, Config ) {
 
     var name = 'Inventory',
         debugEnabled = true,
@@ -89,7 +89,7 @@
      */
     function getAvailableSizes( inventory ) {
 
-        var width = root.innerWidth > 0 ? root.innerWidth : screen.width;
+        var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
 
         if ( width > 1024 ) {
             return inventory;

@@ -1,7 +1,7 @@
 /**
  * Shared utilities for debugging and array manipulation.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -17,15 +17,15 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Util = factory(
-            root.jQuery
+        window.AdManager.Util = factory(
+            window.jQuery
         );
 
     }
 
-} ( this, function ( $ ) {
+} ( window, function ( $ ) {
 
     /**
      * A console.log wrapper with the correct line numbers.
