@@ -1,5 +1,8 @@
 /**
- * Manager
+ * Handles the request and display of ads.
+ *
+ * @todo  Allow for multiple inits, only bind events
+ *        and load library once.
  */
 ( function ( window, factory ) {
 
@@ -52,6 +55,9 @@
 
     //////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Add event listeners and get the DFP library.
+     */
     function init() {
 
         if ( ! isEnabled() ) {
@@ -68,7 +74,7 @@
     }
 
     /**
-     * Bind to custom jQuery events
+     * Add event listeners for library events.
      */
     function bindHandlers() {
 
@@ -84,12 +90,22 @@
 
     }
 
+    /**
+     * Start the sequence to loads ads.
+     *
+     * @todo  Separate initial load functions from request /
+     *        load functions.
+     * @todo  Consider using separate events.
+     *
+     * @fires GPT:initSequence
+     */
     function initSequence() {
 
         $.event.trigger( 'GPT:initSequence' );
 
         listenForDfpEvents();
         enableSingleRequest();
+
         setTargeting();
         setPagePositions();
         defineSlotsForPagePositions();
@@ -97,7 +113,8 @@
     }
 
     /**
-     * Request GPT library
+     * Asynchronously load the DFP library.
+     * Calls ready event when fully loaded.
      */
     function loadLibrary() {
 
@@ -123,7 +140,8 @@
         if ( gads.addEventListener ) {
             gads.addEventListener( 'load', onLibraryLoaded, false );
         } else if ( gads.readyState ) {
-            gads.onreadystatechange = function () { // Legacy IE
+            gads.onreadystatechange = function () {
+                // Legacy IE
                 if ( ! readyStateLoaded ) {
                     readyStateLoaded = true;
                     onLibraryLoaded();
@@ -136,7 +154,9 @@
     }
 
     /**
-     * Callback when GPT library is loaded
+     * Callback when GPT library is loaded.
+     *
+     * @fires GPT:libraryLoaded
      */
     function onLibraryLoaded() {
 
@@ -147,7 +167,7 @@
     }
 
     /**
-     * Bind to GPT events
+     * Add a listener for the GPT `slotRenderEnded` event.
      */
     function listenForDfpEvents() {
 
@@ -162,15 +182,13 @@
     }
 
     /**
-     * Enable Batched SRA
-     *
-     * @uses collapseEmptyDivs()
-     * @uses enableSingleRequest()
-     * @uses disableInitialLoad()
+     * Enable batched SRA calls for requesting multiple ads at once.
+     * Disable initial load of units, wait for display call.
      */
     function enableSingleRequest() {
 
         googletag.cmd.push( function () {
+
             // https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_collapseEmptyDivs
             googletag.pubads().collapseEmptyDivs();
 
@@ -179,13 +197,13 @@
 
             // https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_disableInitialLoad
             googletag.pubads().disableInitialLoad();
+
         } );
 
     }
 
     /**
-     * Send Targeting
-     * Defined in Page Config
+     * Send key-value targeting in ad request.
      */
     function setTargeting() {
 
@@ -206,7 +224,8 @@
     }
 
     /**
-     * Set Page Positions
+     * Looks for ad unit markup in the context to build a list
+     * of units to request.
      */
     function setPagePositions() {
 
@@ -230,7 +249,9 @@
     }
 
     /**
-     * Define Slots for Page Positions
+     * Define slots for page positions.
+     *
+     * @fires GPT:slotsDefined
      */
     function defineSlotsForPagePositions() {
 
@@ -246,12 +267,12 @@
                 Inventory.incrementAdSlot( pagePositions[ i ] );
                 currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
 
-                if ( typeof currentPosition.id == 'undefined' ) {
+                if ( typeof currentPosition.id === 'undefined' ) {
                     continue;
                 }
 
-                // find the empty container div on the page. we
-                // will dynamically instantiate the unique ad unit.
+                // Find the empty container on the page.
+                // Dynamically instantiate the unique ad unit.
                 $unit = $context.find( adSelector + '[data-id="' + currentPosition.id + '"]' );
                 $unitTarget = $( '<div />' );
 
@@ -259,12 +280,12 @@
                     continue;
                 }
 
-                // generate new div
+                // Generate new unique div.
                 $unitTarget.addClass( Config.get( 'adUnitTargetClass' ) );
                 $unitTarget.attr( 'id', currentPosition.idName );
                 $unit.append( $unitTarget );
 
-                // activate
+                // Activate
                 $unit.addClass( 'active' );
 
                 definedSlots[ i ] = googletag
@@ -278,7 +299,7 @@
 
             }
 
-            // Enables GPT services for defined slots
+            // Enables GPT services for defined slots.
             googletag.enableServices();
 
             $.event.trigger( 'GPT:slotsDefined' );
@@ -287,14 +308,15 @@
 
     }
 
+    /**
+     * Fetch and display defined slots.
+     */
     function displayPageAds() {
 
         googletag.cmd.push( function () {
 
-            // Fetch and display ads for definedSlots
             googletag.pubads().refresh( definedSlots );
 
-            // lastly, run display code
             for ( var i = 0; i < pagePositions.length; i++ ) {
 
                 currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
@@ -310,10 +332,12 @@
     }
 
     /**
-     * slotRenderEnded - callback after unit is rendered
+     * Callback from DFP rendered event.
      *
-     * @see https://developers.google.com/doubleclick-gpt/reference
-     * @param object unit
+     * @fires GPT:adUnitRendered
+     * @see   https://developers.google.com/doubleclick-gpt/reference
+     *
+     * @param {Object} unit
      */
     function slotRenderEnded( unit ) {
 
@@ -334,10 +358,12 @@
     }
 
     /**
-     * getDefinedSlot
+     * Get defined slot by name.
      *
-     * @param string name
-     * @return object definedSlot
+     * @todo   Use `$.grep` instead of `$.each`.
+     *
+     * @param  {String} name
+     * @return {Object} definedSlot
      */
     function getDefinedSlot( name ) {
 
@@ -356,9 +382,10 @@
     }
 
     /**
-     * displaySlot
+     * Display slot by ID or slot.
+     * Separate display call from `displayPageAds()`.
      *
-     * @param string unit [type or slot]
+     * @param {String} unit
      */
     function displaySlot( unit ) {
 
@@ -374,9 +401,9 @@
     }
 
     /**
-     * Check if the Ad Manager is enabled for page
+     * Check if the Ad Manager is currently enabled.
      *
-     * @return bool
+     * @return {Boolean}
      */
     function isEnabled() {
 
@@ -385,10 +412,11 @@
     }
 
     /**
-     * Empties all ads in a given context
+     * Empties all ads in a given context.
+     * Can be used to refresh ads on pushState.
      *
-     * @param object options.$context
-     * @param bool   options.removeContainer
+     * @param {Object}  options.$context
+     * @param {Boolean} options.removeContainer
      */
     function emptyAds( options ) {
 
