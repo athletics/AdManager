@@ -10,11 +10,14 @@
             './Util',
             './Config',
             './Inventory'
-        ], factory );
+        ], function ( $, Util, Config, Inventory ) {
+            return factory( root, $, Util, Config, Inventory );
+        } );
 
     } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
+            root,
             require( 'jquery' ),
             require( './Util' ),
             require( './Config' ),
@@ -26,6 +29,7 @@
         root.AdManager = root.AdManager || {};
 
         root.AdManager.Manager = factory(
+            root,
             root.jQuery,
             root.AdManager.Util,
             root.AdManager.Config,
@@ -34,7 +38,7 @@
 
     }
 
-} ( this, function ( $, Util, Config, Inventory ) {
+} ( this, function ( root, $, Util, Config, Inventory ) {
 
     var name = 'Manager',
         debugEnabled = true,
@@ -108,9 +112,9 @@
             readyStateLoaded = false
         ;
 
-        window.googletag = window.googletag || {};
-        googletag = window.googletag;
-        googletag.cmd = googletag.cmd || [];
+        root.googletag = root.googletag || {};
+        root.googletag.cmd = root.googletag.cmd || [];
+
         gads = document.createElement( 'script' );
         gads.async = true;
         gads.type = 'text/javascript';
