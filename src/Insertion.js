@@ -195,10 +195,10 @@
 
         if ( disableFloat ) {
             $html
-                .addClass( 'disableFloat' );
+                .addClass( 'disable-float' );
         } else {
             $html
-                .addClass( 'inContent' )
+                .addClass( 'in-content' )
                 .addClass( alignment );
         }
 
