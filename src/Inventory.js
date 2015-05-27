@@ -9,11 +9,14 @@
             'jquery',
             './Util',
             './Config'
-        ], factory );
+        ], function ( $, Util, Config ) {
+            return factory( root, $, Util, Config );
+        } );
 
     } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
+            root,
             require( 'jquery' ),
             require( './Util' ),
             require( './Config' )
@@ -24,6 +27,7 @@
         root.AdManager = root.AdManager || {};
 
         root.AdManager.Inventory = factory(
+            root,
             root.jQuery,
             root.AdManager.Util,
             root.AdManager.Config
@@ -31,7 +35,7 @@
 
     }
 
-} ( this, function ( $, Util, Config ) {
+} ( this, function ( root, $, Util, Config ) {
 
     var name = 'Inventory',
         debugEnabled = true,
@@ -85,7 +89,7 @@
      */
     function getAvailableSizes( inventory ) {
 
-        var width = ( window.innerWidth > 0 ) ? window.innerWidth : screen.width;
+        var width = root.innerWidth > 0 ? root.innerWidth : screen.width;
 
         if ( width > 1024 ) {
             return inventory;
