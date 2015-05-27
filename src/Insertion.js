@@ -372,11 +372,13 @@
      */
     NodeSearch.prototype.markValidNodes = function () {
 
-        if ( this.inserted.length ) {
-            $.each( this.inserted, function ( index, item ) {
-                $( item ).data( 'valid-location', false );
-            } );
+        if ( ! this.inserted.length ) {
+            return;
         }
+
+        $.each( this.inserted, function ( index, item ) {
+            $( item ).data( 'valid-location', false );
+        } );
 
     };
 
