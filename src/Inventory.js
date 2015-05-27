@@ -1,5 +1,5 @@
 /**
- * Inventory
+ * Get, filter, and augment the ad unit inventory.
  */
 ( function ( root, factory ) {
 
@@ -53,6 +53,8 @@
     /**
      * Add default unit type if not set.
      *
+     * @todo   Should this edit the inventory in the Config?
+     *
      * @param  {Array} inventory
      * @return {Array} inventory
      */
@@ -75,7 +77,8 @@
     /**
      * Remove sizes from inventory that will not display properly.
      *
-     * @todo   Simplify and remove limits.
+     * @todo   Clarify what this function is limiting, and remove the
+     *         hard limits set to use desktop width for tablets.
      *
      * @param  {Array} inventory
      * @return {Array} inventory
@@ -109,6 +112,7 @@
 
     /**
      * Remove slot by name.
+     * Relies on the `googletag` slot object.
      *
      * @param  {Object} definedSlots
      * @param  {String} name
@@ -138,6 +142,8 @@
     /**
      * Get ad units for dynamic insertion.
      *
+     * @todo   Replace `$.each` with `$.grep`.
+     *
      * @return {Object}
      */
     function getDynamicInventory() {
@@ -164,9 +170,9 @@
     }
 
     /**
-     * Get Ad Unit Info
+     * Get info about an ad unit by id or slot name.
      *
-     * @param  {String} unit
+     * @param  {String} unit   ID or slot.
      * @return {Object} adInfo
      */
     function getAdInfo( unit ) {
@@ -179,15 +185,12 @@
                 continue;
             }
 
-            // build return object
             adInfo = inventory[ i ];
 
-            // determine the object's idName
+            // Determine the object's idName (using the iterator if allowed).
             if ( typeof adInfo.useIterator !== 'undefined' && ! adInfo.useIterator ) {
-                // don't use the iterator
                 adInfo.idName = adInfo.id;
             } else {
-                // use the iterator
                 adInfo.idName = adInfo.id + '_' + adInfo.iteration;
             }
 
@@ -199,7 +202,10 @@
     }
 
     /**
-     * Get Shortest Possible Size for Unit
+     * Get shortest possible height for unit.
+     *
+     * @todo   Consider abstracting shortest and tallest
+     *         functions into one.
      *
      * @param  {Object}  unit
      * @return {Integer} shortest
@@ -221,7 +227,10 @@
     }
 
     /**
-     * Get Tallest Possible Size for Unit
+     * Get tallest possible height for unit.
+     *
+     * @todo   Consider abstracting shortest and tallest
+     *         functions into one.
      *
      * @param  {Object}  unit
      * @return {Integer} tallest
@@ -241,7 +250,10 @@
     }
 
     /**
-     * Limit Ad Unit Height: Removes Larger Sizes from Inventory
+     * Limit ad unit sizes.
+     * Removes heights too large for context.
+     *
+     * @todo   Limit to the current iteration.
      *
      * @param  {Object}  unit
      * @param  {Integer} limit
@@ -261,7 +273,8 @@
     }
 
     /**
-     * Get Unit Type
+     * Finds the unit by id and returns its type.
+     * Type is used to filter the inventory (like desktop and mobile).
      *
      * @param  {String} id
      * @return {String} type
@@ -288,6 +301,10 @@
 
     /**
      * Increment ad slot.
+     *
+     * DFP requires an HTML id to display a unit. This function
+     * ensures all ids are unique by incrementing the unit every
+     * time an ad is loaded.
      *
      * @param {String} unit
      */
