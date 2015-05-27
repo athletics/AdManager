@@ -4,7 +4,7 @@
  * @todo  Initialization should die when no valid account or inventory.
  * @todo  Add optional dynamically-determined context for use in infinite scroll.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -22,16 +22,16 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Config = factory(
-            root.jQuery,
-            root.AdManager.Util
+        window.AdManager.Config = factory(
+            window.jQuery,
+            window.AdManager.Util
         );
 
     }
 
-} ( this, function ( $, Util ) {
+} ( window, function ( $, Util ) {
 
     var name = 'Config',
         debugEnabled = true,

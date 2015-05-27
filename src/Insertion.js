@@ -5,7 +5,7 @@
  * @todo  Insert the previously inserted units in an infinite scroll context.
  * @todo  Update language to `node` and `nodes` everywhere for consistency.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -27,18 +27,18 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Insertion = factory(
-            root.jQuery,
-            root.AdManager.Util,
-            root.AdManager.Config,
-            root.AdManager.Inventory
+        window.AdManager.Insertion = factory(
+            window.jQuery,
+            window.AdManager.Util,
+            window.AdManager.Config,
+            window.AdManager.Inventory
         );
 
     }
 
-} ( this, function ( $, Util, Config, Inventory ) {
+} ( window, function ( $, Util, Config, Inventory ) {
 
     var name = 'Insertion',
         debugEnabled = true,

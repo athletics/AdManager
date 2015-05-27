@@ -4,7 +4,7 @@
  *
  * @see  http://requirejs.org/docs/commonjs.html#intro On CommonJS Transport.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -28,9 +28,9 @@
 
     } else {
 
-        var _AdManager = root.AdManager;
+        var _AdManager = window.AdManager;
 
-        root.AdManager = factory(
+        window.AdManager = factory(
             _AdManager.Util,
             _AdManager.Config,
             _AdManager.Inventory,
@@ -40,7 +40,7 @@
 
     }
 
-} ( this, function ( Util, Config, Inventory, Manager, Insertion ) {
+} ( window, function ( Util, Config, Inventory, Manager, Insertion ) {
 
     /**
      * AdManager prototype.

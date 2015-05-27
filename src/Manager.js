@@ -1,7 +1,7 @@
 /**
  * Manager
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -11,13 +11,13 @@
             './Config',
             './Inventory'
         ], function ( $, Util, Config, Inventory ) {
-            return factory( root, $, Util, Config, Inventory );
+            return factory( window, $, Util, Config, Inventory );
         } );
 
     } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
-            root,
+            window,
             require( 'jquery' ),
             require( './Util' ),
             require( './Config' ),
@@ -26,19 +26,19 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Manager = factory(
-            root,
-            root.jQuery,
-            root.AdManager.Util,
-            root.AdManager.Config,
-            root.AdManager.Inventory
+        window.AdManager.Manager = factory(
+            window,
+            window.jQuery,
+            window.AdManager.Util,
+            window.AdManager.Config,
+            window.AdManager.Inventory
         );
 
     }
 
-} ( this, function ( root, $, Util, Config, Inventory ) {
+} ( window, function ( window, $, Util, Config, Inventory ) {
 
     var name = 'Manager',
         debugEnabled = true,
@@ -112,8 +112,8 @@
             readyStateLoaded = false
         ;
 
-        root.googletag = root.googletag || {};
-        root.googletag.cmd = root.googletag.cmd || [];
+        window.googletag = window.googletag || {};
+        window.googletag.cmd = window.googletag.cmd || [];
 
         gads = document.createElement( 'script' );
         gads.async = true;
