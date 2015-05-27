@@ -2,6 +2,7 @@
  * Import, get, and set configuration values.
  *
  * @todo  Initialization should die when no valid account or inventory.
+ * @todo  Add optional dynamically-determined context for use in infinite scroll.
  */
 ( function ( root, factory ) {
 
