@@ -66,11 +66,11 @@
     /**
      * Merge passed config with defaults.
      *
-     * @param  {Object} config
+     * @param  {Object} newConfig
      */
-    function init( config ) {
+    function init( newConfig ) {
 
-        config = $.extend( defaults, config );
+        config = $.extend( defaults, newConfig );
 
     }
 
