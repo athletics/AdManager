@@ -48,24 +48,15 @@
 
     //////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Bind init event listener.
+     * Begins qualification procedure when the DOM is ready.
+     *
+     * @todo  Check if is already attached.
+     */
     function init() {
 
-        bindHandlers();
-
-    }
-
-    function bindHandlers() {
-
-        $( document )
-            .on( 'GPT:initSequence', function ( event ) {
-
-                debug( name + ': ' + event.type );
-                /**
-                 * Begin qualification procedure when the DOM is ready
-                 */
-                qualifyContext();
-
-            } );
+        $( document ).on( 'GPT:initSequence', qualifyContext );
 
     }
 
