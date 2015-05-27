@@ -1,5 +1,5 @@
 /**
- * Util
+ * Shared utilities for debugging and array manipulation.
  */
 ( function ( root, factory ) {
 
@@ -46,7 +46,7 @@
     } ();
 
     /**
-     * Return difference between arrays.
+     * Get the difference of two arrays.
      *
      * @param  {Array} array
      * @param  {Array} values
@@ -67,7 +67,7 @@
     }
 
     /**
-     * Remove by key.
+     * Remove array value by key.
      *
      * @param  {Array}   array
      * @param  {Integer} key
