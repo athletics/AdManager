@@ -28,8 +28,11 @@
 } ( this, function ( $ ) {
 
     /**
-     * Debug: a console.log wrapper.
+     * A console.log wrapper with the correct line numbers.
      *
+     * @see    https://gist.github.com/bgrins/5108712
+     * @see    https://developer.mozilla.org/en-US/docs/Web/API/Console/log
+     * @param  {Mixed}
      * @return {String}
      */
     var debug = function () {
@@ -38,7 +41,7 @@
             return;
         }
 
-        return Function.prototype.bind.call( console.log, console );
+        return console.log.bind( console );
 
     } ();
 
