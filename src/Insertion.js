@@ -66,37 +66,33 @@
 
     }
 
-    /*
+    /**
      * First qualify the DOM context where ads are to be inserted
      * to determine if insertion should proceed.
-     *
-     * @return object
      */
     function qualifyContext() {
 
         var inventoryData = Inventory.getDynamicInventory();
 
-        setContext();
         inventory = inventory.length ? inventory : inventoryData.dynamicItems;
         localContext = localContext ? localContext : inventoryData.localContext;
 
-        // Return if empty
+        // No dynamic inventory.
         if ( ! inventory.length ) {
-            broadcast();
-            return;
+            return broadcast();
         }
 
+        setContext();
         $localContext = $context.find( localContext ).first();
 
-        // Detect a local context
+        // Detect a local context.
         if ( $localContext.length ) {
             inContent = true;
         }
 
-        // Return if there is no insertion selector
+        // There is no insertion selector.
         if ( ! inContent ) {
-            broadcast();
-            return;
+            return broadcast();
         }
 
         insertAdUnits();
