@@ -182,8 +182,9 @@
      */
     function adUnitMarkup( unitId, disableFloat ) {
 
-        var floatDisable = disableFloat || false,
-            type = Inventory.getUnitType( unitId ),
+        disableFloat = disableFloat || false;
+
+        var type = Inventory.getUnitType( unitId ),
             alignment = odd ? 'odd' : 'even',
             $html = $( '<div />' );
 
@@ -192,7 +193,7 @@
             .attr( 'data-id', unitId )
             .attr( 'data-client-type', type );
 
-        if ( floatDisable ) {
+        if ( disableFloat ) {
             $html
                 .addClass( 'disableFloat' );
         } else {
@@ -201,7 +202,7 @@
                 .addClass( alignment );
         }
 
-        if ( ! floatDisable ) {
+        if ( ! disableFloat ) {
             odd = ! odd;
         }
 
