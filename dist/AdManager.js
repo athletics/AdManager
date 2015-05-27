@@ -5,9 +5,9 @@
  * @see https://github.com/athletics/ad-manager
  * @version 0.3.1
  *//**
- * Util
+ * Shared utilities for debugging and array manipulation.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -23,19 +23,22 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Util = factory(
-            root.jQuery
+        window.AdManager.Util = factory(
+            window.jQuery
         );
 
     }
 
-} ( this, function ( $ ) {
+} ( window, function ( $ ) {
 
     /**
-     * Debug: a console.log wrapper.
+     * A console.log wrapper with the correct line numbers.
      *
+     * @see    https://gist.github.com/bgrins/5108712
+     * @see    https://developer.mozilla.org/en-US/docs/Web/API/Console/log
+     * @param  {Mixed}
      * @return {String}
      */
     var debug = function () {
@@ -44,12 +47,12 @@
             return;
         }
 
-        return Function.prototype.bind.call( console.log, console );
+        return console.log.bind( console );
 
     } ();
 
     /**
-     * Return difference between arrays.
+     * Get the difference of two arrays.
      *
      * @param  {Array} array
      * @param  {Array} values
@@ -70,7 +73,7 @@
     }
 
     /**
-     * Remove by key.
+     * Remove array value by key.
      *
      * @param  {Array}   array
      * @param  {Integer} key
@@ -96,9 +99,12 @@
 
 } ) );
 /**
- * Config
+ * Import, get, and set configuration values.
+ *
+ * @todo  Initialization should die when no valid account or inventory.
+ * @todo  Add optional dynamically-determined context for use in infinite scroll.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -116,21 +122,22 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Config = factory(
-            root.jQuery,
-            root.AdManager.Util
+        window.AdManager.Config = factory(
+            window.jQuery,
+            window.AdManager.Util
         );
 
     }
 
-} ( this, function ( $, Util ) {
+} ( window, function ( $, Util ) {
 
     var name = 'Config',
         debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
-        config = {
+        config = {},
+        defaults = {
             account:             null,               // DFP account ID
             adClass:             'app_ad_unit',      // Outer ad wrap
             adUnitTargetClass:   'app_unit_target',  // Inner ad wrap
@@ -152,26 +159,26 @@
                     '.app_ad_unit'
                 ]
             },
-            inventory:           [],                 // Inventory of ad units
-            pageConfigAttr:      false,              // Selector for dynamic config import
-            targeting:           []                  // Key value pairs to send with DFP request
+            inventory: [],                           // Inventory of ad units
+            pageConfigAttr: false,                   // Selector for dynamic config import
+            targeting: []                            // Key value pairs to send with DFP request
         };
 
     //////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Initialize the config module.
+     * Merge passed config with defaults.
      *
-     * @param  {Object} newConfig The AdManager config object.
+     * @param  {Object} newConfig
      */
     function init( newConfig ) {
 
-        config = $.extend( config, newConfig );
+        config = $.extend( defaults, newConfig );
 
     }
 
     /**
-     * Set
+     * Set config value by key.
      *
      * @param  {String} key
      * @param  {Mixed}  value
@@ -184,7 +191,8 @@
     }
 
     /**
-     * Get
+     * Get config value by key.
+     * Pass no key to get entire config object.
      *
      * @param  {String|Null} key Optional.
      * @return {Mixed}
@@ -211,7 +219,8 @@
     }
 
     /**
-     * Set config value. Uses recursion to set nested values.
+     * Set config value.
+     * Uses recursion to set nested values.
      *
      * @param  {Object} config
      * @param  {String} key
@@ -235,7 +244,8 @@
     }
 
     /**
-     * Get config value. Uses recursion to get nested values.
+     * Get config value.
+     * Uses recursion to get nested values.
      *
      * @param  {Object} config
      * @param  {String} key
@@ -256,14 +266,18 @@
     }
 
     /**
-     * Import JSON page config data from DOM
+     * Import JSON page config data from DOM.
      *
      * This imports inline JSON via data attribute
      * and extends an existing config with it.
      *
-     * @param object options.$context
-     * @param string options.attrName
-     * @return object
+     * @todo   Reenable usage in the project.
+     *         Ascertain the correct place to use.
+     *         Previous usage was in `Manager.isEnabled()`.
+     *
+     * @param  {Object} options.$context
+     * @param  {String} options.attrName
+     * @return {Object}
      */
     function importConfig( options ) {
 
@@ -289,16 +303,17 @@
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        init: init,
-        set:  set,
-        get:  get
+        init:         init,
+        set:          set,
+        get:          get,
+        importConfig: importConfig
     };
 
 } ) );
 /**
- * Inventory
+ * Get, filter, and augment the ad unit inventory.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -306,11 +321,14 @@
             'jquery',
             './Util',
             './Config'
-        ], factory );
+        ], function ( $, Util, Config ) {
+            return factory( window, $, Util, Config );
+        } );
 
     } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
+            window,
             require( 'jquery' ),
             require( './Util' ),
             require( './Config' )
@@ -318,17 +336,18 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Inventory = factory(
-            root.jQuery,
-            root.AdManager.Util,
-            root.AdManager.Config
+        window.AdManager.Inventory = factory(
+            window,
+            window.jQuery,
+            window.AdManager.Util,
+            window.AdManager.Config
         );
 
     }
 
-} ( this, function ( $, Util, Config ) {
+} ( window, function ( window, $, Util, Config ) {
 
     var name = 'Inventory',
         debugEnabled = true,
@@ -349,6 +368,8 @@
 
     /**
      * Add default unit type if not set.
+     *
+     * @todo   Should this edit the inventory in the Config?
      *
      * @param  {Array} inventory
      * @return {Array} inventory
@@ -372,14 +393,15 @@
     /**
      * Remove sizes from inventory that will not display properly.
      *
-     * @todo   Simplify and remove limits.
+     * @todo   Clarify what this function is limiting, and remove the
+     *         hard limits set to use desktop width for tablets.
      *
      * @param  {Array} inventory
      * @return {Array} inventory
      */
     function getAvailableSizes( inventory ) {
 
-        var width = ( window.innerWidth > 0 ) ? window.innerWidth : screen.width;
+        var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
 
         if ( width > 1024 ) {
             return inventory;
@@ -406,6 +428,7 @@
 
     /**
      * Remove slot by name.
+     * Relies on the `googletag` slot object.
      *
      * @param  {Object} definedSlots
      * @param  {String} name
@@ -435,6 +458,8 @@
     /**
      * Get ad units for dynamic insertion.
      *
+     * @todo   Replace `$.each` with `$.grep`.
+     *
      * @return {Object}
      */
     function getDynamicInventory() {
@@ -461,9 +486,9 @@
     }
 
     /**
-     * Get Ad Unit Info
+     * Get info about an ad unit by id or slot name.
      *
-     * @param  {String} unit
+     * @param  {String} unit   ID or slot.
      * @return {Object} adInfo
      */
     function getAdInfo( unit ) {
@@ -476,15 +501,12 @@
                 continue;
             }
 
-            // build return object
             adInfo = inventory[ i ];
 
-            // determine the object's idName
+            // Determine the object's idName (using the iterator if allowed).
             if ( typeof adInfo.useIterator !== 'undefined' && ! adInfo.useIterator ) {
-                // don't use the iterator
                 adInfo.idName = adInfo.id;
             } else {
-                // use the iterator
                 adInfo.idName = adInfo.id + '_' + adInfo.iteration;
             }
 
@@ -496,7 +518,10 @@
     }
 
     /**
-     * Get Shortest Possible Size for Unit
+     * Get shortest possible height for unit.
+     *
+     * @todo   Consider abstracting shortest and tallest
+     *         functions into one.
      *
      * @param  {Object}  unit
      * @return {Integer} shortest
@@ -518,7 +543,10 @@
     }
 
     /**
-     * Get Tallest Possible Size for Unit
+     * Get tallest possible height for unit.
+     *
+     * @todo   Consider abstracting shortest and tallest
+     *         functions into one.
      *
      * @param  {Object}  unit
      * @return {Integer} tallest
@@ -538,7 +566,10 @@
     }
 
     /**
-     * Limit Ad Unit Height: Removes Larger Sizes from Inventory
+     * Limit ad unit sizes.
+     * Removes heights too large for context.
+     *
+     * @todo   Limit to the current iteration.
      *
      * @param  {Object}  unit
      * @param  {Integer} limit
@@ -558,7 +589,8 @@
     }
 
     /**
-     * Get Unit Type
+     * Finds the unit by id and returns its type.
+     * Type is used to filter the inventory (like desktop and mobile).
      *
      * @param  {String} id
      * @return {String} type
@@ -585,6 +617,10 @@
 
     /**
      * Increment ad slot.
+     *
+     * DFP requires an HTML id to display a unit. This function
+     * ensures all ids are unique by incrementing the unit every
+     * time an ad is loaded.
      *
      * @param {String} unit
      */
@@ -623,9 +659,9 @@
 
 } ) );
 /**
- * Manager
+ * Handles the request and display of ads.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -634,11 +670,14 @@
             './Util',
             './Config',
             './Inventory'
-        ], factory );
+        ], function ( $, Util, Config, Inventory ) {
+            return factory( window, $, Util, Config, Inventory );
+        } );
 
     } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
+            window,
             require( 'jquery' ),
             require( './Util' ),
             require( './Config' ),
@@ -647,22 +686,24 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Manager = factory(
-            root.jQuery,
-            root.AdManager.Util,
-            root.AdManager.Config,
-            root.AdManager.Inventory
+        window.AdManager.Manager = factory(
+            window,
+            window.jQuery,
+            window.AdManager.Util,
+            window.AdManager.Config,
+            window.AdManager.Inventory
         );
 
     }
 
-} ( this, function ( $, Util, Config, Inventory ) {
+} ( window, function ( window, $, Util, Config, Inventory ) {
 
     var name = 'Manager',
         debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
+        libraryLoaded = false,
         definedSlots = [],
         pagePositions = [],
         inventory = [],
@@ -671,6 +712,9 @@
 
     //////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Add event listeners and get the DFP library.
+     */
     function init() {
 
         if ( ! isEnabled() ) {
@@ -687,31 +731,38 @@
     }
 
     /**
-     * Bind to custom jQuery events
+     * Add event listeners for library events.
      */
     function bindHandlers() {
 
         $( document )
-            .on( 'GPT:unitsInserted', function ( event ) {
-                debug( name + ': ' + event.type );
-            } )
+            .on( 'GPT:unitsInserted', function ( event ) {} )
             .on( 'GPT:libraryLoaded', function ( event ) {
-                debug( name + ': ' + event.type );
+                libraryLoaded = true;
                 initSequence();
             } )
             .on( 'GPT:slotsDefined', function ( event ) {
-                debug( name + ': ' + event.type );
                 displayPageAds();
             } );
 
     }
 
+    /**
+     * Start the sequence to loads ads.
+     *
+     * @todo  Separate initial load functions from request /
+     *        load functions.
+     * @todo  Consider using separate events.
+     *
+     * @fires GPT:initSequence
+     */
     function initSequence() {
 
         $.event.trigger( 'GPT:initSequence' );
 
         listenForDfpEvents();
         enableSingleRequest();
+
         setTargeting();
         setPagePositions();
         defineSlotsForPagePositions();
@@ -719,9 +770,14 @@
     }
 
     /**
-     * Request GPT library
+     * Asynchronously load the DFP library.
+     * Calls ready event when fully loaded.
      */
     function loadLibrary() {
+
+        if ( libraryLoaded ) {
+            return onLibraryLoaded();
+        }
 
         var googletag,
             gads,
@@ -731,8 +787,8 @@
         ;
 
         window.googletag = window.googletag || {};
-        googletag = window.googletag;
-        googletag.cmd = googletag.cmd || [];
+        window.googletag.cmd = window.googletag.cmd || [];
+
         gads = document.createElement( 'script' );
         gads.async = true;
         gads.type = 'text/javascript';
@@ -741,7 +797,8 @@
         if ( gads.addEventListener ) {
             gads.addEventListener( 'load', onLibraryLoaded, false );
         } else if ( gads.readyState ) {
-            gads.onreadystatechange = function () { // Legacy IE
+            gads.onreadystatechange = function () {
+                // Legacy IE
                 if ( ! readyStateLoaded ) {
                     readyStateLoaded = true;
                     onLibraryLoaded();
@@ -754,7 +811,9 @@
     }
 
     /**
-     * Callback when GPT library is loaded
+     * Callback when GPT library is loaded.
+     *
+     * @fires GPT:libraryLoaded
      */
     function onLibraryLoaded() {
 
@@ -765,7 +824,7 @@
     }
 
     /**
-     * Bind to GPT events
+     * Add a listener for the GPT `slotRenderEnded` event.
      */
     function listenForDfpEvents() {
 
@@ -780,15 +839,13 @@
     }
 
     /**
-     * Enable Batched SRA
-     *
-     * @uses collapseEmptyDivs()
-     * @uses enableSingleRequest()
-     * @uses disableInitialLoad()
+     * Enable batched SRA calls for requesting multiple ads at once.
+     * Disable initial load of units, wait for display call.
      */
     function enableSingleRequest() {
 
         googletag.cmd.push( function () {
+
             // https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_collapseEmptyDivs
             googletag.pubads().collapseEmptyDivs();
 
@@ -797,13 +854,13 @@
 
             // https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_disableInitialLoad
             googletag.pubads().disableInitialLoad();
+
         } );
 
     }
 
     /**
-     * Send Targeting
-     * Defined in Page Config
+     * Send key-value targeting in ad request.
      */
     function setTargeting() {
 
@@ -824,7 +881,8 @@
     }
 
     /**
-     * Set Page Positions
+     * Looks for ad unit markup in the context to build a list
+     * of units to request.
      */
     function setPagePositions() {
 
@@ -848,7 +906,9 @@
     }
 
     /**
-     * Define Slots for Page Positions
+     * Define slots for page positions.
+     *
+     * @fires GPT:slotsDefined
      */
     function defineSlotsForPagePositions() {
 
@@ -864,12 +924,12 @@
                 Inventory.incrementAdSlot( pagePositions[ i ] );
                 currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
 
-                if ( typeof currentPosition.id == 'undefined' ) {
+                if ( typeof currentPosition.id === 'undefined' ) {
                     continue;
                 }
 
-                // find the empty container div on the page. we
-                // will dynamically instantiate the unique ad unit.
+                // Find the empty container on the page.
+                // Dynamically instantiate the unique ad unit.
                 $unit = $context.find( adSelector + '[data-id="' + currentPosition.id + '"]' );
                 $unitTarget = $( '<div />' );
 
@@ -877,12 +937,12 @@
                     continue;
                 }
 
-                // generate new div
+                // Generate new unique div.
                 $unitTarget.addClass( Config.get( 'adUnitTargetClass' ) );
                 $unitTarget.attr( 'id', currentPosition.idName );
                 $unit.append( $unitTarget );
 
-                // activate
+                // Activate
                 $unit.addClass( 'active' );
 
                 definedSlots[ i ] = googletag
@@ -896,7 +956,7 @@
 
             }
 
-            // Enables GPT services for defined slots
+            // Enables GPT services for defined slots.
             googletag.enableServices();
 
             $.event.trigger( 'GPT:slotsDefined' );
@@ -905,17 +965,18 @@
 
     }
 
+    /**
+     * Fetch and display defined slots.
+     */
     function displayPageAds() {
 
         googletag.cmd.push( function () {
 
-            // Fetch and display ads for definedSlots
             googletag.pubads().refresh( definedSlots );
 
-            // lastly, run display code
-            for ( var n = 0; n < pagePositions.length; n++ ) {
+            for ( var i = 0; i < pagePositions.length; i++ ) {
 
-                currentPosition = Inventory.getAdInfo( pagePositions[n] );
+                currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
 
                 if ( $( '#' + currentPosition.idName ).length ) {
                     googletag.display( currentPosition.idName );
@@ -928,10 +989,12 @@
     }
 
     /**
-     * slotRenderEnded - callback after unit is rendered
+     * Callback from DFP rendered event.
      *
-     * @see https://developers.google.com/doubleclick-gpt/reference
-     * @param object unit
+     * @fires GPT:adUnitRendered
+     * @see   https://developers.google.com/doubleclick-gpt/reference
+     *
+     * @param {Object} unit
      */
     function slotRenderEnded( unit ) {
 
@@ -940,22 +1003,24 @@
         ;
 
         $.event.trigger( 'GPT:adUnitRendered', {
-            name: unitName,
-            id: adInfo.id,
-            size: unit.size,
-            isEmpty: unit.isEmpty,
-            creativeId: unit.creativeId,
-            lineItemId: unit.lineItemId,
+            name:        unitName,
+            id:          adInfo.id,
+            size:        unit.size,
+            isEmpty:     unit.isEmpty,
+            creativeId:  unit.creativeId,
+            lineItemId:  unit.lineItemId,
             serviceName: unit.serviceName
         } );
 
     }
 
     /**
-     * getDefinedSlot
+     * Get defined slot by name.
      *
-     * @param string name
-     * @return object definedSlot
+     * @todo   Use `$.grep` instead of `$.each`.
+     *
+     * @param  {String} name
+     * @return {Object} definedSlot
      */
     function getDefinedSlot( name ) {
 
@@ -974,9 +1039,10 @@
     }
 
     /**
-     * displaySlot
+     * Display slot by ID or slot.
+     * Separate display call from `displayPageAds()`.
      *
-     * @param string unit [type or slot]
+     * @param {String} unit
      */
     function displaySlot( unit ) {
 
@@ -992,9 +1058,9 @@
     }
 
     /**
-     * Check if the Ad Manager is enabled for page
+     * Check if the Ad Manager is currently enabled.
      *
-     * @return bool
+     * @return {Boolean}
      */
     function isEnabled() {
 
@@ -1003,10 +1069,11 @@
     }
 
     /**
-     * Empties all ads in a given context
+     * Empties all ads in a given context.
+     * Can be used to refresh ads on pushState.
      *
-     * @param object options.$context
-     * @param bool   options.removeContainer
+     * @param {Object}  options.$context
+     * @param {Boolean} options.removeContainer
      */
     function emptyAds( options ) {
 
@@ -1033,9 +1100,13 @@
 
 } ) );
 /**
- * Insertion
+ * Dynamically insert ad units into container.
+ * Avoids ads and other problematic elements.
+ *
+ * @todo  Insert the previously inserted units in an infinite scroll context.
+ * @todo  Update language to `node` and `nodes` everywhere for consistency.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -1057,18 +1128,18 @@
 
     } else {
 
-        root.AdManager = root.AdManager || {};
+        window.AdManager = window.AdManager || {};
 
-        root.AdManager.Insertion = factory(
-            root.jQuery,
-            root.AdManager.Util,
-            root.AdManager.Config,
-            root.AdManager.Inventory
+        window.AdManager.Insertion = factory(
+            window.jQuery,
+            window.AdManager.Util,
+            window.AdManager.Config,
+            window.AdManager.Inventory
         );
 
     }
 
-} ( this, function ( $, Util, Config, Inventory ) {
+} ( window, function ( $, Util, Config, Inventory ) {
 
     var name = 'Insertion',
         debugEnabled = true,
@@ -1082,64 +1153,57 @@
 
     //////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Bind init event listener.
+     * Begins qualification procedure when the DOM is ready.
+     *
+     * @todo  Check if is already attached.
+     */
     function init() {
 
-        bindHandlers();
+        $( document ).on( 'GPT:initSequence', qualifyContext );
 
     }
 
-    function bindHandlers() {
-
-        $( document )
-            .on( 'GPT:initSequence', function ( event ) {
-
-                debug( name + ': ' + event.type );
-                /**
-                 * Begin qualification procedure when the DOM is ready
-                 */
-                qualifyContext();
-
-            } );
-
-    }
-
+    /**
+     * Sets the context jQuery object variable.
+     *
+     * @todo  Consider resetting variable to `null` when
+     *        no longer needed in a pushState context.
+     */
     function setContext() {
 
         $context = $( Config.get( 'context' ) );
 
     }
 
-    /*
+    /**
      * First qualify the DOM context where ads are to be inserted
      * to determine if insertion should proceed.
-     *
-     * @return object
      */
     function qualifyContext() {
 
         var inventoryData = Inventory.getDynamicInventory();
 
-        setContext();
         inventory = inventory.length ? inventory : inventoryData.dynamicItems;
         localContext = localContext ? localContext : inventoryData.localContext;
 
-        // Return if empty
+        // No dynamic inventory.
         if ( ! inventory.length ) {
-            broadcast();
-            return;
+            return broadcast();
         }
 
+        setContext();
         $localContext = $context.find( localContext ).first();
 
-        // Detect a local context
+        // Detect a local context.
         if ( $localContext.length ) {
             inContent = true;
         }
 
-        // Return if there is no insertion selector
+        // There is no insertion selector.
         if ( ! inContent ) {
-            broadcast();
-            return;
+            return broadcast();
         }
 
         insertAdUnits();
@@ -1147,7 +1211,9 @@
     }
 
     /**
-     * Ad units have been inserted / proceed
+     * Triggers ad units inserted event.
+     *
+     * @fires GPT:unitsInserted
      */
     function broadcast() {
 
@@ -1158,7 +1224,7 @@
     /**
      * Is Insertion Enabled?
      *
-     * @return bool
+     * @return {Boolean} Probably!
      */
     function isEnabled() {
 
@@ -1166,6 +1232,11 @@
 
     }
 
+    /**
+     * Run in-content insertion.
+     *
+     * @todo  Does this need the extra check?
+     */
     function insertAdUnits() {
 
         if ( inContent ) {
@@ -1178,6 +1249,14 @@
 
     }
 
+    /**
+     * Walks DOM elements in the local context.
+     * Sets a data attribute if element is a valid insertion location.
+     *
+     * @todo  Potentially use `$.grep` to filter nodes for faster parsing.
+     * @todo  Use `for` loop or `$.grep` to check for excluded elements.
+     * @todo  Clarify `$prev` check.
+     */
     function denoteValidInsertions() {
 
         var $nodes = $localContext.children(),
@@ -1209,28 +1288,31 @@
     }
 
     /**
-     * Check against of list of elements to skip
+     * Check if node should be skipped.
      *
-     * @param  object $element
-     * @return bool
+     * @param  {Object}  $element
+     * @return {Boolean}
      */
     function isValidInsertionLocation( $element ) {
 
-        return $element.data( 'valid-location' );
+        return $.parseJSON( $element.data( 'valid-location' ) );
 
     }
 
     /**
-     * adUnitMarkup
+     * Generate ad unit markup.
+     * Creates DOM node to attach to the DOM.
      *
-     * @param string unitId
-     * @param bool disableFloat
-     * @return string
+     * @see    https://vip.wordpress.com/2015/03/25/preventing-xss-in-javascript/
+     * @param  {String}  unitId
+     * @param  {Boolean} disableFloat
+     * @return {Array}   $html
      */
     function adUnitMarkup( unitId, disableFloat ) {
 
-        var floatDisable = disableFloat || false,
-            type = Inventory.getUnitType( unitId ),
+        disableFloat = disableFloat || false;
+
+        var type = Inventory.getUnitType( unitId ),
             alignment = odd ? 'odd' : 'even',
             $html = $( '<div />' );
 
@@ -1239,16 +1321,16 @@
             .attr( 'data-id', unitId )
             .attr( 'data-client-type', type );
 
-        if ( floatDisable ) {
+        if ( disableFloat ) {
             $html
-                .addClass( 'disableFloat' );
+                .addClass( 'disable-float' );
         } else {
             $html
-                .addClass( 'inContent' )
+                .addClass( 'in-content' )
                 .addClass( alignment );
         }
 
-        if ( ! floatDisable ) {
+        if ( ! disableFloat ) {
             odd = ! odd;
         }
 
@@ -1257,7 +1339,9 @@
     }
 
     /**
-     * Insert Primary Unit: Unit most display above the fold
+     * Inserts the primary unit, which must display above the fold.
+     *
+     * @todo  Clarify usage, make optional.
      */
     function insertPrimaryUnit() {
 
@@ -1291,7 +1375,7 @@
     }
 
     /**
-     * Insert Secondary Unit: Ad units that commonly appear below the fold
+     * Inserts the secondary units, which can appear below the fold.
      */
     function insertSecondaryUnits() {
 
@@ -1315,6 +1399,12 @@
 
     }
 
+    /**
+     * Determines the primary unit, which is either denoted or the first listed.
+     *
+     * @todo   Use `$.grep` instead of `$.each` for optimization.
+     * @return {Object|Boolean} primaryUnit False on failure.
+     */
     function getPrimaryUnit() {
 
         var primaryUnit = false;
@@ -1339,10 +1429,14 @@
     }
 
     /**
-     * findInsertionLocation
+     * Find insertion location.
+     * Considers distance between units and valid locations.
      *
-     * @param object options
-     * @return object or boolean:false
+     * @todo   Convert `$.each` to `for` loop.
+     *         Use `continue` and `break` for clarity.
+     *
+     * @param  {Object}         options
+     * @return {Object|Boolean}         False on failure.
      */
     function findInsertionLocation( options ) {
 
@@ -1361,16 +1455,12 @@
             return false;
         }
 
-        // Loop through each node as necessary
+        // Loop through each node as necessary.
+        // `verifyNode()` returns true when found.
+        // Break the loop when true.
         $.each( $nodes, function ( i, node ) {
 
-            var exitLoop = nodeSearch.verifyNode( i, $( node ) );
-
-            if ( exitLoop ) {
-                return false;
-            } else if ( ! exitLoop ) {
-                return true;
-            }
+            return true !== nodeSearch.verifyNode( i, $( node ) ) ? true : false;
 
         } );
 
@@ -1389,7 +1479,9 @@
     }
 
     /**
-     * Search object used for determining insertion points
+     * Search prototype used for determining insertion points.
+     *
+     * @param  {Object} options
      */
     function NodeSearch( options ) {
 
@@ -1411,7 +1503,7 @@
     }
 
     /**
-     * Store the position of the last ad
+     * Store the position of the last ad.
      */
     NodeSearch.prototype.setLastPosition = function () {
 
@@ -1420,22 +1512,30 @@
     };
 
     /**
-     * Mark nodes where insertion is valid
+     * Mark nodes where insertion is valid.
+     *
+     * @todo  Consistently use `.attr()` or `.data()` when setting.
+     *        jQuery does not need the DOM to change for data attributes.
      */
     NodeSearch.prototype.markValidNodes = function () {
 
-        if ( this.inserted.length ) {
-            $.each( this.inserted, function ( index, item ) {
-                $( item ).data( 'valid-location', false );
-            } );
+        if ( ! this.inserted.length ) {
+            return;
         }
+
+        $.each( this.inserted, function ( index, item ) {
+            $( item ).data( 'valid-location', false );
+        } );
 
     };
 
     /**
-     * Verify each node to find a suitable insertion point
+     * Verify each node to find a suitable insertion point.
      *
-     * @return boolean
+     * @todo   Why is `this.exitLoop` set to `null`?
+     * @todo   Document each step. Simplify if possible.
+     *
+     * @return {Boolean}
      */
     NodeSearch.prototype.verifyNode = function ( index, $node ) {
 
@@ -1493,10 +1593,10 @@
     };
 
     /**
-     * Is Element an Ad Unit
+     * Is Element an Ad Unit?
      *
-     * @param mixed $el
-     * @return bool
+     * @param  {Mixed}   $el
+     * @return {Boolean}
      */
     function isThisAnAd( $el ) {
 
@@ -1509,16 +1609,16 @@
     }
 
     /**
-     * Get Nodes to Loop Through
+     * Get next group of nodes to loop through.
+     * Grabs the nodes after previous unit or all nodes if no previous.
      *
-     * @return array $nodes
+     * @return {Array} $nodes
      */
     function getNodes() {
 
         var $prevUnit = $localContext.find( Config.get( 'adSelector' ) ).last(),
             $nodes = null;
 
-        // nodes after previous unit or all nodes
         if ( $prevUnit.length ) {
             $nodes = $prevUnit.nextAll( $localContext );
         } else {
@@ -1537,9 +1637,12 @@
 
 } ) );
 /**
- * Bootstrap
+ * Builds the AdManager prototype.
+ * This file should be required directly for CommonJS usage.
+ *
+ * @see  http://requirejs.org/docs/commonjs.html#intro On CommonJS Transport.
  */
-( function ( root, factory ) {
+( function ( window, factory ) {
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -1563,9 +1666,9 @@
 
     } else {
 
-        var _AdManager = root.AdManager;
+        var _AdManager = window.AdManager;
 
-        root.AdManager = factory(
+        window.AdManager = factory(
             _AdManager.Util,
             _AdManager.Config,
             _AdManager.Inventory,
@@ -1575,8 +1678,14 @@
 
     }
 
-} ( this, function ( Util, Config, Inventory, Manager, Insertion ) {
+} ( window, function ( Util, Config, Inventory, Manager, Insertion ) {
 
+    /**
+     * AdManager prototype.
+     *
+     * @param  {Object} newConfig Required configuration for initialization.
+     * @throws {Error}            When no configuration is specified.
+     */
     function AdManager( newConfig ) {
 
         newConfig = newConfig || false;
@@ -1584,8 +1693,6 @@
         if ( ! newConfig ) {
             throw new Error( 'Please provide a config.' );
         }
-
-        debug = Util.debug;
 
         Config.init( newConfig );
         Insertion.init();
