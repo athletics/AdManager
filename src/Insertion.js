@@ -169,7 +169,7 @@
      */
     function isValidInsertionLocation( $element ) {
 
-        return $element.data( 'valid-location' );
+        return $.parseJSON( $element.data( 'valid-location' ) );
 
     }
 
