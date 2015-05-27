@@ -322,12 +322,12 @@
         ;
 
         $.event.trigger( 'GPT:adUnitRendered', {
-            name: unitName,
-            id: adInfo.id,
-            size: unit.size,
-            isEmpty: unit.isEmpty,
-            creativeId: unit.creativeId,
-            lineItemId: unit.lineItemId,
+            name:        unitName,
+            id:          adInfo.id,
+            size:        unit.size,
+            isEmpty:     unit.isEmpty,
+            creativeId:  unit.creativeId,
+            lineItemId:  unit.lineItemId,
             serviceName: unit.serviceName
         } );
 
