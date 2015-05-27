@@ -69,16 +69,12 @@
     function bindHandlers() {
 
         $( document )
-            .on( 'GPT:unitsInserted', function ( event ) {
-                debug( name + ': ' + event.type );
-            } )
+            .on( 'GPT:unitsInserted', function ( event ) {} )
             .on( 'GPT:libraryLoaded', function ( event ) {
-                debug( name + ': ' + event.type );
                 libraryLoaded = true;
                 initSequence();
             } )
             .on( 'GPT:slotsDefined', function ( event ) {
-                debug( name + ': ' + event.type );
                 displayPageAds();
             } );
 
