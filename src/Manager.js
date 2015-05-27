@@ -295,9 +295,9 @@
             googletag.pubads().refresh( definedSlots );
 
             // lastly, run display code
-            for ( var n = 0; n < pagePositions.length; n++ ) {
+            for ( var i = 0; i < pagePositions.length; i++ ) {
 
-                currentPosition = Inventory.getAdInfo( pagePositions[n] );
+                currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
 
                 if ( $( '#' + currentPosition.idName ).length ) {
                     googletag.display( currentPosition.idName );
