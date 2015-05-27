@@ -1,5 +1,5 @@
 /**
- * Config
+ * Import, get, and set configuration values.
  */
 ( function ( root, factory ) {
 
@@ -33,7 +33,8 @@
     var name = 'Config',
         debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
-        config = {
+        config = {},
+        defaults = {
             account:             null,               // DFP account ID
             adClass:             'app_ad_unit',      // Outer ad wrap
             adUnitTargetClass:   'app_unit_target',  // Inner ad wrap
@@ -55,26 +56,26 @@
                     '.app_ad_unit'
                 ]
             },
-            inventory:           [],                 // Inventory of ad units
-            pageConfigAttr:      false,              // Selector for dynamic config import
-            targeting:           []                  // Key value pairs to send with DFP request
+            inventory: [],                           // Inventory of ad units
+            pageConfigAttr: false,                   // Selector for dynamic config import
+            targeting: []                            // Key value pairs to send with DFP request
         };
 
     //////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Initialize the config module.
+     * Merge passed config with defaults.
      *
-     * @param  {Object} newConfig The AdManager config object.
+     * @param  {Object} config
      */
-    function init( newConfig ) {
+    function init( config ) {
 
-        config = $.extend( config, newConfig );
+        config = $.extend( defaults, config );
 
     }
 
     /**
-     * Set
+     * Set config value by key.
      *
      * @param  {String} key
      * @param  {Mixed}  value
@@ -87,7 +88,8 @@
     }
 
     /**
-     * Get
+     * Get config value by key.
+     * Pass no key to get entire config object.
      *
      * @param  {String|Null} key Optional.
      * @return {Mixed}
@@ -114,7 +116,8 @@
     }
 
     /**
-     * Set config value. Uses recursion to set nested values.
+     * Set config value.
+     * Uses recursion to set nested values.
      *
      * @param  {Object} config
      * @param  {String} key
@@ -138,7 +141,8 @@
     }
 
     /**
-     * Get config value. Uses recursion to get nested values.
+     * Get config value.
+     * Uses recursion to get nested values.
      *
      * @param  {Object} config
      * @param  {String} key
@@ -159,14 +163,18 @@
     }
 
     /**
-     * Import JSON page config data from DOM
+     * Import JSON page config data from DOM.
      *
      * This imports inline JSON via data attribute
      * and extends an existing config with it.
      *
-     * @param object options.$context
-     * @param string options.attrName
-     * @return object
+     * @todo   Reenable usage in the project.
+     *         Ascertain the correct place to use.
+     *         Previous usage was in `Manager.isEnabled()`.
+     *
+     * @param  {Object} options.$context
+     * @param  {String} options.attrName
+     * @return {Object}
      */
     function importConfig( options ) {
 
@@ -192,9 +200,10 @@
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        init: init,
-        set:  set,
-        get:  get
+        init:         init,
+        set:          set,
+        get:          get,
+        importConfig: importConfig
     };
 
 } ) );
