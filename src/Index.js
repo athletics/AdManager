@@ -1,5 +1,8 @@
 /**
- * Bootstrap
+ * Builds the AdManager prototype.
+ * This file should be required directly for CommonJS usage.
+ *
+ * @see  http://requirejs.org/docs/commonjs.html#intro On CommonJS Transport.
  */
 ( function ( root, factory ) {
 
@@ -39,6 +42,12 @@
 
 } ( this, function ( Util, Config, Inventory, Manager, Insertion ) {
 
+    /**
+     * AdManager prototype.
+     *
+     * @param  {Object} newConfig Required configuration for initialization.
+     * @throws {Error}            When no configuration is specified.
+     */
     function AdManager( newConfig ) {
 
         newConfig = newConfig || false;
@@ -46,8 +55,6 @@
         if ( ! newConfig ) {
             throw new Error( 'Please provide a config.' );
         }
-
-        debug = Util.debug;
 
         Config.init( newConfig );
         Insertion.init();
