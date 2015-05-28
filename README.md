@@ -6,19 +6,19 @@
 
 A configuration object is required to initialize the Ad Manager.
 
-| key                                     | type    |
-| --------------------------------------- | ------- |
-| [`account`](#account)                   | Integer |
-| [`clientType`](#clientType)             | String  |
-| [`pageConfigAttr`](#pageConfigAttr)     | String  |
-| [`inventory`](#inventory)               | Array   |
-| [`context`](#context)                   | String  |
-| [`enabled`](#enabled)                   | Boolean |
-| [`targeting`](#targeting)               | Array   |
-| [`insertionEnabled`](#insertionEnabled) | Array   |
-| `insertion.insertExclusion`             | Array   |
-| `insertion.pxBetweenUnits`              | Integer |
-| `insertion.adHeightLimit`               | Integer |
+| key                                                      | type    |
+| -------------------------------------------------------- | ------- |
+| [`account`](#account)                                    | Integer |
+| [`clientType`](#clienttype)                              | String  |
+| [`pageConfigAttr`](#pageconfigattr)                      | String  |
+| [`inventory`](#inventory)                                | Array   |
+| [`context`](#context)                                    | String  |
+| [`enabled`](#enabled)                                    | Boolean |
+| [`targeting`](#targeting)                                | Array   |
+| [`insertionEnabled`](#insertionenabled)                  | Array   |
+| [`insertion.insertExclusion`](#insertioninsertexclusion) | Array   |
+| [`insertion.pxBetweenUnits`](#insertionpxbetweenunits)   | Integer |
+| [`insertion.adHeightLimit`](#insertionadheightlimit)     | Integer |
 
 **Example Configuration:**
 
