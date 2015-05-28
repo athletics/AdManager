@@ -1,6 +1,6 @@
 {
-  "name": "ad-manager",
-  "version": "0.4.0",
+  "name": "AdManager",
+  "version": "0.4.1",
   "homepage": "https://github.com/athletics/ad-manager",
   "description": "Generic code for GPT ad management",
   "license": "Apache-2.0",
