@@ -50,7 +50,7 @@ AdManager( {
 
 **Description:** Your network code. You can find your network code in the “Admin” tab of DFP.
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
 
 #### `clientType`
 
@@ -62,7 +62,7 @@ AdManager( {
 
 For example, if a desktop device is detected, this value should be set to `clientType: 'desktop'` and items in the inventory array that match (`type: 'desktop'`) will be displayed. This allows you to include both desktop and mobile inventory items, but only shown the appropriate ones according to what `clientType` is set to at load time.
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
 
 #### `pageConfigAttr`
 
@@ -74,7 +74,7 @@ For example, if a desktop device is detected, this value should be set to `clien
 
 _Not currently used._
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
 
 #### `inventory`
 
@@ -116,7 +116,7 @@ var config = {
 };
 ```
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
 
 #### `context`
 
@@ -126,7 +126,7 @@ var config = {
 
 **Description:** The is used as a jQuery selector that specifies the DOM context where ads are to be inserted. In standard cases this will be static since there will only be one page. In infinite scroll applications, there may exist multiple pages in a single window and this provides a way to distinguish one page/context from another.
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
 
 #### `enabled`
 
@@ -136,9 +136,9 @@ var config = {
 
 **Description:** This provides a way to disable the Ad Manager.
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
 
-#### `insertion.insertionEnabled`
+#### `insertionEnabled`
 
 **Type:** Boolean
 
@@ -146,7 +146,9 @@ var config = {
 
 **Description:** Whether to enable dynamic insertion.
 
-#### `insertExclusion`
+[:arrow_up:](#configuration)
+
+#### `insertion.insertExclusion`
 
 **Type:** Array
 
@@ -165,7 +167,7 @@ var config = {
 
 **Description:** When using the dynamic insertion feature, this allows customization of what body elements to exclude when looking for valid insertion points.
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
 
 #### `insertion.pxBetweenUnits`
 
@@ -175,7 +177,7 @@ var config = {
 
 **Description:** The minimum distance between dynamically inserted units.
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
 
 #### `insertion.adHeightLimit`
 
@@ -185,4 +187,4 @@ var config = {
 
 **Description:** The max height for dynamically inserted units.
 
-[:leftwards_arrow_with_hook:](#configuration)
+[:arrow_up:](#configuration)
