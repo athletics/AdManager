@@ -1,6 +1,6 @@
 {
   "name": "AdManager",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Generic code for GPT ad management",
   "main": "src/Index.js",
   "repository": {
