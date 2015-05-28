@@ -159,7 +159,7 @@
     function denoteValidInsertions() {
 
         var $nodes = $localContext.children(),
-            excluded = Config.get( 'insertExclusion' )
+            excluded = Config.get( 'insertion.insertExclusion' )
         ;
 
         $nodes.each( function ( i ) {

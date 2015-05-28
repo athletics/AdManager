@@ -144,7 +144,6 @@
             clientType:          false,              // Used to filter inventory
             context:             'body',             // Selector for ad filling container
             enabled:             true,               // Turn off ads
-            insertExclusion:     [],                 // Inventory to exclude from dynamic insertion
             insertionEnabled:    false,              // Enable dynamic insertion
             insertion:           {
                 pxBetweenUnits:  800,                // Minimum space b/w dynamically inserted units
@@ -1263,7 +1262,7 @@
     function denoteValidInsertions() {
 
         var $nodes = $localContext.children(),
-            excluded = Config.get( 'insertExclusion' )
+            excluded = Config.get( 'insertion.insertExclusion' )
         ;
 
         $nodes.each( function ( i ) {
