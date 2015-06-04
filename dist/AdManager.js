@@ -2,8 +2,8 @@
  * AdManager - A JavaScipt library for interacting with Google DFP.
  *
  * @author Athletics - http://athleticsnyc.com
- * @see https://github.com/athletics/ad-manager
- * @version 0.4.3
+ * @see https://github.com/athletics/AdManager
+ * @version 0.4.4
  *//**
  * Shared utilities for debugging and array manipulation.
  */
