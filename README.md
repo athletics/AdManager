@@ -1,8 +1,15 @@
 # AdManager
 
-## Usage
+- [Basic Usage](#basicusage)
+- [Configuration](#configuration)
+- [Inventory](#inventory)
+- [Events](#events)
+- [Contributing](#contributing)
+- [References](#references)
 
-### Configuration
+## Basic Usage
+
+## Configuration
 
 A configuration object is required to initialize the Ad Manager.
 
@@ -42,7 +49,7 @@ AdManager( {
 } );
 ```
 
-#### `account`
+### `account`
 
 **Type:** Integer
 
@@ -52,7 +59,7 @@ AdManager( {
 
 [:arrow_up:](#configuration)
 
-#### `clientType`
+### `clientType`
 
 **Type:** String
 
@@ -64,7 +71,7 @@ For example, if a desktop device is detected, this value should be set to `clien
 
 [:arrow_up:](#configuration)
 
-#### `pageConfigAttr`
+### `pageConfigAttr`
 
 **Type:** String
 
@@ -76,7 +83,7 @@ _Not currently used._
 
 [:arrow_up:](#configuration)
 
-#### `inventory`
+### `inventory`
 
 **Type:** Array
 
@@ -118,7 +125,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-#### `context`
+### `context`
 
 **Type:** String
 
@@ -128,7 +135,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-#### `enabled`
+### `enabled`
 
 **Type:** Boolean
 
@@ -138,7 +145,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-#### `insertionEnabled`
+### `insertionEnabled`
 
 **Type:** Boolean
 
@@ -148,7 +155,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-#### `insertion.insertExclusion`
+### `insertion.insertExclusion`
 
 **Type:** Array
 
@@ -169,7 +176,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-#### `insertion.pxBetweenUnits`
+### `insertion.pxBetweenUnits`
 
 **Type:** Integer
 
@@ -179,7 +186,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-#### `insertion.adHeightLimit`
+### `insertion.adHeightLimit`
 
 **Type:** Integer
 
@@ -189,7 +196,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-### Inventory
+## Inventory
 
 The inventory array is a collection of objects that represent different ad positions.
 
@@ -235,7 +242,7 @@ var config = {
     ]
 };
 ```
-#### `slot`
+### `slot`
 
 **Type:** String
 
@@ -243,7 +250,7 @@ var config = {
 
 [:arrow_up:](#inventory)
 
-#### `id`
+### `id`
 
 **Type:** String
 
@@ -251,7 +258,7 @@ var config = {
 
 [:arrow_up:](#inventory)
 
-#### `sizes`
+### `sizes`
 
 **Type:** Array
 
@@ -259,7 +266,7 @@ var config = {
 
 [:arrow_up:](#inventory)
 
-#### `type`
+### `type`
 
 **Type:** String
 
@@ -267,7 +274,7 @@ var config = {
 
 [:arrow_up:](#inventory)
 
-#### `dynamic`
+### `dynamic`
 
 **Type:** Boolean
 
@@ -277,7 +284,7 @@ var config = {
 
 [:arrow_up:](#inventory)
 
-#### `iteration`
+### `iteration`
 
 **Type:** Integer
 
@@ -287,7 +294,7 @@ var config = {
 
 [:arrow_up:](#inventory)
 
-#### `localContext`
+### `localContext`
 
 **Type:** String
 
@@ -317,7 +324,7 @@ var config = {
 
 [:arrow_up:](#inventory)
 
-### Events
+## Events
 
 Custom jQuery events prefixed with `GPT`.
 
@@ -328,19 +335,19 @@ Custom jQuery events prefixed with `GPT`.
 | [`GPT:adUnitRendered`](#gptadunitrendered) | internal        |
 | [`GPT:slotsDefined`](#gptslotsdefined)     | internal        |
 
-#### `GPT:initPageAds`
+### `GPT:initPageAds`
 
 **Description:** This is triggered once when ads are initialized.
 
 [:arrow_up:](#events)
 
-#### `GPT:libraryLoaded`
+### `GPT:libraryLoaded`
 
 **Description:** This is triggered once when the GPT library is loaded.
 
 [:arrow_up:](#events)
 
-#### `GPT:adUnitRendered`
+### `GPT:adUnitRendered`
 
 **Description:** This is triggered each time an ad is rendered. Bind to this event to receive notification of a particular ad that has rendered.
 
@@ -358,7 +365,7 @@ Custom jQuery events prefixed with `GPT`.
 
 [:arrow_up:](#events)
 
-#### `GPT:slotsDefined`
+### `GPT:slotsDefined`
 
 **Description:** This is triggered when slots are successfully defined, but before ads are rendered.
 
