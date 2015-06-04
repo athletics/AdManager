@@ -77,19 +77,19 @@ A configuration object is required to initialize the Ad Manager.
 
 ```javascript
 AdManager( {
-    account:        1234567,
-    clientType:     'desktop',
+    account: 1234567,
+    clientType: 'desktop',
     pageConfigAttr: 'ad-page-config',
-    inventory:      [
+    inventory: [
         {
-            slot:  'Unit_Name_in_DFP',
-            id:    'data_attribute_id',
+            slot: 'Unit_Name_in_DFP',
+            id: 'data_attribute_id',
             sizes: [
                 [ 728, 90 ],
                 [ 970, 250 ],
                 [ 1000, 220 ]
             ],
-            type:  'desktop'
+            type: 'desktop'
         }
     ]
 } );
