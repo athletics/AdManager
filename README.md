@@ -9,6 +9,52 @@
 
 ## Basic Usage
 
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>AdManager Usage</title>
+        <script src="jquery.js"></script>
+        <script src="AdManager.min.js"></script>
+    </head>
+    <body>
+        <!--
+        This is the ad unit container. AdManager looks for all
+        of the `.add_ad_unit` in the DOM and grabs their ids to
+        make a request from DFP to fill those units.
+        -->
+        <div class="app_ad_unit" data-id="my-identifier"></div>
+
+        <script type="text/javascript">
+            ( function () {
+
+                var config = {
+                    account: 1234567,
+                    type: 'desktop',
+                    inventory: [
+                        {
+                            slot: 'Unit_Name_in_DFP',
+                            id: 'my-identifier',
+                            iteration: 0,
+                            sizes: [
+                                [ 728, 90 ],
+                                [ 970, 250 ],
+                                [ 1000, 220 ]
+                            ],
+                            type: 'desktop'
+                        }
+                    ]
+                };
+
+                AdManager( config );
+
+            } () );
+        </script>
+    </body>
+</html>
+```
+
 ## Configuration
 
 A configuration object is required to initialize the Ad Manager.
