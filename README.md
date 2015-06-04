@@ -189,6 +189,134 @@ var config = {
 
 [:arrow_up:](#configuration)
 
+### Inventory
+
+The inventory array is a collection of objects that represent different ad positions.
+
+| property name                   | type    |                                        |
+| ------------------------------- | ------- | -------------------------------------- |
+| [`slot`](#slot)                 | String  |                                        |
+| [`id`](#id)                     | String  |                                        |
+| [`sizes`](#sizes)               | Array   |                                        |
+| [`type`](#type)                 | String  |                                        |
+| [`dynamic`](#dynamic)           | Boolean |                                        |
+| [`iteration`](#iteration)       | Integer | optional                               |
+| [`localContext`](#localcontext) | String  | optional (required if `dynamic: true`) |
+
+**Example Usage:**
+
+```javascript
+var config = {
+    // ...
+    inventory: [
+        {
+            slot: 'Article_Leaderboard',
+            id: 'article-leaderboard',
+            sizes: [
+                [ 728, 90 ],
+                [ 970, 250 ],
+                [ 1000, 220 ]
+            ],
+            type: 'desktop',
+            dynamic: false
+        },
+        {
+            slot: 'Article_Dynamic',
+            id: 'article-dynamic',
+            sizes: [
+                [ 300, 250 ],
+                [ 300, 600 ]
+            ],
+            type: 'desktop',
+            dynamic: true,
+            localContext: '.entry-content'
+        }
+        // ...
+    ]
+};
+```
+#### `slot`
+
+**Type:** String
+
+**Description:** The slot name defined in DFP.
+
+[:arrow_up:](#inventory)
+
+#### `id`
+
+**Type:** String
+
+**Description:** String to identify the ad unit container. Used as a data attribute `data-id=""`.
+
+[:arrow_up:](#inventory)
+
+#### `sizes`
+
+**Type:** Array
+
+**Description:** An array of accepted sizes for this unit. Must match up to the sizes defined in DFP.
+
+[:arrow_up:](#inventory)
+
+#### `type`
+
+**Type:** String
+
+**Description:** This can be used to categorize inventory. For example, it can be used to denote whether an unit is for desktop or mobile devices. This value is checked against [`clientType`](#clienttype).
+
+[:arrow_up:](#inventory)
+
+#### `dynamic`
+
+**Type:** Boolean
+
+**Default:** `false`
+
+**Description:** This enables/disables dynamic insertion. If set to `false`, AdManager will expect a `<div>` container on the page with an `data` attribute that corresponds to the id declared in the Inventory object.
+
+[:arrow_up:](#inventory)
+
+#### `iteration`
+
+**Type:** Integer
+
+**Default:** `0`
+
+**Description:** Used internally to keep the insertion container `id` attribute unique.
+
+[:arrow_up:](#inventory)
+
+#### `localContext`
+
+**Type:** String
+
+**Description:** This is needed only for dynamic insertion. The string is a jQuery selector that specifies an nth-child insertion point for the new ad.
+
+Example:
+```javascript
+var config = {
+    // ...
+    inventory: [
+        // ...
+        {
+            slot: 'Article_Dynamic',
+            id: 'article-dynamic',
+            sizes: [
+                [ 300, 250 ],
+                [ 300, 600 ]
+            ],
+            type: 'desktop',
+            dynamic: true,
+            localContext: '.entry-content'
+        }
+        // ...
+    ]
+};
+```
+
+[:arrow_up:](#inventory)
+
 ### Events
 
 Custom jQuery events prefixed with `GPT`.
