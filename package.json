@@ -5,14 +5,14 @@
   "main": "src/Index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/athletics/ad-manager.git"
+    "url": "https://github.com/athletics/AdManager.git"
   },
   "author": {
     "name": "Athletics",
     "url": "http://athleticsnyc.com"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/athletics/ad-manager",
+  "homepage": "https://github.com/athletics/AdManager",
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-cli": "^0.2.0",
