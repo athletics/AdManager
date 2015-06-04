@@ -189,6 +189,53 @@ var config = {
 
 [:arrow_up:](#configuration)
 
+### Events
+
+Custom jQuery events prefixed with `GPT`.
+
+| event                                      | trigger source  |
+| ------------------------------------------ | --------------- |
+| [`GPT:initPageAds`](#gptinitpageads)       | internal        |
+| [`GPT:libraryLoaded`](#gptlibraryloaded)   | internal        |
+| [`GPT:adUnitRendered`](#gptadunitrendered) | internal        |
+| [`GPT:slotsDefined`](#gptslotsdefined)     | internal        |
+
+#### `GPT:initPageAds`
+
+**Description:** This is triggered once when ads are initialized.
+
+[:arrow_up:](#events)
+
+#### `GPT:libraryLoaded`
+
+**Description:** This is triggered once when the GPT library is loaded.
+
+[:arrow_up:](#events)
+
+#### `GPT:adUnitRendered`
+
+**Description:** This is triggered each time an ad is rendered. Bind to this event to receive notification of a particular ad that has rendered.
+
+**Parameter:** `unit` {Object}
+
+| name          | type    | description                                               |
+| ------------- | ------- | --------------------------------------------------------- |
+| `name`        | String  | The slot name defined in DFP.                             |
+| `id`          | String  | HTML id for the current ad wrapper.                       |
+| `size`        | Array   | Indicates the pixel size of the rendered creative.        |
+| `isEmpty`     | Boolean | true if no ad was returned for the slot, false otherwise. |
+| `creativeId`  | String  | Creative ID of the rendered ad.                           |
+| `lineItemId`  | String  | Line item ID of the rendered ad.                          |
+| `serviceName` | String  | Name of the service that rendered the slot.               |
+
+[:arrow_up:](#events)
+
+#### `GPT:slotsDefined`
+
+**Description:** This is triggered when slots are successfully defined, but before ads are rendered.
+
+[:arrow_up:](#events)
+
 ## Contributing
 
 ### Coding Style
