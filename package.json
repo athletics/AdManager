@@ -1,7 +1,7 @@
 {
   "name": "AdManager",
   "version": "0.4.1",
-  "description": "Generic code for GPT ad management",
+  "description": "A JavaScipt library for interacting with Google DFP.",
   "main": "src/Index.js",
   "repository": {
     "type": "git",

@@ -2,7 +2,7 @@
   "name": "AdManager",
   "version": "0.4.1",
   "homepage": "https://github.com/athletics/ad-manager",
-  "description": "Generic code for GPT ad management",
+  "description": "A JavaScipt library for interacting with Google DFP.",
   "license": "Apache-2.0",
   "main": "dist/AdManager.min.js",
   "ignore": [

@@ -1,5 +1,7 @@
 # AdManager
 
+A JavaScipt library for interacting with Google DFP.
+
 ## Introduction
 
 AdManger is a JavaScript library for interacting with [Google Publish Tags (GPT)](https://support.google.com/dfp_sb/answer/1649768?hl=en) and [Google DFP](https://www.google.com/dfp). It handles the loading of the GPT library as well as the definition and request of ad inventory. Below you’ll find documentation on its configuration and usage.
