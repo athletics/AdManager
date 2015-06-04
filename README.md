@@ -382,26 +382,26 @@ var config = {
 
 Custom jQuery events prefixed with `GPT`.
 
-| event                                      | trigger source  |
-| ------------------------------------------ | --------------- |
-| [`GPT:initPageAds`](#gptinitpageads)       | internal        |
-| [`GPT:libraryLoaded`](#gptlibraryloaded)   | internal        |
-| [`GPT:adUnitRendered`](#gptadunitrendered) | internal        |
-| [`GPT:slotsDefined`](#gptslotsdefined)     | internal        |
+| event                                                  | trigger source  |
+| ------------------------------------------------------ | --------------- |
+| [`AdManager:initPageAds`](#admanagerinitpageads)       | internal        |
+| [`AdManager:libraryLoaded`](#admanagerlibraryloaded)   | internal        |
+| [`AdManager:adUnitRendered`](#admanageradunitrendered) | internal        |
+| [`AdManager:slotsDefined`](#admanagerslotsdefined)     | internal        |
 
-### `GPT:initPageAds`
+### `AdManager:initPageAds`
 
 **Description:** This is triggered once when ads are initialized.
 
 [:arrow_up:](#events)
 
-### `GPT:libraryLoaded`
+### `AdManager:libraryLoaded`
 
 **Description:** This is triggered once when the GPT library is loaded.
 
 [:arrow_up:](#events)
 
-### `GPT:adUnitRendered`
+### `AdManager:adUnitRendered`
 
 **Description:** This is triggered each time an ad is rendered. Bind to this event to receive notification of a particular ad that has rendered.
 
@@ -419,7 +419,7 @@ Custom jQuery events prefixed with `GPT`.
 
 [:arrow_up:](#events)
 
-### `GPT:slotsDefined`
+### `AdManager:slotsDefined`
 
 **Description:** This is triggered when slots are successfully defined, but before ads are rendered.
 
