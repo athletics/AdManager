@@ -79,12 +79,12 @@
     function bindHandlers() {
 
         $( document )
-            .on( 'GPT:unitsInserted', function ( event ) {} )
-            .on( 'GPT:libraryLoaded', function ( event ) {
+            .on( 'AdManager:unitsInserted', function ( event ) {} )
+            .on( 'AdManager:libraryLoaded', function ( event ) {
                 libraryLoaded = true;
                 initSequence();
             } )
-            .on( 'GPT:slotsDefined', function ( event ) {
+            .on( 'AdManager:slotsDefined', function ( event ) {
                 displayPageAds();
             } );
 
@@ -97,11 +97,11 @@
      *        load functions.
      * @todo  Consider using separate events.
      *
-     * @fires GPT:initSequence
+     * @fires AdManager:initSequence
      */
     function initSequence() {
 
-        $.event.trigger( 'GPT:initSequence' );
+        $.event.trigger( 'AdManager:initSequence' );
 
         listenForDfpEvents();
         enableSingleRequest();
@@ -156,12 +156,12 @@
     /**
      * Callback when GPT library is loaded.
      *
-     * @fires GPT:libraryLoaded
+     * @fires AdManager:libraryLoaded
      */
     function onLibraryLoaded() {
 
         googletag.cmd.push( function () {
-            $.event.trigger( 'GPT:libraryLoaded' );
+            $.event.trigger( 'AdManager:libraryLoaded' );
         } );
 
     }
@@ -251,7 +251,7 @@
     /**
      * Define slots for page positions.
      *
-     * @fires GPT:slotsDefined
+     * @fires AdManager:slotsDefined
      */
     function defineSlotsForPagePositions() {
 
@@ -302,7 +302,7 @@
             // Enables GPT services for defined slots.
             googletag.enableServices();
 
-            $.event.trigger( 'GPT:slotsDefined' );
+            $.event.trigger( 'AdManager:slotsDefined' );
 
         } );
 
@@ -334,7 +334,7 @@
     /**
      * Callback from DFP rendered event.
      *
-     * @fires GPT:adUnitRendered
+     * @fires AdManager:adUnitRendered
      * @see   https://developers.google.com/doubleclick-gpt/reference
      *
      * @param {Object} unit
@@ -345,7 +345,7 @@
             adInfo = Inventory.getAdInfo( unitName )
         ;
 
-        $.event.trigger( 'GPT:adUnitRendered', {
+        $.event.trigger( 'AdManager:adUnitRendered', {
             name:        unitName,
             id:          adInfo.id,
             size:        unit.size,
