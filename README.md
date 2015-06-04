@@ -4,6 +4,7 @@
 - [Configuration](#configuration)
 - [Inventory](#inventory)
 - [Events](#events)
+- [Dynamic Insertion](#dynamicinsertion)
 - [Contributing](#contributing)
 - [Dependencies](#dependencies)
 - [References](#references)
@@ -417,6 +418,98 @@ Custom jQuery events prefixed with `GPT`.
 **Description:** This is triggered when slots are successfully defined, but before ads are rendered.
 
 [:arrow_up:](#events)
+
+## Dynamic Insertion
+
+### Overview
+
+**Note:** This feature is optional.
+
+This feature allows AdManager to dynamically insert a variable number of new ad positions on the fly, without predetermined ad containers. The Insertion.js module contains logic that analyzes the DOM nodes in a specified text area to determine the optimal places where to insert ads.
+
+### Instructions
+
+- Add new inventory items that reflect the maximum possible number of dynamically inserted ads. Note that each inventory item should have unique and `slot` and `id` values.
+- Set the additional options `dynamic` and `localContext` in the inventory config.
+```javascript
+var config = {
+    // ...
+    inventory: [
+        // ...
+        {
+            slot: 'Dynamic_Unit_1',
+            id: 'dynamic-unit-1',
+            sizes: [
+                [ 300, 250 ],
+                [ 300, 425 ],
+                [ 300, 600 ]
+            ],
+            type: 'desktop',
+            dynamic: true,
+            localContext: '.entry-content'
+        },
+        {
+            slot: 'Dynamic_Unit_2',
+            id: 'dynamic-unit-2',
+            sizes: [
+                [ 300, 250 ],
+                [ 300, 425 ],
+                [ 300, 600 ]
+            ],
+            type: 'desktop',
+            dynamic: true,
+            localContext: '.entry-content'
+        },
+        {
+            slot: 'Dynamic_Unit_3',
+            id: 'dynamic-unit-3',
+            sizes: [
+                [ 300, 250 ],
+                [ 300, 425 ],
+                [ 300, 600 ]
+            ],
+            type: 'desktop',
+            dynamic: true,
+            localContext: '.entry-content'
+        }
+    ]
+};
+
+AdManager( config );
+```
+- If a more specific outer/main context is needed (the default context is `body`), the property `context` can be added to the config. This is needed when keeping multiple contexts or articles separate, such as in infinite scroll applications. In the example below, it is `.hentry`.
+```html
+<body>
+    <div class="hentry">
+        <div class="entry-content">
+            <p>Paragraph 1</p>
+            <p>Paragraph 2</p>
+            <p>Paragraph 3</p>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        ( function () {
+
+            var config = {
+                // ...
+                context: '.hentry',
+                inventory: [
+                    {
+                        // ...
+                        dynamic: true,
+                        localContext: '.entry-content'
+                        }
+                    ]
+                }
+            };
+
+            AdManager( config );
+
+        } () );
+    </script>
+</body>
+```
 
 ## Contributing
 
