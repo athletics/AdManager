@@ -1,6 +1,6 @@
 {
-  "name": "AdManager",
-  "version": "0.4.4",
+  "name": "admanager",
+  "version": "0.4.5",
   "homepage": "https://github.com/athletics/AdManager",
   "description": "A JavaScipt library for interacting with Google DFP.",
   "license": "Apache-2.0",
