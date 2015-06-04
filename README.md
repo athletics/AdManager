@@ -5,6 +5,7 @@
 - [Inventory](#inventory)
 - [Events](#events)
 - [Contributing](#contributing)
+- [Dependencies](#dependencies)
 - [References](#references)
 
 ## Basic Usage
@@ -428,6 +429,10 @@ The modules are written in the [UMD](https://github.com/umdjs/umd) pattern to su
 ### Development
 
 The project contains a gulpfile.js for concatenation and minification. To use first [install gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md) and the dependencies (`npm install`). The default gulp task (`gulp`) will start the watch task.
+
+## Dependencies
+
+AdManager requires jQuery.
 
 ## References
 
