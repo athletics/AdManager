@@ -60,7 +60,7 @@
      */
     function init() {
 
-        $( document ).on( 'GPT:initSequence', qualifyContext );
+        $( document ).on( 'AdManager:initSequence', qualifyContext );
 
     }
 
@@ -112,11 +112,11 @@
     /**
      * Triggers ad units inserted event.
      *
-     * @fires GPT:unitsInserted
+     * @fires AdManager:unitsInserted
      */
     function broadcast() {
 
-        $.event.trigger( 'GPT:unitsInserted' );
+        $.event.trigger( 'AdManager:unitsInserted' );
 
     }
 
