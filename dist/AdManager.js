@@ -1,9 +1,9 @@
 /*!
- * AdManager - Generic code for GPT ad management
+ * AdManager - A JavaScipt library for interacting with Google DFP.
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/ad-manager
- * @version 0.4.1
+ * @version 0.4.2
  *//**
  * Shared utilities for debugging and array manipulation.
  */
