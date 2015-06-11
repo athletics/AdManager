@@ -55,7 +55,7 @@
                     'audio',
                     '.video',
                     '.audio',
-                    '.app_ad_unit'
+                    '[data-ad-unit]'
                 ]
             },
             inventory: [],                           // Inventory of ad units
