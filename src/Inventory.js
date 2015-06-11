@@ -3,6 +3,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -36,6 +38,8 @@
     }
 
 } ( window, function ( window, $, Util, Config ) {
+
+    'use strict';
 
     var name = 'Inventory',
         debugEnabled = true,

@@ -1,13 +1,15 @@
 /*!
- * AdManager - A JavaScipt library for interacting with Google DFP.
+ * admanager - A JavaScipt library for interacting with Google DFP.
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/AdManager
- * @version 0.4.4
+ * @version 0.4.5
  *//**
  * Shared utilities for debugging and array manipulation.
  */
 ( function ( window, factory ) {
+
+    'use strict';
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -32,6 +34,8 @@
     }
 
 } ( window, function ( $ ) {
+
+    'use strict';
 
     /**
      * A console.log wrapper with the correct line numbers.
@@ -106,6 +110,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( 'src/Config',[
@@ -133,6 +139,8 @@
 
 } ( window, function ( $, Util ) {
 
+    'use strict';
+
     var name = 'Config',
         debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
@@ -155,7 +163,7 @@
                     'audio',
                     '.video',
                     '.audio',
-                    '.app_ad_unit'
+                    '[data-ad-unit]'
                 ]
             },
             inventory: [],                           // Inventory of ad units
@@ -314,6 +322,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( 'src/Inventory',[
@@ -347,6 +357,8 @@
     }
 
 } ( window, function ( window, $, Util, Config ) {
+
+    'use strict';
 
     var name = 'Inventory',
         debugEnabled = true,
@@ -426,21 +438,21 @@
     }
 
     /**
-     * Remove slot by name.
+     * Remove slot by slot name.
      * Relies on the `googletag` slot object.
      *
      * @param  {Object} definedSlots
-     * @param  {String} name
+     * @param  {String} slotName
      * @return {Object} definedSlots
      */
-    function removeDefinedSlot( definedSlots, name ) {
+    function removeDefinedSlot( definedSlots, slotName ) {
 
         for ( var i = 0; i < definedSlots.length; i++ ) {
 
             var unitName = definedSlots[ i ].getAdUnitPath()
                 .replace( '/' + Config.get( 'account' ) + '/', '' );
 
-            if ( unitName !== name ) {
+            if ( unitName !== slotName ) {
                 continue;
             }
 
@@ -485,29 +497,22 @@
     }
 
     /**
-     * Get info about an ad unit by id or slot name.
+     * Get info about an ad unit by slot name.
      *
-     * @param  {String} unit   ID or slot.
+     * @param  {String} slotName
      * @return {Object} adInfo
      */
-    function getAdInfo( unit ) {
+    function getAdInfo( slotName ) {
 
         var adInfo = {},
             inventory = getInventory();
 
         for ( var i = 0; i < inventory.length; i++ ) {
-            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
+            if ( inventory[ i ].slot !== slotName ) {
                 continue;
             }
 
             adInfo = inventory[ i ];
-
-            // Determine the object's idName (using the iterator if allowed).
-            if ( typeof adInfo.useIterator !== 'undefined' && ! adInfo.useIterator ) {
-                adInfo.idName = adInfo.id;
-            } else {
-                adInfo.idName = adInfo.id + '_' + adInfo.iteration;
-            }
 
             return adInfo;
         }
@@ -568,8 +573,6 @@
      * Limit ad unit sizes.
      * Removes heights too large for context.
      *
-     * @todo   Limit to the current iteration.
-     *
      * @param  {Object}  unit
      * @param  {Integer} limit
      * @return {Object}  unit
@@ -588,19 +591,19 @@
     }
 
     /**
-     * Finds the unit by id and returns its type.
+     * Finds the unit by slot name and returns its type.
      * Type is used to filter the inventory (like desktop and mobile).
      *
-     * @param  {String} id
+     * @param  {String} slotName
      * @return {String} type
      */
-    function getUnitType( id ) {
+    function getUnitType( slotName ) {
 
         var type = 'default';
 
         $.each( getInventory(), function ( index, unit ) {
 
-            if ( unit.id !== id ) {
+            if ( unit.slot !== slotName ) {
                 return true;
             }
 
@@ -614,35 +617,6 @@
 
     }
 
-    /**
-     * Increment ad slot.
-     *
-     * DFP requires an HTML id to display a unit. This function
-     * ensures all ids are unique by incrementing the unit every
-     * time an ad is loaded.
-     *
-     * @param {String} unit
-     */
-    function incrementAdSlot( unit ) {
-
-        var inventory = Config.get( 'inventory' );
-
-        for ( var i = 0; i < inventory.length; i++ ) {
-
-            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
-                continue;
-            }
-
-            inventory[ i ].iteration = typeof inventory[ i ].iteration === 'undefined' ? 0 : inventory[ i ].iteration + 1;
-
-            Config.set( 'inventory', inventory );
-
-            break;
-
-        }
-
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
@@ -652,8 +626,7 @@
         shortestAvailable:   shortestAvailable,
         tallestAvailable:    tallestAvailable,
         limitUnitHeight:     limitUnitHeight,
-        getUnitType:         getUnitType,
-        incrementAdSlot:     incrementAdSlot
+        getUnitType:         getUnitType
     };
 
 } ) );
@@ -664,6 +637,8 @@
  *        and load library once.
  */
 ( function ( window, factory ) {
+
+    'use strict';
 
     if ( typeof define === 'function' && define.amd ) {
 
@@ -701,6 +676,8 @@
     }
 
 } ( window, function ( window, $, Util, Config, Inventory ) {
+
+    'use strict';
 
     var name = 'Manager',
         debugEnabled = true,
@@ -1110,6 +1087,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( 'src/Insertion',[
@@ -1142,6 +1121,8 @@
     }
 
 } ( window, function ( $, Util, Config, Inventory ) {
+
+    'use strict';
 
     var name = 'Insertion',
         debugEnabled = true,
@@ -1306,21 +1287,21 @@
      * Creates DOM node to attach to the DOM.
      *
      * @see    https://vip.wordpress.com/2015/03/25/preventing-xss-in-javascript/
-     * @param  {String}  unitId
+     * @param  {String}  slotName
      * @param  {Boolean} disableFloat
      * @return {Array}   $html
      */
-    function adUnitMarkup( unitId, disableFloat ) {
+    function adUnitMarkup( slotName, disableFloat ) {
 
         disableFloat = disableFloat || false;
 
-        var type = Inventory.getUnitType( unitId ),
+        var type = Inventory.getUnitType( slotName ),
             alignment = odd ? 'odd' : 'even',
             $html = $( '<div />' );
 
         $html
             .addClass( Config.get( 'adClass' ) )
-            .attr( 'data-id', unitId )
+            .attr( 'data-ad-unit', slotName )
             .attr( 'data-client-type', type );
 
         if ( disableFloat ) {
@@ -1370,7 +1351,7 @@
             }
         }
 
-        markup = adUnitMarkup( unit.id, location.disableFloat );
+        markup = adUnitMarkup( unit.slot, location.disableFloat );
 
         location.$insertBefore.before( markup );
 
@@ -1394,7 +1375,7 @@
                 return false;
             }
 
-            markup = adUnitMarkup( unit.id, location.disableFloat );
+            markup = adUnitMarkup( unit.slot, location.disableFloat );
             location.$insertBefore.before( markup );
 
         } );
@@ -1646,6 +1627,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( 'src/Index',[
@@ -1656,7 +1639,7 @@
             './Insertion'
         ], factory );
 
-    } else if ( typeof exports == 'object' ) {
+    } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
             require( './Util' ),
@@ -1681,6 +1664,8 @@
     }
 
 } ( window, function ( Util, Config, Inventory, Manager, Insertion ) {
+
+    'use strict';
 
     /**
      * AdManager prototype.

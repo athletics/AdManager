@@ -7,6 +7,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -39,6 +41,8 @@
     }
 
 } ( window, function ( $, Util, Config, Inventory ) {
+
+    'use strict';
 
     var name = 'Insertion',
         debugEnabled = true,

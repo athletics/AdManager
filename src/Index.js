@@ -6,6 +6,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -41,6 +43,8 @@
     }
 
 } ( window, function ( Util, Config, Inventory, Manager, Insertion ) {
+
+    'use strict';
 
     /**
      * AdManager prototype.

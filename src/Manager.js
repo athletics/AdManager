@@ -6,6 +6,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -42,6 +44,8 @@
     }
 
 } ( window, function ( window, $, Util, Config, Inventory ) {
+
+    'use strict';
 
     var name = 'Manager',
         debugEnabled = true,
