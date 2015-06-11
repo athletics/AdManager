@@ -29,10 +29,10 @@ AdManger is a JavaScript library for interacting with [Google Publisher Tags (GP
     <body>
         <!--
         This is the ad unit container. AdManager looks for all
-        of the `.add_ad_unit` in the DOM and grabs their ids to
-        make a request from DFP to fill those units.
+        of the `[data-ad-unit]` in the DOM and grabs the slot name
+        to make a request from DFP to fill those units.
         -->
-        <div class="app_ad_unit" data-id="my-identifier"></div>
+        <div data-ad-unit="Unit_Name_in_DFP"></div>
 
         <script type="text/javascript">
             ( function () {
@@ -43,8 +43,6 @@ AdManger is a JavaScript library for interacting with [Google Publisher Tags (GP
                     inventory: [
                         {
                             slot: 'Unit_Name_in_DFP',
-                            id: 'my-identifier',
-                            iteration: 0,
                             sizes: [
                                 [ 728, 90 ],
                                 [ 970, 250 ],
@@ -91,7 +89,6 @@ AdManager( {
     inventory: [
         {
             slot: 'Unit_Name_in_DFP',
-            id: 'data_attribute_id',
             sizes: [
                 [ 728, 90 ],
                 [ 970, 250 ],
@@ -152,7 +149,6 @@ var config = {
   inventory: [
       {
           slot:    'Unit_Name_1',
-          id:      'ad_id_1',
           sizes:   [
               [ 728, 90 ],
               [ 970, 250 ],
@@ -163,7 +159,6 @@ var config = {
       },
       {
           slot:    'Unit_Name_2',
-          id:      'ad_id_2',
           sizes:   [
               [ 728, 90 ],
               [ 970, 250 ],
@@ -222,7 +217,7 @@ var config = {
   'audio',
   '.video',
   '.audio',
-  '.app_ad_unit'
+  '[data-ad-unit]'
 ]
 ```
 
@@ -257,11 +252,9 @@ The inventory array is a collection of objects that represent different ad posit
 | property name                   | type    |                                        |
 | ------------------------------- | ------- | -------------------------------------- |
 | [`slot`](#slot)                 | String  |                                        |
-| [`id`](#id)                     | String  |                                        |
 | [`sizes`](#sizes)               | Array   |                                        |
 | [`type`](#type)                 | String  |                                        |
 | [`dynamic`](#dynamic)           | Boolean |                                        |
-| [`iteration`](#iteration)       | Integer | optional                               |
 | [`localContext`](#localcontext) | String  | optional (required if `dynamic: true`) |
 
 **Example Usage:**
@@ -272,7 +265,6 @@ var config = {
     inventory: [
         {
             slot: 'Article_Leaderboard',
-            id: 'article-leaderboard',
             sizes: [
                 [ 728, 90 ],
                 [ 970, 250 ],
@@ -283,7 +275,6 @@ var config = {
         },
         {
             slot: 'Article_Dynamic',
-            id: 'article-dynamic',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 600 ]
@@ -301,14 +292,6 @@ var config = {
 **Type:** String
 
 **Description:** The slot name defined in DFP.
-
-[:arrow_up:](#inventory)
-
-### `id`
-
-**Type:** String
-
-**Description:** String to identify the ad unit container. Used as a data attribute `data-id=""`.
 
 [:arrow_up:](#inventory)
 
@@ -338,16 +321,6 @@ var config = {
 
 [:arrow_up:](#inventory)
 
-### `iteration`
-
-**Type:** Integer
-
-**Default:** `0`
-
-**Description:** Used internally to keep the insertion container `id` attribute unique.
-
-[:arrow_up:](#inventory)
-
 ### `localContext`
 
 **Type:** String
@@ -362,7 +335,6 @@ var config = {
         // ...
         {
             slot: 'Article_Dynamic',
-            id: 'article-dynamic',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 600 ]
@@ -444,7 +416,6 @@ var config = {
         // ...
         {
             slot: 'Dynamic_Unit_1',
-            id: 'dynamic-unit-1',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 425 ],
@@ -456,7 +427,6 @@ var config = {
         },
         {
             slot: 'Dynamic_Unit_2',
-            id: 'dynamic-unit-2',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 425 ],
@@ -468,7 +438,6 @@ var config = {
         },
         {
             slot: 'Dynamic_Unit_3',
-            id: 'dynamic-unit-3',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 425 ],
