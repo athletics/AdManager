@@ -16,7 +16,7 @@
             './Insertion'
         ], factory );
 
-    } else if ( typeof exports == 'object' ) {
+    } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
             require( './Util' ),
