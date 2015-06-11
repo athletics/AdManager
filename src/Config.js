@@ -37,8 +37,7 @@
 
     'use strict';
 
-    var name = 'Config',
-        debugEnabled = true,
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
         config = {},
         defaults = {

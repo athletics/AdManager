@@ -47,8 +47,7 @@
 
     'use strict';
 
-    var name = 'Manager',
-        debugEnabled = true,
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
         libraryLoaded = false,
         definedSlots = [],

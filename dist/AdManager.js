@@ -141,8 +141,7 @@
 
     'use strict';
 
-    var name = 'Config',
-        debugEnabled = true,
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
         config = {},
         defaults = {
@@ -360,8 +359,7 @@
 
     'use strict';
 
-    var name = 'Inventory',
-        debugEnabled = true,
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {};
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -679,8 +677,7 @@
 
     'use strict';
 
-    var name = 'Manager',
-        debugEnabled = true,
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
         libraryLoaded = false,
         definedSlots = [],
@@ -1117,8 +1114,7 @@
 
     'use strict';
 
-    var name = 'Insertion',
-        debugEnabled = true,
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
         $context = null,
         $localContext = null,

@@ -44,8 +44,7 @@
 
     'use strict';
 
-    var name = 'Insertion',
-        debugEnabled = true,
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
         $context = null,
         $localContext = null,

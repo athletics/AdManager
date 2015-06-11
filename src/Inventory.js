@@ -41,8 +41,7 @@
 
     'use strict';
 
-    var name = 'Inventory',
-        debugEnabled = true,
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {};
 
     //////////////////////////////////////////////////////////////////////////////////////
