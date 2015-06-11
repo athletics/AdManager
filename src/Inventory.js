@@ -191,13 +191,6 @@
 
             adInfo = inventory[ i ];
 
-            // Determine the object's idName (using the iterator if allowed).
-            if ( typeof adInfo.useIterator !== 'undefined' && ! adInfo.useIterator ) {
-                adInfo.idName = adInfo.id;
-            } else {
-                adInfo.idName = adInfo.id + '_' + adInfo.iteration;
-            }
-
             return adInfo;
         }
 
@@ -257,8 +250,6 @@
      * Limit ad unit sizes.
      * Removes heights too large for context.
      *
-     * @todo   Limit to the current iteration.
-     *
      * @param  {Object}  unit
      * @param  {Integer} limit
      * @return {Object}  unit
@@ -303,35 +294,6 @@
 
     }
 
-    /**
-     * Increment ad slot.
-     *
-     * DFP requires an HTML id to display a unit. This function
-     * ensures all ids are unique by incrementing the unit every
-     * time an ad is loaded.
-     *
-     * @param {String} unit
-     */
-    function incrementAdSlot( unit ) {
-
-        var inventory = Config.get( 'inventory' );
-
-        for ( var i = 0; i < inventory.length; i++ ) {
-
-            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
-                continue;
-            }
-
-            inventory[ i ].iteration = typeof inventory[ i ].iteration === 'undefined' ? 0 : inventory[ i ].iteration + 1;
-
-            Config.set( 'inventory', inventory );
-
-            break;
-
-        }
-
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
@@ -341,8 +303,7 @@
         shortestAvailable:   shortestAvailable,
         tallestAvailable:    tallestAvailable,
         limitUnitHeight:     limitUnitHeight,
-        getUnitType:         getUnitType,
-        incrementAdSlot:     incrementAdSlot
+        getUnitType:         getUnitType
     };
 
 } ) );
