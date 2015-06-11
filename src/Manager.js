@@ -108,7 +108,7 @@
         $.event.trigger( 'AdManager:initSequence' );
 
         listenForDfpEvents();
-        enableSingleRequest();
+        setupPubAdsService();
 
         setTargeting();
         setPagePositions();
@@ -189,7 +189,7 @@
      * Enable batched SRA calls for requesting multiple ads at once.
      * Disable initial load of units, wait for display call.
      */
-    function enableSingleRequest() {
+    function setupPubAdsService() {
 
         googletag.cmd.push( function () {
 
