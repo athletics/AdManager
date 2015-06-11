@@ -115,21 +115,21 @@
     }
 
     /**
-     * Remove slot by name.
+     * Remove slot by slot name.
      * Relies on the `googletag` slot object.
      *
      * @param  {Object} definedSlots
-     * @param  {String} name
+     * @param  {String} slotName
      * @return {Object} definedSlots
      */
-    function removeDefinedSlot( definedSlots, name ) {
+    function removeDefinedSlot( definedSlots, slotName ) {
 
         for ( var i = 0; i < definedSlots.length; i++ ) {
 
             var unitName = definedSlots[ i ].getAdUnitPath()
                 .replace( '/' + Config.get( 'account' ) + '/', '' );
 
-            if ( unitName !== name ) {
+            if ( unitName !== slotName ) {
                 continue;
             }
 
@@ -174,18 +174,18 @@
     }
 
     /**
-     * Get info about an ad unit by id or slot name.
+     * Get info about an ad unit by slot name.
      *
-     * @param  {String} unit   ID or slot.
+     * @param  {String} slotName
      * @return {Object} adInfo
      */
-    function getAdInfo( unit ) {
+    function getAdInfo( slotName ) {
 
         var adInfo = {},
             inventory = getInventory();
 
         for ( var i = 0; i < inventory.length; i++ ) {
-            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
+            if ( inventory[ i ].slot !== slotName ) {
                 continue;
             }
 
@@ -277,19 +277,19 @@
     }
 
     /**
-     * Finds the unit by id and returns its type.
+     * Finds the unit by slot name and returns its type.
      * Type is used to filter the inventory (like desktop and mobile).
      *
-     * @param  {String} id
+     * @param  {String} slotName
      * @return {String} type
      */
-    function getUnitType( id ) {
+    function getUnitType( slotName ) {
 
         var type = 'default';
 
         $.each( getInventory(), function ( index, unit ) {
 
-            if ( unit.id !== id ) {
+            if ( unit.slot !== slotName ) {
                 return true;
             }
 
