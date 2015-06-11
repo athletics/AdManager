@@ -808,11 +808,7 @@
     function listenForDfpEvents() {
 
         googletag.cmd.push( function () {
-            googletag.pubads()
-                .addEventListener( 'slotRenderEnded', function ( event ) {
-                    slotRenderEnded( event );
-                } )
-            ;
+            googletag.pubads().addEventListener( 'slotRenderEnded', onSlotRenderEnded );
         } );
 
     }
@@ -975,15 +971,12 @@
      *
      * @param {Object} unit
      */
-    function slotRenderEnded( unit ) {
+    function onSlotRenderEnded( unit ) {
 
-        var unitName = unit.slot.getAdUnitPath().replace( '/' + account + '/', '' ),
-            adInfo = Inventory.getAdInfo( unitName )
-        ;
+        var slotName = unit.slot.getAdUnitPath().replace( '/' + account + '/', '' );
 
         $.event.trigger( 'AdManager:adUnitRendered', {
-            name:        unitName,
-            id:          adInfo.id,
+            name:        slotName,
             size:        unit.size,
             isEmpty:     unit.isEmpty,
             creativeId:  unit.creativeId,
