@@ -54,7 +54,7 @@
         pagePositions = [],
         inventory = [],
         account = null,
-        adSelector = '';
+        adSelector = '[data-ad-unit]';
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -69,7 +69,6 @@
 
         inventory = Inventory.getInventory();
         account = Config.get( 'account' );
-        adSelector = Config.get( 'adSelector' );
 
         bindHandlers();
         loadLibrary();
