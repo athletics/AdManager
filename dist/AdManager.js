@@ -936,23 +936,31 @@
     }
 
     /**
-     * Fetch and display defined slots.
+     * Fetch and display the current page ads.
      */
     function displayPageAds() {
 
         googletag.cmd.push( function () {
 
-            googletag.pubads().refresh( definedSlots );
+            var pageSlots = $.grep( definedSlots, function ( slot, index ) {
 
-            for ( var i = 0; i < pagePositions.length; i++ ) {
+                var slotName = convertSlotName( slot.getAdUnitPath(), 'local' );
 
-                currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
-
-                if ( $( '#' + currentPosition.idName ).length ) {
-                    googletag.display( currentPosition.idName );
+                if ( ! $.inArray( slotName, pagePositions ) ) {
+                    return false;
                 }
 
-            }
+                return true;
+
+            } );
+
+            googletag.pubads().refresh( pageSlots );
+
+            $.each( pagePositions, function ( index, slotName ) {
+
+                googletag.display( slotName );
+
+            } );
 
         } );
 
