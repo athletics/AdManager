@@ -254,52 +254,72 @@
 
         googletag.cmd.push( function () {
 
-            var currentPosition = null,
-                $context = $( Config.get( 'context' ) ),
-                $unit,
-                $unitTarget;
+            var undefinedPagePositions = [];
 
-            for ( var i = 0; i < pagePositions.length; i++ ) {
+            if ( $.isEmptyObject( definedSlots ) ) {
+                undefinedPagePositions = pagePositions;
+            } else {
+                var definedSlotNames = $.map( definedSlots, function ( slot, index ) {
+                    return convertSlotName( slot.getAdUnitPath(), 'local' );
+                } );
 
-                Inventory.incrementAdSlot( pagePositions[ i ] );
-                currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
+                undefinedPagePositions = $.grep( pagePositions, function ( slotName, index ) {
 
-                if ( typeof currentPosition.id === 'undefined' ) {
-                    continue;
-                }
+                    if ( ! $.inArray( slotName, definedSlotNames ) ) {
+                        return false;
+                    }
 
-                // Find the empty container on the page.
-                // Dynamically instantiate the unique ad unit.
-                $unit = $context.find( adSelector + '[data-id="' + currentPosition.id + '"]' );
-                $unitTarget = $( '<div />' );
+                    return true;
 
-                if ( $unit.length < 1 ) {
-                    continue;
-                }
-
-                // Generate new unique div.
-                $unitTarget.addClass( Config.get( 'adUnitTargetClass' ) );
-                $unitTarget.attr( 'id', currentPosition.idName );
-                $unit.append( $unitTarget );
-
-                // Activate
-                $unit.addClass( 'active' );
-
-                definedSlots[ i ] = googletag
-                    .defineSlot(
-                        '/' + account + '/' + currentPosition.slot,
-                        currentPosition.sizes,
-                        currentPosition.idName
-                     )
-                    .addService( googletag.pubads() )
-                ;
-
+                } );
             }
+
+            definedSlots = $.map( undefinedPagePositions, function ( slotName, index ) {
+
+                var position = Inventory.getAdInfo( slotName );
+
+                return googletag
+                    .defineSlot(
+                        convertSlotName( slotName, 'dfp' ),
+                        position.sizes,
+                        position.slot
+                     )
+                    .addService( googletag.pubads() );
+
+            } );
 
             // Enables GPT services for defined slots.
             googletag.enableServices();
 
+            insertUnitTargets();
+
             $.event.trigger( 'AdManager:slotsDefined' );
+
+        } );
+
+    }
+
+    /**
+     * Creates the containers for the DFP to fill.
+     * DFP wants ids.
+     */
+    function insertUnitTargets() {
+
+        var $context = $( Config.get( 'context' ) ),
+            notInserted = [];
+
+        notInserted = $.grep( pagePositions, function ( slotName, index ) {
+            return document.getElementById( slotName ) === null;
+        } );
+
+        $.each( notInserted, function ( index, slotName ) {
+
+            $context.find( '[data-ad-unit="' + slotName + '"]' )
+                .addClass( 'initialized' )
+                .append( $( '<div />', {
+                    id: slotName,
+                    addClass: 'ad-unit-target'
+                } ) );
 
         } );
 
