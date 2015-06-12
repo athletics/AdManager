@@ -240,8 +240,7 @@
         $units = $context.find( selector );
 
         $units.each( function () {
-            var id = $( this ).data( 'id' );
-            pagePositions.push( id );
+            pagePositions.push( $( this ).data( 'ad-unit' ) );
         } );
 
     }
