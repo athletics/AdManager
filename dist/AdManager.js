@@ -969,7 +969,7 @@
      */
     function onSlotRenderEnded( unit ) {
 
-        var slotName = unit.slot.getAdUnitPath().replace( '/' + account + '/', '' );
+        var slotName = convertSlotName( unit.slot.getAdUnitPath(), 'local' );
 
         $.event.trigger( 'AdManager:adUnitRendered', {
             name:        slotName,
@@ -987,16 +987,16 @@
      *
      * @todo   Use `$.grep` instead of `$.each`.
      *
-     * @param  {String} name
+     * @param  {String} slotName
      * @return {Object} definedSlot
      */
-    function getDefinedSlot( name ) {
+    function getDefinedSlot( slotName ) {
 
         var definedSlot = null;
 
         $.each( definedSlots, function ( i, slot ) {
-            var unitName = slot.getAdUnitPath().replace( '/' + account + '/', '' );
-            if ( unitName === name ) {
+            var unitName = convertSlotName( slot.getAdUnitPath(), 'local' );
+            if ( unitName === slotName ) {
                 definedSlot = slot;
                 return false;
             }
@@ -1053,6 +1053,23 @@
         if ( removeContainer ) {
             $context.find( adSelector ).remove();
         }
+
+    }
+
+    /**
+     * Converts a slot name local to DFP or vice versa.
+     *
+     * @param  {String} slotName
+     * @param  {String} format   'dfp' or 'local'.
+     * @return {String}
+     */
+    function convertSlotName( slotName, format ) {
+
+        if ( 'dfp' === format ) {
+            return '/' + account + '/' + slotName;
+        }
+
+        return slotName.replace( '/' + account + '/', '' );
 
     }
 
