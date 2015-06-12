@@ -194,7 +194,7 @@
 
             adInfo = inventory[ i ];
 
-            return adInfo;
+            break;
         }
 
         return adInfo;
