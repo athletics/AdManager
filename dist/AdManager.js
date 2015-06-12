@@ -1009,17 +1009,21 @@
      * Display slot by ID or slot.
      * Separate display call from `displayPageAds()`.
      *
-     * @param {String} unit
+     * @param {String} slotName
      */
-    function displaySlot( unit ) {
+    function displaySlot( slotName ) {
 
         googletag.cmd.push( function () {
-            var position = Inventory.getAdInfo( unit ),
-                slot = getDefinedSlot( position.slot )
-            ;
+
+            var slot = getDefinedSlot( slotName );
+
             googletag.pubads().refresh( [ slot ] );
-            googletag.display( position.idName );
-            definedSlots = Inventory.removeDefinedSlot( definedSlots, position.slot );
+            googletag.display( slotName );
+
+            // @todo This seems wrong. We want to keep the definition right?
+            // Let's just remove the page position?
+            // definedSlots = Inventory.removeDefinedSlot( definedSlots, slotName );
+
         } );
 
     }
