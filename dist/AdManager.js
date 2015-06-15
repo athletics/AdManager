@@ -717,6 +717,9 @@
             } )
             .on( 'AdManager:slotsDefined', function ( event ) {
                 displayPageAds();
+            } )
+            .on( 'AdManager:softRefresh', function ( event, units ) {
+                softRefresh( units );
             } );
 
     }
@@ -1103,6 +1106,22 @@
 
     }
 
+    /**
+     * Refresh slots.
+     *
+     * @param  {Array} units Optional. List of units to refresh.
+     *                       Default is all.
+     */
+    function softRefresh( units ) {
+
+        units = units || definedSlots;
+
+        googletag.cmd.push( function () {
+            googletag.pubads().refresh( units );
+        } );
+
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
@@ -1110,7 +1129,8 @@
         isEnabled:    isEnabled,
         displaySlot:  displaySlot,
         initSequence: initSequence,
-        emptyAds:     emptyAds
+        emptyAds:     emptyAds,
+        softRefresh:  softRefresh
     };
 
 } ) );
