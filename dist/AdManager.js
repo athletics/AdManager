@@ -711,7 +711,6 @@
     function bindHandlers() {
 
         $( document )
-            .on( 'AdManager:unitsInserted', function ( event ) {} )
             .on( 'AdManager:libraryLoaded', function ( event ) {
                 libraryLoaded = true;
                 initSequence();
