@@ -719,6 +719,7 @@
      * Library loaded callback.
      *
      * @fires AdManager:initSequence
+     * @fires AdManager:ready
      */
     function libraryLoaded() {
 
@@ -730,6 +731,8 @@
         if ( Config.get( 'autoload' ) ) {
             $.event.trigger( 'AdManager:initSequence' );
         }
+
+        $.event.trigger( 'AdManager:ready' );
 
     }
 
