@@ -63,7 +63,7 @@
      */
     function init() {
 
-        if ( ! isEnabled() ) {
+        if ( ! Config.get( 'enabled' ) ) {
             return;
         }
 
@@ -431,17 +431,6 @@
     }
 
     /**
-     * Check if the Ad Manager is currently enabled.
-     *
-     * @return {Boolean}
-     */
-    function isEnabled() {
-
-        return Config.get( 'enabled' );
-
-    }
-
-    /**
      * Empties all ads in a given context.
      * Can be used to refresh ads on pushState.
      *
@@ -498,7 +487,6 @@
 
     return {
         init:         init,
-        isEnabled:    isEnabled,
         displaySlot:  displaySlot,
         initSequence: initSequence,
         emptyAds:     emptyAds,

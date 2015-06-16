@@ -176,7 +176,6 @@
      *
      * @todo   Reenable usage in the project.
      *         Ascertain the correct place to use.
-     *         Previous usage was in `Manager.isEnabled()`.
      *
      * @param  {Object} options.$context
      * @param  {String} options.attrName
