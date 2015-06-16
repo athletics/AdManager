@@ -49,7 +49,7 @@
 
     var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
-        libraryLoaded = false,
+        loaded = false,
         definedSlots = [],
         pagePositions = [],
         inventory = [],
@@ -92,7 +92,7 @@
      */
     function libraryLoaded() {
 
-        libraryLoaded = true;
+        loaded = true;
 
         listenForDfpEvents();
         setupPubAdsService();
@@ -120,7 +120,7 @@
      */
     function loadLibrary() {
 
-        if ( libraryLoaded ) {
+        if ( loaded ) {
             return onLibraryLoaded();
         }
 
