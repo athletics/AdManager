@@ -68,6 +68,7 @@ A configuration object is required to initialize the Ad Manager.
 | key                                                      | type    |
 | -------------------------------------------------------- | ------- |
 | [`account`](#account)                                    | Integer |
+| [`autoload`](#autoload)                                  | Boolean |
 | [`clientType`](#clienttype)                              | String  |
 | [`pageConfigAttr`](#pageconfigattr)                      | String  |
 | [`inventory`](#inventory)                                | Array   |
@@ -107,6 +108,16 @@ AdManager( {
 **Default:** `null`, must be specified
 
 **Description:** Your network code. You can find your network code in the “Admin” tab of DFP.
+
+[:arrow_up:](#configuration)
+
+### `autoload`
+
+**Type:** Boolean
+
+**Default:** `true`
+
+**Description:** Whether to start the qualification process automatically.
 
 [:arrow_up:](#configuration)
 

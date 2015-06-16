@@ -110,9 +110,11 @@
         listenForDfpEvents();
         setupPubAdsService();
 
-        setTargeting();
-        setPagePositions();
-        defineSlotsForPagePositions();
+        if ( Config.get( 'autoload' ) ) {
+            setTargeting();
+            setPagePositions();
+            defineSlotsForPagePositions();
+        }
 
     }
 

@@ -44,6 +44,7 @@
             account:             null,               // DFP account ID
             adClass:             'app_ad_unit',      // Outer ad wrap
             adUnitTargetClass:   'app_unit_target',  // Inner ad wrap
+            autoload:            true,               // Start the qualification process automatically
             clientType:          false,              // Used to filter inventory
             context:             'body',             // Selector for ad filling container
             enabled:             true,               // Turn off ads
