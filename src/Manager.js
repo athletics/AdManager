@@ -70,51 +70,47 @@
         inventory = Inventory.getInventory();
         account = Config.get( 'account' );
 
-        bindHandlers();
+        addEventListeners();
         loadLibrary();
 
     }
 
-    /**
-     * Add event listeners for library events.
-     */
-    function bindHandlers() {
+    function addEventListeners() {
 
         $( document )
-            .on( 'AdManager:libraryLoaded', function ( event ) {
-                libraryLoaded = true;
-                initSequence();
-            } )
-            .on( 'AdManager:slotsDefined', function ( event ) {
-                displayPageAds();
-            } )
-            .on( 'AdManager:softRefresh', function ( event, units ) {
-                softRefresh( units );
-            } );
+            .on( 'AdManager:libraryLoaded', libraryLoaded )
+            .on( 'AdManager:initSequence', initSequence )
+            .on( 'AdManager:slotsDefined', displayPageAds )
+            .on( 'AdManager:softRefresh', softRefresh );
 
     }
 
     /**
-     * Start the sequence to loads ads.
-     *
-     * @todo  Separate initial load functions from request /
-     *        load functions.
-     * @todo  Consider using separate events.
+     * Library loaded callback.
      *
      * @fires AdManager:initSequence
      */
-    function initSequence() {
+    function libraryLoaded() {
 
-        $.event.trigger( 'AdManager:initSequence' );
+        libraryLoaded = true;
 
         listenForDfpEvents();
         setupPubAdsService();
 
         if ( Config.get( 'autoload' ) ) {
-            setTargeting();
-            setPagePositions();
-            defineSlotsForPagePositions();
+            $.event.trigger( 'AdManager:initSequence' );
         }
+
+    }
+
+    /**
+     * Start qualification sequence.
+     */
+    function initSequence() {
+
+        setTargeting();
+        setPagePositions();
+        defineSlotsForPagePositions();
 
     }
 
@@ -470,10 +466,11 @@
     /**
      * Refresh slots.
      *
-     * @param  {Array} units Optional. List of units to refresh.
-     *                       Default is all.
+     * @param  {Object} event
+     * @param  {Array}  units Optional. List of units to refresh.
+     *                        Default is all.
      */
-    function softRefresh( units ) {
+    function softRefresh( event, units ) {
 
         units = units || definedSlots;
 
