@@ -79,17 +79,16 @@
 
         $( document )
             .on( 'AdManager:libraryLoaded', libraryLoaded )
-            .on( 'AdManager:initSequence', initSequence )
+            .on( 'AdManager:runSequence', runSequence )
             .on( 'AdManager:slotsDefined', displayPageAds )
-            .on( 'AdManager:softRefresh', softRefresh )
-            .on( 'AdManager:hardRefresh', hardRefresh );
+            .on( 'AdManager:refresh', refresh );
 
     }
 
     /**
      * Library loaded callback.
      *
-     * @fires AdManager:initSequence
+     * @fires AdManager:runSequence
      * @fires AdManager:ready
      */
     function libraryLoaded() {
@@ -100,7 +99,7 @@
         setupPubAdsService();
 
         if ( Config.get( 'autoload' ) ) {
-            $.event.trigger( 'AdManager:initSequence' );
+            $.event.trigger( 'AdManager:runSequence' );
         }
 
         $.event.trigger( 'AdManager:ready' );
@@ -108,10 +107,14 @@
     }
 
     /**
-     * Start qualification sequence.
+     * Run qualification sequence.
+     *
+     * - Find page positions in the DOM
+     * - Define new slots
      */
-    function initSequence() {
+    function runSequence() {
 
+        pagePositions = [];
         setTargeting();
         setPagePositions();
         defineSlotsForPagePositions();
@@ -475,7 +478,7 @@
      * @param  {Array}  units Optional. List of units to refresh.
      *                        Default is all.
      */
-    function softRefresh( event, units ) {
+    function refresh( event, units ) {
 
         units = units || definedSlots;
 
@@ -485,28 +488,14 @@
 
     }
 
-    /**
-     * Clear out page positions and re-run sequence.
-     *
-     * @todo   Consider rolling this into one sequence event/method.
-     *
-     * @param  {Object} event
-     */
-    function hardRefresh( event ) {
-
-        pagePositions = [];
-        $.event.trigger( 'AdManager:initSequence' );
-
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        init:         init,
-        displaySlot:  displaySlot,
-        initSequence: initSequence,
-        emptyAds:     emptyAds,
-        softRefresh:  softRefresh
+        init:        init,
+        displaySlot: displaySlot,
+        runSequence: runSequence,
+        emptyAds:    emptyAds,
+        refresh:     refresh
     };
 
 } ) );
