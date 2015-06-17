@@ -268,7 +268,7 @@
 
                 undefinedPagePositions = $.grep( pagePositions, function ( slotName, index ) {
 
-                    if ( ! $.inArray( slotName, definedSlotNames ) ) {
+                    if ( $.inArray( slotName, definedSlotNames ) !== -1 ) {
                         return false;
                     }
 
