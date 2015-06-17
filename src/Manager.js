@@ -81,7 +81,8 @@
             .on( 'AdManager:libraryLoaded', libraryLoaded )
             .on( 'AdManager:initSequence', initSequence )
             .on( 'AdManager:slotsDefined', displayPageAds )
-            .on( 'AdManager:softRefresh', softRefresh );
+            .on( 'AdManager:softRefresh', softRefresh )
+            .on( 'AdManager:hardRefresh', hardRefresh );
 
     }
 
@@ -481,6 +482,20 @@
         googletag.cmd.push( function () {
             googletag.pubads().refresh( units );
         } );
+
+    }
+
+    /**
+     * Clear out page positions and re-run sequence.
+     *
+     * @todo   Consider rolling this into one sequence event/method.
+     *
+     * @param  {Object} event
+     */
+    function hardRefresh( event ) {
+
+        pagePositions = [];
+        $.event.trigger( 'AdManager:initSequence' );
 
     }
 
