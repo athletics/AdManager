@@ -839,6 +839,8 @@
 
     /**
      * Send key-value targeting in ad request.
+     *
+     * @todo  https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_clearTargeting
      */
     function setTargeting() {
 
@@ -1067,6 +1069,8 @@
     /**
      * Empties all ads in a given context.
      * Can be used to refresh ads on pushState.
+     *
+     * @todo  Use https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_clear
      *
      * @param {Object}  options.$context
      * @param {Boolean} options.removeContainer
