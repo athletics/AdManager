@@ -277,17 +277,18 @@
                 } );
             }
 
-            definedSlots = $.map( undefinedPagePositions, function ( slotName, index ) {
+            $.each( undefinedPagePositions, function ( index, slotName ) {
 
-                var position = Inventory.getAdInfo( slotName );
+                var position = Inventory.getAdInfo( slotName ),
+                    slot = googletag
+                        .defineSlot(
+                            convertSlotName( slotName, 'dfp' ),
+                            position.sizes,
+                            position.slot
+                         )
+                        .addService( googletag.pubads() );
 
-                return googletag
-                    .defineSlot(
-                        convertSlotName( slotName, 'dfp' ),
-                        position.sizes,
-                        position.slot
-                     )
-                    .addService( googletag.pubads() );
+                definedSlots.push( slot );
 
             } );
 
