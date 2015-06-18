@@ -869,7 +869,7 @@
         var clientType = Config.get( 'clientType' ),
             $context = $( Config.get( 'context' ) ),
             $units = null,
-            selector = adSelector
+            selector = adSelector + ':not(.is-disabled)'
         ;
 
         if ( clientType !== false ) {
