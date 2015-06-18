@@ -325,7 +325,7 @@
         $.each( notInserted, function ( index, slotName ) {
 
             $context.find( '[data-ad-unit="' + slotName + '"]' )
-                .addClass( 'initialized' )
+                .addClass( 'is-initialized' )
                 .append( $( '<div />', {
                     id: slotName,
                     addClass: 'ad-unit-target'
