@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/AdManager
- * @version 0.4.5
+ * @version 0.5.0
  *//**
  * Shared utilities for debugging and array manipulation.
  */
