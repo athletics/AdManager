@@ -438,22 +438,39 @@
 
     /**
      * Empties all ads in a given context.
-     * Can be used to refresh ads on pushState.
      *
-     * @todo  Use https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_clear
-     *
-     * @param {Object}  options.$context
-     * @param {Boolean} options.removeContainer
+     * @param {Object}  options
+     *        {Array}   $context        jQuery element.
+     *        {Boolean} removeContainer Default is true.
      */
-    function emptyAds( options ) {
+    function emptySlotsInContext( options ) {
 
-        var $context = options.$context,
-            removeContainer = options.removeContainer || false;
+        options = options || {};
+        options = $.extend( {
+            $context:        $( Config.get( 'context' ) ),
+            removeContainer: true
+        }, options );
 
-        $context.find( adSelector ).empty();
+        var units = $.map( options.$context.find( adSelector ), function ( $unit, index ) {
+            return $unit.data( 'ad-unit' );
+        } );
+
+        googletag.pubads().clear( units );
+
+        var $elements = $.map( units, function ( unit, index ) {
+
+            return options.$context.find( '#' + unit );
+
+        } );
 
         if ( removeContainer ) {
-            $context.find( adSelector ).remove();
+
+            $elements.remove();
+
+        } else {
+
+            $elements.empty();
+
         }
 
     }
@@ -495,11 +512,11 @@
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        init:        init,
-        displaySlot: displaySlot,
-        runSequence: runSequence,
-        emptyAds:    emptyAds,
-        refresh:     refresh
+        init:                init,
+        displaySlot:         displaySlot,
+        runSequence:         runSequence,
+        emptySlotsInContext: emptySlotsInContext,
+        refresh:             refresh
     };
 
 } ) );
