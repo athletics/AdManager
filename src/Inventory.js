@@ -118,35 +118,6 @@
     }
 
     /**
-     * Remove slot by slot name.
-     * Relies on the `googletag` slot object.
-     *
-     * @param  {Object} definedSlots
-     * @param  {String} slotName
-     * @return {Object} definedSlots
-     */
-    function removeDefinedSlot( definedSlots, slotName ) {
-
-        for ( var i = 0; i < definedSlots.length; i++ ) {
-
-            var unitName = definedSlots[ i ].getAdUnitPath()
-                .replace( '/' + Config.get( 'account' ) + '/', '' );
-
-            if ( unitName !== slotName ) {
-                continue;
-            }
-
-            definedSlots = Util.removeByKey( definedSlots, i );
-
-            break;
-
-        }
-
-        return definedSlots;
-
-    }
-
-    /**
      * Get ad units for dynamic insertion.
      *
      * @todo   Replace `$.each` with `$.grep`.

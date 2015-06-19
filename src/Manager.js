@@ -81,7 +81,9 @@
             .on( 'AdManager:libraryLoaded', libraryLoaded )
             .on( 'AdManager:runSequence', runSequence )
             .on( 'AdManager:slotsDefined', displayPageAds )
-            .on( 'AdManager:refresh', refresh );
+            .on( 'AdManager:refresh', refresh )
+            .on( 'AdManager:emptySlots', emptySlots )
+            .on( 'AdManager:emptySlotsInContext', emptySlotsInContext );
 
     }
 
@@ -428,10 +430,26 @@
             googletag.pubads().refresh( [ slot ] );
             googletag.display( slotName );
 
-            // @todo This seems wrong. We want to keep the definition right?
-            // Let's just remove the page position?
-            // definedSlots = Inventory.removeDefinedSlot( definedSlots, slotName );
+            pagePositions = $.grep( pagePositions, function ( pagePosition, index ) {
+                return slotName !== pagePosition;
+            } );
 
+        } );
+
+    }
+
+    /**
+     * Empty slots by name. Removes their target container,
+     *
+     * @param  {Object} event
+     * @param  {Array}  units List of slot names.
+     */
+    function emptySlots( event, units ) {
+
+        googletag.pubads().clear( units );
+
+        $.each( units, function ( index, unit ) {
+            $( document.getElementById( unit ) ).remove();
         } );
 
     }
@@ -439,11 +457,12 @@
     /**
      * Empties all ads in a given context.
      *
-     * @param {Object}  options
-     *        {Array}   $context        jQuery element.
-     *        {Boolean} removeContainer Default is true.
+     * @param  {Object} event
+     * @param  {Object}  options
+     *         {Array}   $context        jQuery element.
+     *         {Boolean} removeContainer Default is true.
      */
-    function emptySlotsInContext( options ) {
+    function emptySlotsInContext( event, options ) {
 
         options = options || {};
         options = $.extend( {
@@ -515,6 +534,7 @@
         init:                init,
         displaySlot:         displaySlot,
         runSequence:         runSequence,
+        emptySlots:          emptySlots,
         emptySlotsInContext: emptySlotsInContext,
         refresh:             refresh
     };
