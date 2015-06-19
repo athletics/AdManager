@@ -348,11 +348,7 @@
 
                 var slotName = convertSlotName( slot.getAdUnitPath(), 'local' );
 
-                if ( ! $.inArray( slotName, pagePositions ) ) {
-                    return false;
-                }
-
-                return true;
+                return -1 !== $.inArray( slotName, pagePositions );
 
             } );
 
