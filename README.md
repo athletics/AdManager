@@ -8,7 +8,7 @@ AdManger is a JavaScript library for interacting with [Google Publisher Tags (GP
 
 - [Basic Usage](#basicusage)
 - [Configuration](#configuration)
-- [Inventory](#inventory)
+- [Inventory](#inventory-1)
 - [Events](#events)
 - [Dynamic Insertion](#dynamicinsertion)
 - [Contributing](#contributing)
@@ -20,46 +20,42 @@ AdManger is a JavaScript library for interacting with [Google Publisher Tags (GP
 ```html
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>AdManager Usage</title>
-        <script src="jquery.js"></script>
-        <script src="AdManager.min.js"></script>
-    </head>
-    <body>
-        <!--
-        This is the ad unit container. AdManager looks for all
-        of the `.add_ad_unit` in the DOM and grabs their ids to
-        make a request from DFP to fill those units.
-        -->
-        <div class="app_ad_unit" data-id="my-identifier"></div>
+<head>
+    <meta charset="utf-8">
+    <title>AdManager Usage</title>
+    <script src="jquery.js"></script>
+    <script src="AdManager.min.js"></script>
+</head>
+<body>
+    <!--
+    This is the ad unit container. AdManager looks for all
+    of the `[data-ad-unit]` in the DOM and grabs the slot name
+    to make a request from DFP to fill those units.
+    -->
+    <div data-ad-unit="Unit_Name_in_DFP"></div>
 
-        <script type="text/javascript">
-            ( function () {
+    <script type="text/javascript">
+        ( function () {
 
-                var config = {
-                    account: 1234567,
-                    type: 'desktop',
-                    inventory: [
-                        {
-                            slot: 'Unit_Name_in_DFP',
-                            id: 'my-identifier',
-                            iteration: 0,
-                            sizes: [
-                                [ 728, 90 ],
-                                [ 970, 250 ],
-                                [ 1000, 220 ]
-                            ],
-                            type: 'desktop'
-                        }
-                    ]
-                };
+            var config = {
+                account: 1234567,
+                inventory: [
+                    {
+                        slot: 'Unit_Name_in_DFP',
+                        sizes: [
+                            [ 728, 90 ],
+                            [ 970, 250 ],
+                            [ 1000, 220 ]
+                        ]
+                    }
+                ]
+            };
 
-                AdManager( config );
+            AdManager( config );
 
-            } () );
-        </script>
-    </body>
+        } () );
+    </script>
+</body>
 </html>
 ```
 
@@ -67,31 +63,29 @@ AdManger is a JavaScript library for interacting with [Google Publisher Tags (GP
 
 A configuration object is required to initialize the Ad Manager.
 
-| key                                                      | type    |
-| -------------------------------------------------------- | ------- |
-| [`account`](#account)                                    | Integer |
-| [`clientType`](#clienttype)                              | String  |
-| [`pageConfigAttr`](#pageconfigattr)                      | String  |
-| [`inventory`](#inventory)                                | Array   |
-| [`context`](#context)                                    | String  |
-| [`enabled`](#enabled)                                    | Boolean |
-| [`targeting`](#targeting)                                | Array   |
-| [`insertionEnabled`](#insertionenabled)                  | Array   |
-| [`insertion.insertExclusion`](#insertioninsertexclusion) | Array   |
-| [`insertion.pxBetweenUnits`](#insertionpxbetweenunits)   | Integer |
-| [`insertion.adHeightLimit`](#insertionadheightlimit)     | Integer |
+| key                                      | type    |
+| ---------------------------------------- | ------- |
+| [`account`](#account)                    | Integer |
+| [`autoload`](#autoload)                  | Boolean |
+| [`clientType`](#clienttype)              | String  |
+| [`pageConfigAttr`](#pageconfigattr)      | String  |
+| [`inventory`](#inventory)                | Array   |
+| [`context`](#context)                    | String  |
+| [`enabled`](#enabled)                    | Boolean |
+| [`targeting`](#targeting)                | Array   |
+| [`insertionEnabled`](#insertionenabled)  | Array   |
+| [`insertion`](#insertion)                | Object  |
 
 **Example Configuration:**
 
 ```javascript
-AdManager( {
+{
     account: 1234567,
     clientType: 'desktop',
     pageConfigAttr: 'ad-page-config',
     inventory: [
         {
             slot: 'Unit_Name_in_DFP',
-            id: 'data_attribute_id',
             sizes: [
                 [ 728, 90 ],
                 [ 970, 250 ],
@@ -100,7 +94,7 @@ AdManager( {
             type: 'desktop'
         }
     ]
-} );
+}
 ```
 
 ### `account`
@@ -113,11 +107,21 @@ AdManager( {
 
 [:arrow_up:](#configuration)
 
+### `autoload`
+
+**Type:** Boolean
+
+**Default:** `true`
+
+**Description:** Whether to start the qualification process automatically.
+
+[:arrow_up:](#configuration)
+
 ### `clientType`
 
 **Type:** String
 
-**Default:** `false`, must be specified
+**Default:** `'default'`, optional
 
 **Description:** This declares the client type (such as desktop, tablet, or mobile). The value can be set by an external client-detection script and will be used to compare against each inventory item to see whether the item should be displayed or not for that client.
 
@@ -143,37 +147,31 @@ _Not currently used._
 
 **Default:** `[]`, must be specified
 
-**Description:** An array of one or more objects that define different ad types. See the Inventory section below.
+**Description:** An array of one or more objects that define different ad types. See the Inventory section below. More information can be found in the [inventory section below](#inventory-1).
 
 Example:
 ```javascript
 var config = {
-  ...
-  inventory: [
-      {
-          slot:    'Unit_Name_1',
-          id:      'ad_id_1',
-          sizes:   [
-              [ 728, 90 ],
-              [ 970, 250 ],
-              [ 1000, 220 ]
-          ],
-          type:    'desktop',
-          dynamic: false
-      },
-      {
-          slot:    'Unit_Name_2',
-          id:      'ad_id_2',
-          sizes:   [
-              [ 728, 90 ],
-              [ 970, 250 ],
-              [ 1000, 220 ]
-          ],
-          type:    'desktop',
-          dynamic: false
-      },
-      ...
-  ]
+    // ...
+    inventory: [
+        {
+            slot: 'Unit_Name_1',
+            sizes: [
+                [ 728, 90 ],
+                [ 970, 250 ],
+                [ 1000, 220 ]
+            ]
+        },
+        {
+            slot: 'Unit_Name_2',
+            sizes: [
+                [ 728, 90 ],
+                [ 970, 250 ],
+                [ 1000, 220 ]
+            ]
+        },
+        // ...
+    ]
 };
 ```
 
@@ -209,20 +207,41 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-### `insertion.insertExclusion`
+### `insertion`
+
+**Type:** Object
+
+**Example Insertion:**
+```javascript
+{
+    pxBetweenUnits: 800,
+    adHeightLimit: 1000,
+    insertExclusion: [
+        'img',
+        'iframe',
+        'video',
+        'audio',
+        '.video',
+        '.audio',
+        '[data-ad-unit]'
+    ]
+}
+```
+
+#### `insertion.insertExclusion`
 
 **Type:** Array
 
 **Default:**
-```
+```javascript
 [
-  'img',
-  'iframe',
-  'video',
-  'audio',
-  '.video',
-  '.audio',
-  '.app_ad_unit'
+    'img',
+    'iframe',
+    'video',
+    'audio',
+    '.video',
+    '.audio',
+    '[data-ad-unit]'
 ]
 ```
 
@@ -230,7 +249,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-### `insertion.pxBetweenUnits`
+#### `insertion.pxBetweenUnits`
 
 **Type:** Integer
 
@@ -240,7 +259,7 @@ var config = {
 
 [:arrow_up:](#configuration)
 
-### `insertion.adHeightLimit`
+#### `insertion.adHeightLimit`
 
 **Type:** Integer
 
@@ -257,11 +276,9 @@ The inventory array is a collection of objects that represent different ad posit
 | property name                   | type    |                                        |
 | ------------------------------- | ------- | -------------------------------------- |
 | [`slot`](#slot)                 | String  |                                        |
-| [`id`](#id)                     | String  |                                        |
 | [`sizes`](#sizes)               | Array   |                                        |
 | [`type`](#type)                 | String  |                                        |
 | [`dynamic`](#dynamic)           | Boolean |                                        |
-| [`iteration`](#iteration)       | Integer | optional                               |
 | [`localContext`](#localcontext) | String  | optional (required if `dynamic: true`) |
 
 **Example Usage:**
@@ -272,7 +289,6 @@ var config = {
     inventory: [
         {
             slot: 'Article_Leaderboard',
-            id: 'article-leaderboard',
             sizes: [
                 [ 728, 90 ],
                 [ 970, 250 ],
@@ -283,7 +299,6 @@ var config = {
         },
         {
             slot: 'Article_Dynamic',
-            id: 'article-dynamic',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 600 ]
@@ -302,15 +317,7 @@ var config = {
 
 **Description:** The slot name defined in DFP.
 
-[:arrow_up:](#inventory)
-
-### `id`
-
-**Type:** String
-
-**Description:** String to identify the ad unit container. Used as a data attribute `data-id=""`.
-
-[:arrow_up:](#inventory)
+[:arrow_up:](#inventory-1)
 
 ### `sizes`
 
@@ -318,7 +325,7 @@ var config = {
 
 **Description:** An array of accepted sizes for this unit. Must match up to the sizes defined in DFP.
 
-[:arrow_up:](#inventory)
+[:arrow_up:](#inventory-1)
 
 ### `type`
 
@@ -326,7 +333,7 @@ var config = {
 
 **Description:** This can be used to categorize inventory. For example, it can be used to denote whether an unit is for desktop or mobile devices. This value is checked against [`clientType`](#clienttype).
 
-[:arrow_up:](#inventory)
+[:arrow_up:](#inventory-1)
 
 ### `dynamic`
 
@@ -336,17 +343,7 @@ var config = {
 
 **Description:** This enables/disables dynamic insertion. If set to `false`, AdManager will expect a `<div>` container on the page with an `data` attribute that corresponds to the id declared in the Inventory object.
 
-[:arrow_up:](#inventory)
-
-### `iteration`
-
-**Type:** Integer
-
-**Default:** `0`
-
-**Description:** Used internally to keep the insertion container `id` attribute unique.
-
-[:arrow_up:](#inventory)
+[:arrow_up:](#inventory-1)
 
 ### `localContext`
 
@@ -362,7 +359,6 @@ var config = {
         // ...
         {
             slot: 'Article_Dynamic',
-            id: 'article-dynamic',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 600 ]
@@ -376,24 +372,21 @@ var config = {
 };
 ```
 
-[:arrow_up:](#inventory)
+[:arrow_up:](#inventory-1)
 
 ## Events
 
 Custom jQuery events prefixed with `AdManager`.
 
-| event                                                  | trigger source  |
-| ------------------------------------------------------ | --------------- |
-| [`AdManager:initPageAds`](#admanagerinitpageads)       | internal        |
-| [`AdManager:libraryLoaded`](#admanagerlibraryloaded)   | internal        |
-| [`AdManager:adUnitRendered`](#admanageradunitrendered) | internal        |
-| [`AdManager:slotsDefined`](#admanagerslotsdefined)     | internal        |
-
-### `AdManager:initPageAds`
-
-**Description:** This is triggered once when ads are initialized.
-
-[:arrow_up:](#events)
+| event                                                            | trigger source  |
+| ---------------------------------------------------------------- | --------------- |
+| [`AdManager:libraryLoaded`](#admanagerlibraryloaded)             | internal        |
+| [`AdManager:adUnitRendered`](#admanageradunitrendered)           | internal        |
+| [`AdManager:slotsDefined`](#admanagerslotsdefined)               | internal        |
+| [`AdManager:refresh`](#admanagerrefresh)                         | external        |
+| [`AdManager:runSequence`](#admanagerrunsequence)                 | both            |
+| [`AdManager:emptySlots`](#admanageremptyslots)                   | external        |
+| [`AdManager:emptySlotsInContext`](#admanageremptyslotsincontext) | external        |
 
 ### `AdManager:libraryLoaded`
 
@@ -425,6 +418,57 @@ Custom jQuery events prefixed with `AdManager`.
 
 [:arrow_up:](#events)
 
+### `AdManager:refresh`
+
+**Description:** Pass an array of slot names to be refreshed. Slots should already be in the DOM.
+
+**Example Usage:**
+
+```javascript
+$.event.trigger( 'AdManager:refresh', [ 'Unit_Name_1', 'Unit_Name_2' ] );
+```
+
+[:arrow_up:](#events)
+
+### `AdManager:runSequence`
+
+**Description:** Trigger to run the full qualification sequence: the identification of positions in the DOM, define of DFP slots, targeting, request for creative, and display.
+
+**Example Usage:**
+
+```javascript
+$.event.trigger( 'AdManager:runSequence' );
+```
+
+[:arrow_up:](#events)
+
+### `AdManager:emptySlots`
+
+**Description:** Pass an array of slot names to be emptied.
+
+**Example Usage:**
+
+```javascript
+$.event.trigger( 'AdManager:emptySlots', [ 'Unit_Name_1', 'Unit_Name_2' ] );
+```
+
+[:arrow_up:](#events)
+
+### `AdManager:emptySlotsInContext`
+
+**Description:** Pass an array of slot names to be emptied.
+
+**Example Usage:**
+
+```javascript
+$.event.trigger( 'AdManager:emptySlotsInContext', {
+    $context: $( '.entry-content' ), // Defaults to the context set in the config.
+    removeContainer: true // Defaults to true
+} );
+```
+
+[:arrow_up:](#events)
+
 ## Dynamic Insertion
 
 ### Overview
@@ -444,7 +488,6 @@ var config = {
         // ...
         {
             slot: 'Dynamic_Unit_1',
-            id: 'dynamic-unit-1',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 425 ],
@@ -456,7 +499,6 @@ var config = {
         },
         {
             slot: 'Dynamic_Unit_2',
-            id: 'dynamic-unit-2',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 425 ],
@@ -468,7 +510,6 @@ var config = {
         },
         {
             slot: 'Dynamic_Unit_3',
-            id: 'dynamic-unit-3',
             sizes: [
                 [ 300, 250 ],
                 [ 300, 425 ],

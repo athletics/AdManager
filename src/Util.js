@@ -3,6 +3,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -26,6 +28,8 @@
     }
 
 } ( window, function ( $ ) {
+
+    'use strict';
 
     /**
      * A console.log wrapper with the correct line numbers.

@@ -3,6 +3,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -37,8 +39,9 @@
 
 } ( window, function ( window, $, Util, Config ) {
 
-    var name = 'Inventory',
-        debugEnabled = true,
+    'use strict';
+
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {};
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -115,35 +118,6 @@
     }
 
     /**
-     * Remove slot by name.
-     * Relies on the `googletag` slot object.
-     *
-     * @param  {Object} definedSlots
-     * @param  {String} name
-     * @return {Object} definedSlots
-     */
-    function removeDefinedSlot( definedSlots, name ) {
-
-        for ( var i = 0; i < definedSlots.length; i++ ) {
-
-            var unitName = definedSlots[ i ].getAdUnitPath()
-                .replace( '/' + Config.get( 'account' ) + '/', '' );
-
-            if ( unitName !== name ) {
-                continue;
-            }
-
-            definedSlots = Util.removeByKey( definedSlots, i );
-
-            break;
-
-        }
-
-        return definedSlots;
-
-    }
-
-    /**
      * Get ad units for dynamic insertion.
      *
      * @todo   Replace `$.each` with `$.grep`.
@@ -174,31 +148,24 @@
     }
 
     /**
-     * Get info about an ad unit by id or slot name.
+     * Get info about an ad unit by slot name.
      *
-     * @param  {String} unit   ID or slot.
+     * @param  {String} slotName
      * @return {Object} adInfo
      */
-    function getAdInfo( unit ) {
+    function getAdInfo( slotName ) {
 
         var adInfo = {},
             inventory = getInventory();
 
         for ( var i = 0; i < inventory.length; i++ ) {
-            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
+            if ( inventory[ i ].slot !== slotName ) {
                 continue;
             }
 
             adInfo = inventory[ i ];
 
-            // Determine the object's idName (using the iterator if allowed).
-            if ( typeof adInfo.useIterator !== 'undefined' && ! adInfo.useIterator ) {
-                adInfo.idName = adInfo.id;
-            } else {
-                adInfo.idName = adInfo.id + '_' + adInfo.iteration;
-            }
-
-            return adInfo;
+            break;
         }
 
         return adInfo;
@@ -257,8 +224,6 @@
      * Limit ad unit sizes.
      * Removes heights too large for context.
      *
-     * @todo   Limit to the current iteration.
-     *
      * @param  {Object}  unit
      * @param  {Integer} limit
      * @return {Object}  unit
@@ -277,19 +242,19 @@
     }
 
     /**
-     * Finds the unit by id and returns its type.
+     * Finds the unit by slot name and returns its type.
      * Type is used to filter the inventory (like desktop and mobile).
      *
-     * @param  {String} id
+     * @param  {String} slotName
      * @return {String} type
      */
-    function getUnitType( id ) {
+    function getUnitType( slotName ) {
 
         var type = 'default';
 
         $.each( getInventory(), function ( index, unit ) {
 
-            if ( unit.id !== id ) {
+            if ( unit.slot !== slotName ) {
                 return true;
             }
 
@@ -303,35 +268,6 @@
 
     }
 
-    /**
-     * Increment ad slot.
-     *
-     * DFP requires an HTML id to display a unit. This function
-     * ensures all ids are unique by incrementing the unit every
-     * time an ad is loaded.
-     *
-     * @param {String} unit
-     */
-    function incrementAdSlot( unit ) {
-
-        var inventory = Config.get( 'inventory' );
-
-        for ( var i = 0; i < inventory.length; i++ ) {
-
-            if ( inventory[ i ].id !== unit && inventory[ i ].slot !== unit ) {
-                continue;
-            }
-
-            inventory[ i ].iteration = typeof inventory[ i ].iteration === 'undefined' ? 0 : inventory[ i ].iteration + 1;
-
-            Config.set( 'inventory', inventory );
-
-            break;
-
-        }
-
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
@@ -341,8 +277,7 @@
         shortestAvailable:   shortestAvailable,
         tallestAvailable:    tallestAvailable,
         limitUnitHeight:     limitUnitHeight,
-        getUnitType:         getUnitType,
-        incrementAdSlot:     incrementAdSlot
+        getUnitType:         getUnitType
     };
 
 } ) );

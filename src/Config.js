@@ -6,6 +6,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -33,14 +35,14 @@
 
 } ( window, function ( $, Util ) {
 
-    var name = 'Config',
-        debugEnabled = true,
+    'use strict';
+
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
         config = {},
         defaults = {
             account:             null,               // DFP account ID
-            adClass:             'app_ad_unit',      // Outer ad wrap
-            adUnitTargetClass:   'app_unit_target',  // Inner ad wrap
+            autoload:            true,               // Start the qualification process automatically
             clientType:          false,              // Used to filter inventory
             context:             'body',             // Selector for ad filling container
             enabled:             true,               // Turn off ads
@@ -55,7 +57,7 @@
                     'audio',
                     '.video',
                     '.audio',
-                    '.app_ad_unit'
+                    '[data-ad-unit]'
                 ]
             },
             inventory: [],                           // Inventory of ad units
@@ -102,15 +104,6 @@
 
         if ( ! key ) {
             return config;
-        }
-
-        // get selector from className
-        // use with `adClass`, `adUnitTargetClass`, etc.
-        var index = key.indexOf( 'Selector', this.length - 'Selector'.length );
-
-        if ( index !== -1 ) {
-            key = key.slice( 0, index ) + 'Class';
-            return '.' + getConfigValue( config, key ).replace( /^\./, '' );
         }
 
         return getConfigValue( config, key );
@@ -172,7 +165,6 @@
      *
      * @todo   Reenable usage in the project.
      *         Ascertain the correct place to use.
-     *         Previous usage was in `Manager.isEnabled()`.
      *
      * @param  {Object} options.$context
      * @param  {String} options.attrName

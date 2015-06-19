@@ -6,6 +6,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -16,7 +18,7 @@
             './Insertion'
         ], factory );
 
-    } else if ( typeof exports == 'object' ) {
+    } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
             require( './Util' ),
@@ -41,6 +43,8 @@
     }
 
 } ( window, function ( Util, Config, Inventory, Manager, Insertion ) {
+
+    'use strict';
 
     /**
      * AdManager prototype.

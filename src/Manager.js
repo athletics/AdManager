@@ -6,6 +6,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -43,15 +45,16 @@
 
 } ( window, function ( window, $, Util, Config, Inventory ) {
 
-    var name = 'Manager',
-        debugEnabled = true,
+    'use strict';
+
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
-        libraryLoaded = false,
+        loaded = false,
         definedSlots = [],
         pagePositions = [],
         inventory = [],
         account = null,
-        adSelector = '';
+        adSelector = '[data-ad-unit]';
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -60,52 +63,60 @@
      */
     function init() {
 
-        if ( ! isEnabled() ) {
+        if ( ! Config.get( 'enabled' ) ) {
             return;
         }
 
         inventory = Inventory.getInventory();
         account = Config.get( 'account' );
-        adSelector = Config.get( 'adSelector' );
 
-        bindHandlers();
+        addEventListeners();
         loadLibrary();
 
     }
 
-    /**
-     * Add event listeners for library events.
-     */
-    function bindHandlers() {
+    function addEventListeners() {
 
         $( document )
-            .on( 'AdManager:unitsInserted', function ( event ) {} )
-            .on( 'AdManager:libraryLoaded', function ( event ) {
-                libraryLoaded = true;
-                initSequence();
-            } )
-            .on( 'AdManager:slotsDefined', function ( event ) {
-                displayPageAds();
-            } );
+            .on( 'AdManager:libraryLoaded', libraryLoaded )
+            .on( 'AdManager:runSequence', runSequence )
+            .on( 'AdManager:slotsDefined', displayPageAds )
+            .on( 'AdManager:refresh', refresh )
+            .on( 'AdManager:emptySlots', emptySlots )
+            .on( 'AdManager:emptySlotsInContext', emptySlotsInContext );
 
     }
 
     /**
-     * Start the sequence to loads ads.
+     * Library loaded callback.
      *
-     * @todo  Separate initial load functions from request /
-     *        load functions.
-     * @todo  Consider using separate events.
-     *
-     * @fires AdManager:initSequence
+     * @fires AdManager:runSequence
+     * @fires AdManager:ready
      */
-    function initSequence() {
+    function libraryLoaded() {
 
-        $.event.trigger( 'AdManager:initSequence' );
+        loaded = true;
 
         listenForDfpEvents();
-        enableSingleRequest();
+        setupPubAdsService();
 
+        if ( Config.get( 'autoload' ) ) {
+            $.event.trigger( 'AdManager:runSequence' );
+        }
+
+        $.event.trigger( 'AdManager:ready' );
+
+    }
+
+    /**
+     * Run qualification sequence.
+     *
+     * - Find page positions in the DOM
+     * - Define new slots
+     */
+    function runSequence() {
+
+        pagePositions = [];
         setTargeting();
         setPagePositions();
         defineSlotsForPagePositions();
@@ -118,7 +129,7 @@
      */
     function loadLibrary() {
 
-        if ( libraryLoaded ) {
+        if ( loaded ) {
             return onLibraryLoaded();
         }
 
@@ -172,11 +183,7 @@
     function listenForDfpEvents() {
 
         googletag.cmd.push( function () {
-            googletag.pubads()
-                .addEventListener( 'slotRenderEnded', function ( event ) {
-                    slotRenderEnded( event );
-                } )
-            ;
+            googletag.pubads().addEventListener( 'slotRenderEnded', onSlotRenderEnded );
         } );
 
     }
@@ -185,7 +192,7 @@
      * Enable batched SRA calls for requesting multiple ads at once.
      * Disable initial load of units, wait for display call.
      */
-    function enableSingleRequest() {
+    function setupPubAdsService() {
 
         googletag.cmd.push( function () {
 
@@ -204,6 +211,8 @@
 
     /**
      * Send key-value targeting in ad request.
+     *
+     * @todo  https://developers.google.com/doubleclick-gpt/reference#googletag.PubAdsService_clearTargeting
      */
     function setTargeting() {
 
@@ -232,7 +241,7 @@
         var clientType = Config.get( 'clientType' ),
             $context = $( Config.get( 'context' ) ),
             $units = null,
-            selector = adSelector
+            selector = adSelector + ':not(.is-disabled)'
         ;
 
         if ( clientType !== false ) {
@@ -242,8 +251,7 @@
         $units = $context.find( selector );
 
         $units.each( function () {
-            var id = $( this ).data( 'id' );
-            pagePositions.push( id );
+            pagePositions.push( $( this ).data( 'ad-unit' ) );
         } );
 
     }
@@ -257,50 +265,45 @@
 
         googletag.cmd.push( function () {
 
-            var currentPosition = null,
-                $context = $( Config.get( 'context' ) ),
-                $unit,
-                $unitTarget;
+            var undefinedPagePositions = [];
 
-            for ( var i = 0; i < pagePositions.length; i++ ) {
+            if ( $.isEmptyObject( definedSlots ) ) {
+                undefinedPagePositions = pagePositions;
+            } else {
+                var definedSlotNames = $.map( definedSlots, function ( slot, index ) {
+                    return convertSlotName( slot.getAdUnitPath(), 'local' );
+                } );
 
-                Inventory.incrementAdSlot( pagePositions[ i ] );
-                currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
+                undefinedPagePositions = $.grep( pagePositions, function ( slotName, index ) {
 
-                if ( typeof currentPosition.id === 'undefined' ) {
-                    continue;
-                }
+                    if ( $.inArray( slotName, definedSlotNames ) !== -1 ) {
+                        return false;
+                    }
 
-                // Find the empty container on the page.
-                // Dynamically instantiate the unique ad unit.
-                $unit = $context.find( adSelector + '[data-id="' + currentPosition.id + '"]' );
-                $unitTarget = $( '<div />' );
+                    return true;
 
-                if ( $unit.length < 1 ) {
-                    continue;
-                }
-
-                // Generate new unique div.
-                $unitTarget.addClass( Config.get( 'adUnitTargetClass' ) );
-                $unitTarget.attr( 'id', currentPosition.idName );
-                $unit.append( $unitTarget );
-
-                // Activate
-                $unit.addClass( 'active' );
-
-                definedSlots[ i ] = googletag
-                    .defineSlot(
-                        '/' + account + '/' + currentPosition.slot,
-                        currentPosition.sizes,
-                        currentPosition.idName
-                     )
-                    .addService( googletag.pubads() )
-                ;
-
+                } );
             }
+
+            $.each( undefinedPagePositions, function ( index, slotName ) {
+
+                var position = Inventory.getAdInfo( slotName ),
+                    slot = googletag
+                        .defineSlot(
+                            convertSlotName( slotName, 'dfp' ),
+                            position.sizes,
+                            position.slot
+                         )
+                        .addService( googletag.pubads() );
+
+                definedSlots.push( slot );
+
+            } );
 
             // Enables GPT services for defined slots.
             googletag.enableServices();
+
+            insertUnitTargets();
 
             $.event.trigger( 'AdManager:slotsDefined' );
 
@@ -309,23 +312,53 @@
     }
 
     /**
-     * Fetch and display defined slots.
+     * Creates the containers for the DFP to fill.
+     * DFP wants ids.
+     */
+    function insertUnitTargets() {
+
+        var $context = $( Config.get( 'context' ) ),
+            notInserted = [];
+
+        notInserted = $.grep( pagePositions, function ( slotName, index ) {
+            return document.getElementById( slotName ) === null;
+        } );
+
+        $.each( notInserted, function ( index, slotName ) {
+
+            $context.find( '[data-ad-unit="' + slotName + '"]' )
+                .addClass( 'is-initialized' )
+                .append( $( '<div />', {
+                    id: slotName,
+                    addClass: 'ad-unit-target'
+                } ) );
+
+        } );
+
+    }
+
+    /**
+     * Fetch and display the current page ads.
      */
     function displayPageAds() {
 
         googletag.cmd.push( function () {
 
-            googletag.pubads().refresh( definedSlots );
+            var pageSlots = $.grep( definedSlots, function ( slot, index ) {
 
-            for ( var i = 0; i < pagePositions.length; i++ ) {
+                var slotName = convertSlotName( slot.getAdUnitPath(), 'local' );
 
-                currentPosition = Inventory.getAdInfo( pagePositions[ i ] );
+                return -1 !== $.inArray( slotName, pagePositions );
 
-                if ( $( '#' + currentPosition.idName ).length ) {
-                    googletag.display( currentPosition.idName );
-                }
+            } );
 
-            }
+            googletag.pubads().refresh( pageSlots );
+
+            $.each( pagePositions, function ( index, slotName ) {
+
+                googletag.display( slotName );
+
+            } );
 
         } );
 
@@ -339,15 +372,12 @@
      *
      * @param {Object} unit
      */
-    function slotRenderEnded( unit ) {
+    function onSlotRenderEnded( unit ) {
 
-        var unitName = unit.slot.getAdUnitPath().replace( '/' + account + '/', '' ),
-            adInfo = Inventory.getAdInfo( unitName )
-        ;
+        var slotName = convertSlotName( unit.slot.getAdUnitPath(), 'local' );
 
         $.event.trigger( 'AdManager:adUnitRendered', {
-            name:        unitName,
-            id:          adInfo.id,
+            name:        slotName,
             size:        unit.size,
             isEmpty:     unit.isEmpty,
             creativeId:  unit.creativeId,
@@ -362,16 +392,16 @@
      *
      * @todo   Use `$.grep` instead of `$.each`.
      *
-     * @param  {String} name
+     * @param  {String} slotName
      * @return {Object} definedSlot
      */
-    function getDefinedSlot( name ) {
+    function getDefinedSlot( slotName ) {
 
         var definedSlot = null;
 
         $.each( definedSlots, function ( i, slot ) {
-            var unitName = slot.getAdUnitPath().replace( '/' + account + '/', '' );
-            if ( unitName === name ) {
+            var unitName = convertSlotName( slot.getAdUnitPath(), 'local' );
+            if ( unitName === slotName ) {
                 definedSlot = slot;
                 return false;
             }
@@ -385,60 +415,124 @@
      * Display slot by ID or slot.
      * Separate display call from `displayPageAds()`.
      *
-     * @param {String} unit
+     * @param {String} slotName
      */
-    function displaySlot( unit ) {
+    function displaySlot( slotName ) {
 
         googletag.cmd.push( function () {
-            var position = Inventory.getAdInfo( unit ),
-                slot = getDefinedSlot( position.slot )
-            ;
+
+            var slot = getDefinedSlot( slotName );
+
             googletag.pubads().refresh( [ slot ] );
-            googletag.display( position.idName );
-            definedSlots = Inventory.removeDefinedSlot( definedSlots, position.slot );
+            googletag.display( slotName );
+
+            pagePositions = $.grep( pagePositions, function ( pagePosition, index ) {
+                return slotName !== pagePosition;
+            } );
+
         } );
 
     }
 
     /**
-     * Check if the Ad Manager is currently enabled.
+     * Empty slots by name. Removes their target container,
      *
-     * @return {Boolean}
+     * @param  {Object} event
+     * @param  {Array}  units List of slot names.
      */
-    function isEnabled() {
+    function emptySlots( event, units ) {
 
-        return Config.get( 'enabled' );
+        googletag.pubads().clear( units );
+
+        $.each( units, function ( index, unit ) {
+            $( document.getElementById( unit ) ).remove();
+        } );
 
     }
 
     /**
      * Empties all ads in a given context.
-     * Can be used to refresh ads on pushState.
      *
-     * @param {Object}  options.$context
-     * @param {Boolean} options.removeContainer
+     * @param  {Object} event
+     * @param  {Object}  options
+     *         {Array}   $context        jQuery element.
+     *         {Boolean} removeContainer Default is true.
      */
-    function emptyAds( options ) {
+    function emptySlotsInContext( event, options ) {
 
-        var $context = options.$context,
-            removeContainer = options.removeContainer || false;
+        options = options || {};
+        options = $.extend( {
+            $context:        $( Config.get( 'context' ) ),
+            removeContainer: true
+        }, options );
 
-        $context.find( adSelector ).empty();
+        var units = $.map( options.$context.find( adSelector ), function ( $unit, index ) {
+            return $unit.data( 'ad-unit' );
+        } );
+
+        googletag.pubads().clear( units );
+
+        var $elements = $.map( units, function ( unit, index ) {
+
+            return options.$context.find( '#' + unit );
+
+        } );
 
         if ( removeContainer ) {
-            $context.find( adSelector ).remove();
+
+            $elements.remove();
+
+        } else {
+
+            $elements.empty();
+
         }
+
+    }
+
+    /**
+     * Converts a slot name local to DFP or vice versa.
+     *
+     * @param  {String} slotName
+     * @param  {String} format   'dfp' or 'local'.
+     * @return {String}
+     */
+    function convertSlotName( slotName, format ) {
+
+        if ( 'dfp' === format ) {
+            return '/' + account + '/' + slotName;
+        }
+
+        return slotName.replace( '/' + account + '/', '' );
+
+    }
+
+    /**
+     * Refresh slots.
+     *
+     * @param  {Object} event
+     * @param  {Array}  units Optional. List of units to refresh.
+     *                        Default is all.
+     */
+    function refresh( event, units ) {
+
+        units = units || definedSlots;
+
+        googletag.cmd.push( function () {
+            googletag.pubads().refresh( units );
+        } );
 
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        init:         init,
-        isEnabled:    isEnabled,
-        displaySlot:  displaySlot,
-        initSequence: initSequence,
-        emptyAds:     emptyAds
+        init:                init,
+        displaySlot:         displaySlot,
+        runSequence:         runSequence,
+        emptySlots:          emptySlots,
+        emptySlotsInContext: emptySlotsInContext,
+        refresh:             refresh
     };
 
 } ) );

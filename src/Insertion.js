@@ -7,6 +7,8 @@
  */
 ( function ( window, factory ) {
 
+    'use strict';
+
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
@@ -40,15 +42,17 @@
 
 } ( window, function ( $, Util, Config, Inventory ) {
 
-    var name = 'Insertion',
-        debugEnabled = true,
+    'use strict';
+
+    var debugEnabled = true,
         debug = debugEnabled ? Util.debug : function () {},
         $context = null,
         $localContext = null,
         inContent = false,
         inventory = [],
         odd = true,
-        localContext = null;
+        localContext = null,
+        adSelector = '[data-ad-unit]';
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -203,21 +207,20 @@
      * Creates DOM node to attach to the DOM.
      *
      * @see    https://vip.wordpress.com/2015/03/25/preventing-xss-in-javascript/
-     * @param  {String}  unitId
+     * @param  {String}  slotName
      * @param  {Boolean} disableFloat
      * @return {Array}   $html
      */
-    function adUnitMarkup( unitId, disableFloat ) {
+    function adUnitMarkup( slotName, disableFloat ) {
 
         disableFloat = disableFloat || false;
 
-        var type = Inventory.getUnitType( unitId ),
+        var type = Inventory.getUnitType( slotName ),
             alignment = odd ? 'odd' : 'even',
             $html = $( '<div />' );
 
         $html
-            .addClass( Config.get( 'adClass' ) )
-            .attr( 'data-id', unitId )
+            .attr( 'data-ad-unit', slotName )
             .attr( 'data-client-type', type );
 
         if ( disableFloat ) {
@@ -267,7 +270,7 @@
             }
         }
 
-        markup = adUnitMarkup( unit.id, location.disableFloat );
+        markup = adUnitMarkup( unit.slot, location.disableFloat );
 
         location.$insertBefore.before( markup );
 
@@ -291,7 +294,7 @@
                 return false;
             }
 
-            markup = adUnitMarkup( unit.id, location.disableFloat );
+            markup = adUnitMarkup( unit.slot, location.disableFloat );
             location.$insertBefore.before( markup );
 
         } );
@@ -503,7 +506,7 @@
             return false;
         }
 
-        return $el.is( Config.get( 'adSelector' ) );
+        return $el.is( adSelector );
 
     }
 
@@ -515,7 +518,7 @@
      */
     function getNodes() {
 
-        var $prevUnit = $localContext.find( Config.get( 'adSelector' ) ).last(),
+        var $prevUnit = $localContext.find( adSelector ).last(),
             $nodes = null;
 
         if ( $prevUnit.length ) {
