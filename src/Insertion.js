@@ -51,7 +51,8 @@
         inContent = false,
         inventory = [],
         odd = true,
-        localContext = null;
+        localContext = null,
+        adSelector = '[data-ad-unit]';
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,7 +220,6 @@
             $html = $( '<div />' );
 
         $html
-            .addClass( Config.get( 'adClass' ) )
             .attr( 'data-ad-unit', slotName )
             .attr( 'data-client-type', type );
 
@@ -506,7 +506,7 @@
             return false;
         }
 
-        return $el.is( Config.get( 'adSelector' ) );
+        return $el.is( adSelector );
 
     }
 
@@ -518,7 +518,7 @@
      */
     function getNodes() {
 
-        var $prevUnit = $localContext.find( Config.get( 'adSelector' ) ).last(),
+        var $prevUnit = $localContext.find( adSelector ).last(),
             $nodes = null;
 
         if ( $prevUnit.length ) {

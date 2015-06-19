@@ -146,8 +146,6 @@
         config = {},
         defaults = {
             account:             null,               // DFP account ID
-            adClass:             'app_ad_unit',      // Outer ad wrap
-            adUnitTargetClass:   'app_unit_target',  // Inner ad wrap
             autoload:            true,               // Start the qualification process automatically
             clientType:          false,              // Used to filter inventory
             context:             'body',             // Selector for ad filling container
@@ -210,15 +208,6 @@
 
         if ( ! key ) {
             return config;
-        }
-
-        // get selector from className
-        // use with `adClass`, `adUnitTargetClass`, etc.
-        var index = key.indexOf( 'Selector', this.length - 'Selector'.length );
-
-        if ( index !== -1 ) {
-            key = key.slice( 0, index ) + 'Class';
-            return '.' + getConfigValue( config, key ).replace( /^\./, '' );
         }
 
         return getConfigValue( config, key );
@@ -1186,7 +1175,8 @@
         inContent = false,
         inventory = [],
         odd = true,
-        localContext = null;
+        localContext = null,
+        adSelector = '[data-ad-unit]';
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -1354,7 +1344,6 @@
             $html = $( '<div />' );
 
         $html
-            .addClass( Config.get( 'adClass' ) )
             .attr( 'data-ad-unit', slotName )
             .attr( 'data-client-type', type );
 
@@ -1641,7 +1630,7 @@
             return false;
         }
 
-        return $el.is( Config.get( 'adSelector' ) );
+        return $el.is( adSelector );
 
     }
 
@@ -1653,7 +1642,7 @@
      */
     function getNodes() {
 
-        var $prevUnit = $localContext.find( Config.get( 'adSelector' ) ).last(),
+        var $prevUnit = $localContext.find( adSelector ).last(),
             $nodes = null;
 
         if ( $prevUnit.length ) {
