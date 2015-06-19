@@ -6,6 +6,7 @@ A JavaScipt library for interacting with Google DFP.
 
 AdManger is a JavaScript library for interacting with [Google Publisher Tags (GPT)](https://support.google.com/dfp_sb/answer/1649768?hl=en) and [Google DFP](https://www.google.com/dfp). It handles the loading of the GPT library as well as the definition and request of ad inventory. Below you’ll find documentation on its configuration and usage.
 
+- [Installation](#installation)
 - [Basic Usage](#basicusage)
 - [Configuration](#configuration)
 - [Inventory](#inventory-1)
@@ -14,6 +15,44 @@ AdManger is a JavaScript library for interacting with [Google Publisher Tags (GP
 - [Contributing](#contributing)
 - [Dependencies](#dependencies)
 - [References](#references)
+
+## Installation
+
+### Bower
+
+Use the [Bower](http://bower.io/) package manager to install AdManager into your project. To do so you can either use the cli:
+
+```bash
+$ bower install admanager --save
+```
+
+Or define it in your bower.json manifest:
+
+```javascript
+    "dependencies": {
+        "admanager": "latest"
+    }
+```
+
+### npm
+
+Similarly, AdManager can be from [npm](https://www.npmjs.com/). To do so you can either use the cli:
+
+```bash
+$ npm install admanager --save
+```
+
+Or define it in your package.json manifest:
+
+```javascript
+    "dependencies": {
+        "admanager": "latest"
+    }
+```
+
+### Direct download
+
+If package managers are not your thing, the library can be downloaded directly from GitHub using the **Download ZIP** button.
 
 ## Basic Usage
 
