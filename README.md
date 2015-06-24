@@ -426,6 +426,7 @@ Custom jQuery events prefixed with `AdManager`.
 | [`AdManager:runSequence`](#admanagerrunsequence)                 | both            |
 | [`AdManager:emptySlots`](#admanageremptyslots)                   | external        |
 | [`AdManager:emptySlotsInContext`](#admanageremptyslotsincontext) | external        |
+| [`AdManager:importConfig`](#admanagerimportconfig)               | both            |
 
 ### `AdManager:libraryLoaded`
 
@@ -503,6 +504,26 @@ $.event.trigger( 'AdManager:emptySlots', [ 'Unit_Name_1', 'Unit_Name_2' ] );
 $.event.trigger( 'AdManager:emptySlotsInContext', {
     $context: $( '.entry-content' ), // Defaults to the context set in the config.
     removeContainer: true // Defaults to true
+} );
+```
+
+[:arrow_up:](#events)
+
+### `AdManager:importConfig`
+
+**Description:** Pass an object to import new configuration values. The new config will override values in the current config.
+
+**Example Usage:**
+
+```javascript
+$.event.trigger( 'AdManager:importConfig', {
+    targeting: {
+        category: [
+            'athletics',
+            'technology',
+            'graphic design'
+        ]
+    }
 } );
 ```
 

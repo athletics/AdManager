@@ -70,11 +70,15 @@
     /**
      * Merge passed config with defaults.
      *
+     * @fires AdManager:unitsInserted
+     *
      * @param  {Object} newConfig
      */
     function init( newConfig ) {
 
-        config = $.extend( defaults, newConfig );
+        $( document ).on( 'AdManager:importConfig', onImportConfig );
+
+        $.event.trigger( 'AdManager:importConfig', newConfig );
 
     }
 
@@ -158,46 +162,27 @@
     }
 
     /**
-     * Import JSON page config data from DOM.
+     * Import new config.
+     * Merges with the current config.
      *
-     * This imports inline JSON via data attribute
-     * and extends an existing config with it.
-     *
-     * @todo   Reenable usage in the project.
-     *         Ascertain the correct place to use.
-     *
-     * @param  {Object} options.$context
-     * @param  {String} options.attrName
-     * @return {Object}
+     * @param  {Object} event
+     * @param  {Object} newConfig
+     * @return {Object} config
      */
-    function importConfig( options ) {
+    function onImportConfig( event, newConfig ) {
 
-        var $context = options.$context,
-            attrName = options.attrName,
-            existConfig = options.existConfig,
-            selector,
-            newConfig,
-            data = {};
+        config = $.extend( defaults, config, newConfig );
 
-        selector = '*[data-' + attrName + ']';
-        newConfig = $.extend( {}, existConfig );
-        data = $context.find( selector ).data( attrName );
-
-        if ( typeof newConfig === 'object' ) {
-            newConfig = $.extend( newConfig, data );
-        }
-
-        return newConfig;
+        return config;
 
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        init:         init,
-        set:          set,
-        get:          get,
-        importConfig: importConfig
+        init: init,
+        set:  set,
+        get:  get
     };
 
 } ) );

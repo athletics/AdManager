@@ -220,7 +220,7 @@
 
             var targeting = Config.get( 'targeting' );
 
-            if ( ! targeting.length ) {
+            if ( $.isEmptyObject( targeting ) ) {
                 return;
             }
 
