@@ -107,7 +107,6 @@ A configuration object is required to initialize the Ad Manager.
 | [`account`](#account)                    | Integer |
 | [`autoload`](#autoload)                  | Boolean |
 | [`clientType`](#clienttype)              | String  |
-| [`pageConfigAttr`](#pageconfigattr)      | String  |
 | [`inventory`](#inventory)                | Array   |
 | [`context`](#context)                    | String  |
 | [`enabled`](#enabled)                    | Boolean |
@@ -121,7 +120,6 @@ A configuration object is required to initialize the Ad Manager.
 {
     account: 1234567,
     clientType: 'desktop',
-    pageConfigAttr: 'ad-page-config',
     inventory: [
         {
             slot: 'Unit_Name_in_DFP',
@@ -165,18 +163,6 @@ A configuration object is required to initialize the Ad Manager.
 **Description:** This declares the client type (such as desktop, tablet, or mobile). The value can be set by an external client-detection script and will be used to compare against each inventory item to see whether the item should be displayed or not for that client.
 
 For example, if a desktop device is detected, this value should be set to `clientType: 'desktop'` and items in the inventory array that match (`type: 'desktop'`) will be displayed. This allows you to include both desktop and mobile inventory items, but only shown the appropriate ones according to what `clientType` is set to at load time.
-
-[:arrow_up:](#configuration)
-
-### `pageConfigAttr`
-
-**Type:** String
-
-**Default:** `false`, optional
-
-**Description:** Optional DOM element data attribute name that Ad Manager uses to import additional config parameters (JSON) from. By default, Ad Manager will look for JSON in an attribute named `data-ad-page-config`.
-
-_Not currently used._
 
 [:arrow_up:](#configuration)
 
@@ -426,6 +412,7 @@ Custom jQuery events prefixed with `AdManager`.
 | [`AdManager:runSequence`](#admanagerrunsequence)                 | both            |
 | [`AdManager:emptySlots`](#admanageremptyslots)                   | external        |
 | [`AdManager:emptySlotsInContext`](#admanageremptyslotsincontext) | external        |
+| [`AdManager:importConfig`](#admanagerimportconfig)               | both            |
 
 ### `AdManager:libraryLoaded`
 
@@ -503,6 +490,26 @@ $.event.trigger( 'AdManager:emptySlots', [ 'Unit_Name_1', 'Unit_Name_2' ] );
 $.event.trigger( 'AdManager:emptySlotsInContext', {
     $context: $( '.entry-content' ), // Defaults to the context set in the config.
     removeContainer: true // Defaults to true
+} );
+```
+
+[:arrow_up:](#events)
+
+### `AdManager:importConfig`
+
+**Description:** Pass an object to import new configuration values. The new config will override values in the current config.
+
+**Example Usage:**
+
+```javascript
+$.event.trigger( 'AdManager:importConfig', {
+    targeting: {
+        category: [
+            'athletics',
+            'technology',
+            'graphic design'
+        ]
+    }
 } );
 ```
 
