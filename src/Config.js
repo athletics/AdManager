@@ -61,7 +61,6 @@
                 ]
             },
             inventory: [],                           // Inventory of ad units
-            pageConfigAttr: false,                   // Selector for dynamic config import
             targeting: []                            // Key value pairs to send with DFP request
         };
 
