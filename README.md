@@ -207,7 +207,7 @@ var config = {
 
 **Default:** `'body'`, optional
 
-**Description:** The is used as a jQuery selector that specifies the DOM context where ads are to be inserted. In standard cases this will be static since there will only be one page. In infinite scroll applications, there may exist multiple pages in a single window and this provides a way to distinguish one page/context from another.
+**Description:** This is used as a jQuery selector that specifies the DOM context where ads are to be inserted. In standard cases this will be static since there will only be one page. In infinite scroll applications, there may exist multiple pages in a single window and this provides a way to distinguish one page/context from another.
 
 [:arrow_up:](#configuration)
 
