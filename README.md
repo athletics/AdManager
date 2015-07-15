@@ -481,7 +481,7 @@ $.event.trigger( 'AdManager:emptySlots', [ 'Unit_Name_1', 'Unit_Name_2' ] );
 
 ### `AdManager:emptySlotsInContext`
 
-**Description:** Pass an array of slot names to be emptied.
+**Description:** Pass an array of slot names to be emptied within a selection.
 
 **Example Usage:**
 
