@@ -100,7 +100,7 @@ If package managers are not your thing, the library can be downloaded directly f
 
 ## Configuration
 
-A configuration object is required to initialize the Ad Manager.
+A configuration object is required to initialize the AdManager.
 
 | key                                      | type    |
 | ---------------------------------------- | ------- |
@@ -217,7 +217,7 @@ var config = {
 
 **Default:** `true`, optional
 
-**Description:** This provides a way to disable the Ad Manager.
+**Description:** This provides a way to disable the AdManager.
 
 [:arrow_up:](#configuration)
 
@@ -607,7 +607,7 @@ AdManager( config );
 
 ### Coding Style
 
-Ad Manager follows the [WordPress JavaScript Coding Standards](https://make.wordpress.org/core/handbook/coding-standards/javascript/). There is a [`.jscsrc`](https://github.com/athletics/ad-manager/blob/master/.jscsrc) included in the project for automatic linting using [JSCS](http://jscs.info/).
+AdManager follows the [WordPress JavaScript Coding Standards](https://make.wordpress.org/core/handbook/coding-standards/javascript/). There is a [`.jscsrc`](https://github.com/athletics/ad-manager/blob/master/.jscsrc) included in the project for automatic linting using [JSCS](http://jscs.info/).
 
 The modules are written in the [UMD](https://github.com/umdjs/umd) pattern to support AMD, CommonJS, and global usage.
 
