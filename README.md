@@ -373,7 +373,7 @@ var config = {
 
 **Type:** String
 
-**Description:** This is needed only for dynamic insertion. The string is a jQuery selector that specifies an nth-child insertion point for the new ad.
+**Description:** This is needed only for dynamic insertion. The string is a jQuery selector that specifies an insertion point for the new ad.
 
 Example:
 ```javascript
