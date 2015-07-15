@@ -269,7 +269,7 @@ var config = {
 ]
 ```
 
-**Description:** When using the dynamic insertion feature, this allows customization of what body elements to exclude when looking for valid insertion points.
+**Description:** When using the dynamic insertion feature, this allows customization of what elements to exclude when looking for valid insertion points.
 
 [:arrow_up:](#configuration)
 
