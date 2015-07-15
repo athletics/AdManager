@@ -139,7 +139,7 @@ A configuration object is required to initialize the Ad Manager.
 
 **Default:** `null`, must be specified
 
-**Description:** Your network code. You can find your network code in the “Admin” tab of DFP.
+**Description:** Your network code, found in the “Admin” tab of DFP.
 
 [:arrow_up:](#configuration)
 
