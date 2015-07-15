@@ -36,7 +36,7 @@ Or define it in your bower.json manifest:
 
 ### npm
 
-Similarly, AdManager can be from [npm](https://www.npmjs.com/). To do so you can either use the cli:
+Similarly, AdManager can be installed using [npm](https://www.npmjs.com/). To do so you can either use the cli:
 
 ```bash
 $ npm install admanager --save
