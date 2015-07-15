@@ -67,9 +67,9 @@ If package managers are not your thing, the library can be downloaded directly f
 </head>
 <body>
     <!--
-    This is the ad unit container. AdManager looks for all
-    of the `[data-ad-unit]` in the DOM and grabs the slot name
-    to make a request from DFP to fill those units.
+    This is the ad unit container. AdManager looks for all of the
+    [data-ad-unit] in the DOM and grabs the slot name to make a
+    request from DFP to fill those units.
     -->
     <div data-ad-unit="Unit_Name_in_DFP"></div>
 
