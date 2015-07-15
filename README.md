@@ -365,7 +365,7 @@ var config = {
 
 **Default:** `false`
 
-**Description:** This enables/disables dynamic insertion. If set to `false`, AdManager will expect a `<div>` container on the page with an `data` attribute that corresponds to the id declared in the Inventory object.
+**Description:** This enables/disables dynamic insertion. If set to `false`, AdManager will expect a container on the page with the `data-ad-unit` attribute value that corresponds to the slot name defined in the Inventory object.
 
 [:arrow_up:](#inventory-1)
 
