@@ -20,7 +20,7 @@ AdManager is a JavaScript library for interacting with [Google Publisher Tags (G
 
 ### Bower
 
-Use the [Bower](http://bower.io/) package manager to install AdManager into your project. To do so you can either use the cli:
+Use the [Bower](http://bower.io/) package manager to install AdManager into your project. To do so you can either use the CLI:
 
 ```bash
 $ bower install admanager --save
@@ -36,7 +36,7 @@ Or define it in your bower.json manifest:
 
 ### npm
 
-Similarly, AdManager can be installed using [npm](https://www.npmjs.com/). To do so you can either use the cli:
+Similarly, AdManager can be installed using [npm](https://www.npmjs.com/). To do so you can either use the CLI:
 
 ```bash
 $ npm install admanager --save
