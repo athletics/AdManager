@@ -127,8 +127,7 @@ A configuration object is required to initialize the Ad Manager.
                 [ 728, 90 ],
                 [ 970, 250 ],
                 [ 1000, 220 ]
-            ],
-            type: 'desktop'
+            ]
         }
     ]
 }
