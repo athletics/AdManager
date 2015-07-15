@@ -524,7 +524,7 @@ This feature allows AdManager to dynamically insert a variable number of new ad 
 
 ### Instructions
 
-- Add new inventory items that reflect the maximum possible number of dynamically inserted ads. Note that each inventory item should have unique and `slot` and `id` values.
+- Add new inventory items that reflect the maximum possible number of dynamically inserted ads.
 - Set the additional options `dynamic` and `localContext` in the inventory config.
 ```javascript
 var config = {
