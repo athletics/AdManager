@@ -31,23 +31,7 @@
 
     'use strict';
 
-    /**
-     * A console.log wrapper with the correct line numbers.
-     *
-     * @see    https://gist.github.com/bgrins/5108712
-     * @see    https://developer.mozilla.org/en-US/docs/Web/API/Console/log
-     * @param  {Mixed}
-     * @return {String}
-     */
-    var debug = function () {
-
-        if ( typeof console !== 'object' || ! console.log ) {
-            return;
-        }
-
-        return console.log.bind( console );
-
-    } ();
+    //////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Get the difference of two arrays.
@@ -90,7 +74,6 @@
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        debug:       debug,
         difference:  difference,
         removeByKey: removeByKey
     };

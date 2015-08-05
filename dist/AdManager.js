@@ -37,23 +37,7 @@
 
     'use strict';
 
-    /**
-     * A console.log wrapper with the correct line numbers.
-     *
-     * @see    https://gist.github.com/bgrins/5108712
-     * @see    https://developer.mozilla.org/en-US/docs/Web/API/Console/log
-     * @param  {Mixed}
-     * @return {String}
-     */
-    var debug = function () {
-
-        if ( typeof console !== 'object' || ! console.log ) {
-            return;
-        }
-
-        return console.log.bind( console );
-
-    } ();
+    //////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Get the difference of two arrays.
@@ -96,7 +80,6 @@
     //////////////////////////////////////////////////////////////////////////////////////
 
     return {
-        debug:       debug,
         difference:  difference,
         removeByKey: removeByKey
     };
@@ -115,15 +98,13 @@
     if ( typeof define === 'function' && define.amd ) {
 
         define( 'src/Config',[
-            'jquery',
-            './Util'
+            'jquery'
         ], factory );
 
     } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
-            require( 'jquery' ),
-            require( './Util' )
+            require( 'jquery' )
         );
 
     } else {
@@ -131,19 +112,16 @@
         window.AdManager = window.AdManager || {};
 
         window.AdManager.Config = factory(
-            window.jQuery,
-            window.AdManager.Util
+            window.jQuery
         );
 
     }
 
-} ( window, function ( $, Util ) {
+} ( window, function ( $ ) {
 
     'use strict';
 
-    var debugEnabled = true,
-        debug = debugEnabled ? Util.debug : function () {},
-        config = {},
+    var config = {},
         defaults = {
             account:             null,               // DFP account ID
             autoload:            true,               // Start the qualification process automatically
@@ -331,9 +309,6 @@
 } ( window, function ( window, $, Util, Config ) {
 
     'use strict';
-
-    var debugEnabled = true,
-        debug = debugEnabled ? Util.debug : function () {};
 
     //////////////////////////////////////////////////////////////////////////////////////
 
@@ -586,11 +561,10 @@
 
         define( 'src/Manager',[
             'jquery',
-            './Util',
             './Config',
             './Inventory'
-        ], function ( $, Util, Config, Inventory ) {
-            return factory( window, $, Util, Config, Inventory );
+        ], function ( $, Config, Inventory ) {
+            return factory( window, $, Config, Inventory );
         } );
 
     } else if ( typeof exports === 'object' ) {
@@ -598,7 +572,6 @@
         module.exports = factory(
             window,
             require( 'jquery' ),
-            require( './Util' ),
             require( './Config' ),
             require( './Inventory' )
         );
@@ -610,20 +583,17 @@
         window.AdManager.Manager = factory(
             window,
             window.jQuery,
-            window.AdManager.Util,
             window.AdManager.Config,
             window.AdManager.Inventory
         );
 
     }
 
-} ( window, function ( window, $, Util, Config, Inventory ) {
+} ( window, function ( window, $, Config, Inventory ) {
 
     'use strict';
 
-    var debugEnabled = true,
-        debug = debugEnabled ? Util.debug : function () {},
-        loaded = false,
+    var loaded = false,
         definedSlots = [],
         pagePositions = [],
         inventory = [],
@@ -1156,9 +1126,7 @@
 
     'use strict';
 
-    var debugEnabled = true,
-        debug = debugEnabled ? Util.debug : function () {},
-        $context = null,
+    var $context = null,
         $localContext = null,
         inContent = false,
         inventory = [],

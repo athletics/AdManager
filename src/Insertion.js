@@ -44,9 +44,7 @@
 
     'use strict';
 
-    var debugEnabled = true,
-        debug = debugEnabled ? Util.debug : function () {},
-        $context = null,
+    var $context = null,
         $localContext = null,
         inContent = false,
         inventory = [],

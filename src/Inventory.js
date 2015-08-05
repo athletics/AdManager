@@ -41,9 +41,6 @@
 
     'use strict';
 
-    var debugEnabled = true,
-        debug = debugEnabled ? Util.debug : function () {};
-
     //////////////////////////////////////////////////////////////////////////////////////
 
     /**

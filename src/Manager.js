@@ -12,11 +12,10 @@
 
         define( [
             'jquery',
-            './Util',
             './Config',
             './Inventory'
-        ], function ( $, Util, Config, Inventory ) {
-            return factory( window, $, Util, Config, Inventory );
+        ], function ( $, Config, Inventory ) {
+            return factory( window, $, Config, Inventory );
         } );
 
     } else if ( typeof exports === 'object' ) {
@@ -24,7 +23,6 @@
         module.exports = factory(
             window,
             require( 'jquery' ),
-            require( './Util' ),
             require( './Config' ),
             require( './Inventory' )
         );
@@ -36,20 +34,17 @@
         window.AdManager.Manager = factory(
             window,
             window.jQuery,
-            window.AdManager.Util,
             window.AdManager.Config,
             window.AdManager.Inventory
         );
 
     }
 
-} ( window, function ( window, $, Util, Config, Inventory ) {
+} ( window, function ( window, $, Config, Inventory ) {
 
     'use strict';
 
-    var debugEnabled = true,
-        debug = debugEnabled ? Util.debug : function () {},
-        loaded = false,
+    var loaded = false,
         definedSlots = [],
         pagePositions = [],
         inventory = [],

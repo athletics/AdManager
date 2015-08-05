@@ -11,15 +11,13 @@
     if ( typeof define === 'function' && define.amd ) {
 
         define( [
-            'jquery',
-            './Util'
+            'jquery'
         ], factory );
 
     } else if ( typeof exports === 'object' ) {
 
         module.exports = factory(
-            require( 'jquery' ),
-            require( './Util' )
+            require( 'jquery' )
         );
 
     } else {
@@ -27,19 +25,16 @@
         window.AdManager = window.AdManager || {};
 
         window.AdManager.Config = factory(
-            window.jQuery,
-            window.AdManager.Util
+            window.jQuery
         );
 
     }
 
-} ( window, function ( $, Util ) {
+} ( window, function ( $ ) {
 
     'use strict';
 
-    var debugEnabled = true,
-        debug = debugEnabled ? Util.debug : function () {},
-        config = {},
+    var config = {},
         defaults = {
             account:             null,               // DFP account ID
             autoload:            true,               // Start the qualification process automatically
