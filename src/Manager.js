@@ -461,8 +461,8 @@
             removeContainer: true
         }, options );
 
-        var units = $.map( options.$context.find( adSelector ), function ( $unit, index ) {
-            return $unit.data( 'ad-unit' );
+        var units = $.map( options.$context.find( adSelector ), function ( unit, index ) {
+            return $( unit ).data( 'ad-unit' );
         } );
 
         googletag.pubads().clear( units );
