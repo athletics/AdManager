@@ -467,20 +467,14 @@
 
         googletag.pubads().clear( units );
 
-        var $elements = $.map( units, function ( unit, index ) {
-
+        var elements = $.map( units, function ( unit, index ) {
             return options.$context.find( '#' + unit );
-
         } );
 
         if ( options.removeContainer ) {
-
-            $elements.remove();
-
+            $( elements ).remove();
         } else {
-
-            $elements.empty();
-
+            $( elements ).empty();
         }
 
     }
