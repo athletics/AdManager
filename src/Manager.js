@@ -461,26 +461,20 @@
             removeContainer: true
         }, options );
 
-        var units = $.map( options.$context.find( adSelector ), function ( $unit, index ) {
-            return $unit.data( 'ad-unit' );
+        var units = $.map( options.$context.find( adSelector ), function ( unit, index ) {
+            return $( unit ).data( 'ad-unit' );
         } );
 
         googletag.pubads().clear( units );
 
-        var $elements = $.map( units, function ( unit, index ) {
-
+        var elements = $.map( units, function ( unit, index ) {
             return options.$context.find( '#' + unit );
-
         } );
 
-        if ( removeContainer ) {
-
-            $elements.remove();
-
+        if ( options.removeContainer ) {
+            $( elements ).remove();
         } else {
-
-            $elements.empty();
-
+            $( elements ).empty();
         }
 
     }
