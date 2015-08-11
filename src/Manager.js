@@ -473,7 +473,7 @@
 
         } );
 
-        if ( removeContainer ) {
+        if ( options.removeContainer ) {
 
             $elements.remove();
 
