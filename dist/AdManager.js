@@ -3,7 +3,7 @@
  *
  * @author Athletics - http://athleticsnyc.com
  * @see https://github.com/athletics/AdManager
- * @version 0.6.2
+ * @version 0.6.3
  *//**
  * Shared utilities for debugging and array manipulation.
  */
@@ -1017,19 +1017,13 @@
         googletag.pubads().clear( units );
 
         var elements = $.map( units, function ( unit, index ) {
-
             return options.$context.find( '#' + unit );
-
         } );
 
         if ( options.removeContainer ) {
-
             $( elements ).remove();
-
         } else {
-
             $( elements ).empty();
-
         }
 
     }
