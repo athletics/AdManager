@@ -986,10 +986,15 @@
      */
     function emptySlots( event, units ) {
 
+        units = $.map( units, function ( unit, index ) {
+            return convertSlotName( unit, 'dfp' );
+        } );
+
         googletag.pubads().clear( units );
 
         $.each( units, function ( index, unit ) {
-            $( document.getElementById( unit ) ).remove();
+            var id = convertSlotName( unit, 'local' );
+            $( document.getElementById( id ) ).remove();
         } );
 
     }
@@ -1011,13 +1016,14 @@
         }, options );
 
         var units = $.map( options.$context.find( adSelector ), function ( unit, index ) {
-            return $( unit ).data( 'ad-unit' );
+            return convertSlotName( $( unit ).data( 'ad-unit' ), 'dfp' );
         } );
 
         googletag.pubads().clear( units );
 
         var elements = $.map( units, function ( unit, index ) {
-            return options.$context.find( '#' + unit );
+            var id = convertSlotName( unit, 'local' );
+            return options.$context.find( '#' + id );
         } );
 
         if ( options.removeContainer ) {
