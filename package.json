@@ -1,6 +1,6 @@
 {
   "name": "admanager",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "A JavaScipt library for interacting with Google DFP.",
   "main": "src/Index.js",
   "repository": {
